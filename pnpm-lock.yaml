@@ -47,6 +47,9 @@ importers:
       prisma:
         specifier: ^6.11.1
         version: 6.11.1(typescript@5.8.3)
+      swagger-autogen:
+        specifier: ^2.23.7
+        version: 2.23.7
       swagger-ui-express:
         specifier: ^5.0.1
         version: 5.0.1(express@4.21.2)
@@ -1872,6 +1875,11 @@ packages:
   acorn-walk@8.3.4:
     resolution: {integrity: sha512-ueEepnujpqee2o5aIYnvHU6C0A42MNdsIDeqy5BydrkuC5R1ZuUFnm27EeFJGoEHJQgn3uleRvmTXaJgfXbt4g==}
     engines: {node: '>=0.4.0'}
+
+  acorn@7.4.1:
+    resolution: {integrity: sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
 
   acorn@8.15.0:
     resolution: {integrity: sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==}
@@ -4717,6 +4725,9 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
+  swagger-autogen@2.23.7:
+    resolution: {integrity: sha512-vr7uRmuV0DCxWc0wokLJAwX3GwQFJ0jwN+AWk0hKxre2EZwusnkGSGdVFd82u7fQLgwSTnbWkxUL7HXuz5LTZQ==}
+
   swagger-ui-dist@5.26.2:
     resolution: {integrity: sha512-WmMS9iMlHQejNm/Uw5ZTo4e3M2QMmEavRz7WLWVsq7Mlx4PSHJbY+VCrLsAz9wLxyHVgrJdt7N8+SdQLa52Ykg==}
 
@@ -7274,6 +7285,8 @@ snapshots:
   acorn-walk@8.3.4:
     dependencies:
       acorn: 8.15.0
+
+  acorn@7.4.1: {}
 
   acorn@8.15.0: {}
 
@@ -10345,6 +10358,13 @@ snapshots:
       css-what: 6.2.2
       csso: 5.0.5
       picocolors: 1.1.1
+
+  swagger-autogen@2.23.7:
+    dependencies:
+      acorn: 7.4.1
+      deepmerge: 4.3.1
+      glob: 7.2.3
+      json5: 2.2.3
 
   swagger-ui-dist@5.26.2:
     dependencies:
