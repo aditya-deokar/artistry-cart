@@ -20,7 +20,8 @@
           "main": "apps/auth-service/src/main.ts",
           "tsConfig": "apps/auth-service/tsconfig.app.json",
           "assets": [
-            "apps/auth-service/src/assets"
+            "apps/auth-service/src/assets",
+            "apps/auth-service/src/swagger-output.json"
           ],
           "esbuildOptions": {
             "sourcemap": true,

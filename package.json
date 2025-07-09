@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "pnpm exec nx run-many --target=serve --all"
+    "swagger:generate": "node ./apps/auth-service/src/swagger.js",
+
+    "dev": "pnpm run swagger:generate && pnpm exec nx run-many --target=serve --all"
   },
   "private": true,
   "dependencies": {
@@ -20,6 +22,7 @@
     "morgan": "^1.10.0",
     "nodemailer": "^7.0.5",
     "prisma": "^6.11.1",
+    "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
