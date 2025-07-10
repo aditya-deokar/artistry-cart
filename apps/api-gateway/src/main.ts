@@ -24,7 +24,7 @@ app.use(morgan('dev'));
 
 app.use(express.json({ limit:'100mb' }));
 
-app.use(express.urlencoded({ limit:'100mb' }));
+app.use(express.urlencoded({ limit:'100mb' , extended:true}));
 
 app.use(cookieParser());
 
@@ -53,7 +53,7 @@ app.get('/gateway-health', (req, res) => {
   res.send({ message: 'Welcome to api-gateway!' });
 });
 
-app.use("/", proxy("http://localhost:6001") );
+app.use("/auth", proxy("http://localhost:6001") );
 
 const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
