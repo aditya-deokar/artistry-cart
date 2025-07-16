@@ -2,6 +2,7 @@
 import { HeartIcon, Search, ShoppingCart, User2 } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
+import HeaderBottom from './HeaderBottom'
 
 const Header = () => {
     return (
@@ -56,7 +57,9 @@ const Header = () => {
                 </div>
             </div>
 
-            <div className='border-b'></div>
+            <div className='border-b'/>
+            <HeaderBottom/>
+            
         </div>
     )
 }
