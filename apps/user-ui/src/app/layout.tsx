@@ -2,6 +2,7 @@ import Header from '@/shared/widgets/header';
 import './global.css';
 
 import { Poppins, Roboto} from "next/font/google"
+import Providers from './Providers';
 
 export const metadata = {
   title: 'Artistry Cart',
@@ -28,9 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en"> 
       <body className={`${roboto.variable} ${poppins.variable}`}>
-
+        <Providers>
         <Header/>
         {children}
+
+        </Providers>
       
       </body>
     </html>
