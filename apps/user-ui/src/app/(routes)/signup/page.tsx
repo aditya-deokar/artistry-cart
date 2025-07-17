@@ -19,7 +19,6 @@ type FormData = {
 const SignUpPage = () => {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [serverError, setServerError] = useState<string | null>(null);
     const [showOtp, setshowOtp] = useState(false);
     const [canResend, setCanResend] = useState(true);
     const [timer, setTimer] = useState(60);
@@ -34,7 +33,7 @@ const SignUpPage = () => {
     const signUpMutation = useMutation({
         mutationFn: async(data:FormData)=>{
             const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_SERVER_URI}/api/user-registration`,
+                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/user-registration`,
                  data
                 );
             return response.data;
@@ -51,7 +50,7 @@ const SignUpPage = () => {
     const verifyOtpMutation= useMutation({
         mutationFn: async()=>{
             if(!userData) return;
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URI}/api/verify-user`,
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/verify-user`,
                 {
                     ...userData,
                     otp: otp.join(""),
@@ -98,7 +97,9 @@ const SignUpPage = () => {
     }
 
     const reSendOtp =()=>{
-
+        if(userData) {
+            signUpMutation.mutate(userData);
+        }
     }
 
     const onSubmit = (data: FormData) => {
@@ -208,11 +209,6 @@ const SignUpPage = () => {
                             {signUpMutation.isPending ? "Signing up.. " : "Signup"}
                         </Button>
 
-                        {serverError && (
-                            <p className='text-red-500 text-sm mt-2'>{serverError}</p>
-                        )}
-
-
                     </form>
                    ) : (
                     <div >
@@ -247,7 +243,7 @@ const SignUpPage = () => {
                             ):(`Resend OTP in ${timer}`)}
                         </p>
                         {verifyOtpMutation?.isError && verifyOtpMutation.error instanceof AxiosError && (
-                            <p className='text-red-400 mt-2'>{verifyOtpMutation.error.message}</p>
+                            <p className='text-red-500 mt-2 text-sm'>{verifyOtpMutation.error?.message || verifyOtpMutation.error?.response?.data?.message}</p>
                         )}
                     </div>
                    )}
