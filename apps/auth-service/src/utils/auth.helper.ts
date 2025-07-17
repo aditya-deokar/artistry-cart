@@ -110,7 +110,7 @@ export const handleForgotPassword = async(req:Request, res:Response, next:NextFu
 
 
         // Generate OTP and send
-        await sendOTP(email, user.name, "forgot-password-user-mail");
+        await sendOTP(user.name, email, "forgot-password-user-mail");
 
         res.status(200).json({
             message: "OTP sent to email. Please verify your account."

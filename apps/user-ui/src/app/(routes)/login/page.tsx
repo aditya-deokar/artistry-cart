@@ -1,5 +1,7 @@
 'use client'
 import { Button } from '@/components/ui/button';
+import { useMutation } from '@tanstack/react-query';
+import axios, { AxiosError } from 'axios';
 import { Eye, EyeOff, UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -23,9 +25,33 @@ const LoginPage = () => {
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
 
-    const onSubmit = (data: FormData) => {
+    const loginMutation= useMutation({
+        mutationFn: async(data:FormData)=>{
+            const response= await axios.post(
+                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/login-user`, 
+                data, 
+                {
+                    withCredentials:true
+                }
+            );
+            return response.data;
+        },
+        onSuccess: (data)=>{
+            setServerError(null);
+            router.push("/");
+        },
+        onError: (error:AxiosError)=>{
+            const errorMeassage= (error.response?.data as {message: string})?.message || "Invalide Creadentials!";
+            setServerError(errorMeassage);
+        },
 
+
+    })
+
+    const onSubmit = (data: FormData) => {
+        loginMutation.mutate(data);
     }
+    
     return (
         <div className='w-full py-10 min-h-[85vh]'>
             <h1 className='text-4xl font-poppins font-semibold text-center'>Login</h1>
@@ -114,7 +140,12 @@ const LoginPage = () => {
                                 >Forgot Password?</Link>
                         </div>
 
-                        <Button type='submit' variant={"default"} className='w-full'>Login</Button>
+                        <Button
+                        disabled={loginMutation?.isPending}
+                        type='submit' variant={"default"} 
+                        className='w-full'>
+                            {loginMutation?.isPending ? "Loging in..." :"Login"}
+                        </Button>
 
                         {serverError && (
                             <p className='text-red-500 text-sm mt-2'>{serverError}</p>

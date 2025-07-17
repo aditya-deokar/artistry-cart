@@ -1,10 +1,16 @@
-
+'use client'
 import { HeartIcon, Search, ShoppingCart, User2 } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import HeaderBottom from './HeaderBottom'
+import useUser from '@/hooks/useUser'
 
 const Header = () => {
+
+
+    const { user, isLoading } = useUser();
+
+
     return (
         <div className='w-full bg-background'>
             <div className='w-[80%] py-5 m-auto flex items-center justify-between'>
@@ -27,16 +33,34 @@ const Header = () => {
 
                 <div className='flex items-center gap-8 '>
                     <div className='flex items-center gap-2'>
-                        <Link href={"/login"}>
-                            <User2 />
-                        </Link>
+                        {!isLoading && user ? (
+                            <>
+                            <Link href={'/profile'}>
+                                <User2 />
+                            </Link>
+                            <Link href={"/profile"}>
+                                    <span className='block font-medium'>
+                                        Hello,
+                                    </span>
+                                    <span className='font-semibold'>{user?.name?.split(" ")[0]}</span>
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <Link href={"/login"}>
+                                    <User2 />
+                                </Link>
+                                <Link href={"/login"}>
+                                    <span className='block font-medium'>
+                                        Hello,
+                                    </span>
+                                    <span className='font-semibold'>{isLoading ? "..." : "Sign in"}</span>
+                                </Link>
 
-                        <Link href={"login"}>
-                            <span className='block font-medium'>
-                                Hello,
-                            </span>
-                            <span className='font-semibold'>Sign In</span>
-                        </Link>
+                            </>
+                        )}
+
+
                     </div>
 
                     <div className='flex items-center gap-5 '>
@@ -47,7 +71,7 @@ const Header = () => {
                             </div>
                         </Link>
 
-                         <Link href={"/cart"} className='relative'>
+                        <Link href={"/cart"} className='relative'>
                             <ShoppingCart className='w-6 h-6' />
                             <div className='w-6 h-6 bg-red-400 rounded-full flex items-center justify-center absolute top-[-10px] right-[-10px]'>
                                 <span className='text-sm'>1</span>
@@ -57,9 +81,9 @@ const Header = () => {
                 </div>
             </div>
 
-            <div className='border-b'/>
-            <HeaderBottom/>
-            
+            <div className='border-b' />
+            <HeaderBottom />
+
         </div>
     )
 }
