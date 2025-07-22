@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Artistry Cart:Activate Your Seller Account</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f6f9fc;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background-color: #ffffff;
+      width: 90%;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .header {
+      text-align: center;
+      padding-bottom: 20px;
+    }
+    .header h1 {
+      margin: 0;
+      color: #333333;
+    }
+    .content {
+      font-size: 16px;
+      color: #555555;
+      line-height: 1.6;
+    }
+    .button {
+      display: inline-block;
+      background-color: #007BFF;
+      color: #ffffff;
+      padding: 12px 24px;
+      margin: 20px 0;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+      padding-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Welcome, <%= name %>!</h1>
+    </div>
+    <div class="content">
+      <p>Thank you for registering with <strong>Artistry Cart Seller</strong>. To complete your registration, please confirm your email address by using following Activation code:</p>
+
+      <p style="text-align: center;">
+        <h2><%= otp %></h2>
+      </p>
+
+    
+
+      <p>If you did not register for a Artistry Cart Seller Account, you can safely ignore this email.</p>
+    </div>
+
+    <div class="footer">
+      <p>&copy; <%= new Date().getFullYear() %> Artistry Cart. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

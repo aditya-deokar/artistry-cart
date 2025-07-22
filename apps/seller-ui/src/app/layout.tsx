@@ -1,5 +1,6 @@
-import Providers from '@/Providers';
+
 import './global.css';
+import Providers from './Providers';
 
 export const metadata = {
   title: 'Welcome to Artistry Cart Seller',
