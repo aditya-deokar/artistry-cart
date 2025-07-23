@@ -1,5 +1,5 @@
 import  express,  { Router }  from "express";
-import { createShop, getUser, loginUser, refreshToken, registerSeller, resetUserPassword, userForgotPassword, userRegistration, verifySeller, verifyUser, verifyUserForgotPassword } from "../controller/auth.controller";
+import { createShop, createStripeConnection, getSeller, getUser, loginSeller, loginUser, refreshToken, registerSeller, resetUserPassword, userForgotPassword, userRegistration, verifySeller, verifyUser, verifyUserForgotPassword } from "../controller/auth.controller";
 import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
 
 
@@ -20,6 +20,12 @@ router.post('/verify-forgot-password-user', verifyUserForgotPassword);
 router.post("/seller-registration", registerSeller);
 router.post("/verify-seller", verifySeller);
 router.post("/create-shop", createShop);
+
+router.post("/create-stripe-link", createStripeConnection);
+router.post("/login-seller", loginSeller);
+router.get("/logged-in-seller", isAuthenticated,getSeller);
+
+
 
 router.get('/get', (req, res) => {
     res.send({ 'message': 'Hello API Router  Auth Service'});

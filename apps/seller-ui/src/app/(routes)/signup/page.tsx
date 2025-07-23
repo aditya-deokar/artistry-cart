@@ -1,14 +1,14 @@
 'use client'
 
 
-import { Eye, EyeOff, UserIcon } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import axios, { AxiosError } from "axios"
 import { useMutation } from '@tanstack/react-query';
 import { countries } from '@/utils/countries';
+import CreateShop from '@/shared/modules/auth/CreateShop';
 
 // type FormData = {
 //     name: string;
@@ -21,16 +21,14 @@ import { countries } from '@/utils/countries';
 const SignUpPage = () => {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [activeStep, setActiveStep] = useState(1);
+    const [activeStep, setActiveStep] = useState(3);
     const [showOtp, setshowOtp] = useState(false);
     const [canResend, setCanResend] = useState(true);
     const [timer, setTimer] = useState(60);
     const [otp, setOtp] = useState(["", "", "", ""]);
     const [sellerData, setSellerData] = useState<FormData | null>(null);
-    const [sellerId, setSellerId] =useState(null);
+    const [sellerId, setSellerId] =useState<string | null>(null);
     const inputRef = useRef<(HTMLInputElement | null)[]>([]);
-
-    const router = useRouter();
 
     const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -110,6 +108,20 @@ const SignUpPage = () => {
         // console.log(data);
         signUpMutation.mutate(data);
     }
+
+    const connectStripe = async()=>{
+        try {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/create-stripe-link`,
+                { sellerId }
+            )
+
+            if(response.data.url){
+                window.location.href= response.data.url
+            }
+        } catch (error) {
+            console.error("Stripe Connection Error")
+        }
+    }
     return (
         <div className="w-full flex flex-col items-center pt-10 min-h-screen">
 
@@ -133,7 +145,7 @@ const SignUpPage = () => {
 
             {/* steps contents */}
 
-            <div className='w-[480px] p-8 shadow rounded-lg'>
+            <div className='md:w-[480px] p-8 shadow rounded-lg'>
                 {activeStep == 1 && (
                     <>
                         {!showOtp ? (
@@ -311,6 +323,22 @@ const SignUpPage = () => {
                             </div>
                         )}
                     </>
+                )}
+
+                {activeStep == 2 && (
+                    <CreateShop sellerId={sellerId!} setActiveStep={setActiveStep} />
+                )}
+
+                {activeStep ==3 && (
+                    <div className='text-center'>
+                        <h1 className='text-2xl font-semibold '>Withdraw Method</h1>
+                        <br />
+                        <button className='w-full mt-4 text-lg cursor-pointer py-2 rounded-lg'
+                        onClick={connectStripe}
+                        >
+                            Connect Stripe
+                        </button>
+                    </div>
                 )}
             </div>
 
