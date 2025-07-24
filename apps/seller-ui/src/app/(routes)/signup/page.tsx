@@ -21,7 +21,7 @@ import CreateShop from '@/shared/modules/auth/CreateShop';
 const SignUpPage = () => {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [activeStep, setActiveStep] = useState(3);
+    const [activeStep, setActiveStep] = useState(1);
     const [showOtp, setshowOtp] = useState(false);
     const [canResend, setCanResend] = useState(true);
     const [timer, setTimer] = useState(60);

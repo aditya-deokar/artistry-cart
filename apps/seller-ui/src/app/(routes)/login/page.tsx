@@ -28,7 +28,7 @@ const LoginPage = () => {
     const loginMutation= useMutation({
         mutationFn: async(data:FormData)=>{
             const response= await axios.post(
-                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/login-user`, 
+                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/login-seller`, 
                 data, 
                 {
                     withCredentials:true
