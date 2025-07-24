@@ -192,15 +192,25 @@ export const refreshToken = async (
       return new JsonWebTokenError("Forbidden Invalid refresh tokens.");
     }
 
-    // let account ;
-    // if(decoded.role == "user"){
-    const user = await prisma.users.findUnique({
-      where: {
-        id: decoded.id,
-      },
-    });
+    let account ;
+    if(decoded.role == "user"){
+      account = await prisma.users.findUnique({
+        where: {
+          id: decoded.id,
+        },
+      });
+    }else if(decoded.role == "seller"){
+      account = await prisma.sellers.findUnique({
+        where: {
+          id: decoded.id,
+        },
+        include:{
+          shop: true
+        }
+      });
+    }
 
-    if (!user) {
+    if (!account) {
       return new AuthError("Forbidden! user not found");
     }
 
@@ -396,7 +406,7 @@ export const createShop = async(req:Request, res: Response, next:NextFunction)=>
   try {
     const { name, bio, address, opening_hours, website, category, sellerId } = req.body;
 
-    if(!name || !bio|| !address || !opening_hours || !category || sellerId){
+    if(!name || !bio|| !address || !opening_hours || !category || !sellerId){
       return next(new ValidationError("All fields are required!"))
     }
 
@@ -452,7 +462,7 @@ export const createStripeConnection = async(req:Request, res: Response, next:Nex
     const account = await stripe.accounts.create({
       type: "express",
       email: seller.email,
-      country: "IND",
+      country: "US",
       capabilities:{
         card_payments:{
           requested:true
@@ -509,7 +519,7 @@ export const loginSeller = async (
     });
 
     if (!user) {
-      return next(new AuthError("User doen't exists!"));
+      return next(new AuthError("Seller doen't exists!!"));
     }
 
     // verify password
