@@ -24,7 +24,7 @@ export function NavMain({
 }) {
   const pathname = usePathname();
   return (
-    <SidebarGroup className="p-0">
+    <SidebarGroup className="p-0 font-roboto">
       <SidebarMenu>
         {items.map((item, idx) => (
           <SidebarMenuItem key={idx}>

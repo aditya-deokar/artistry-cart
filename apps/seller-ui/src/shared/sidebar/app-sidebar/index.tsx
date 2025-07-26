@@ -12,12 +12,17 @@ import {
 
 import { NavMain } from "./nav-main";
 import Link from "next/link";
-import { BookTemplate, Home, Settings, Trash } from "lucide-react";
+import { BookTemplate, Home, SquarePlus, HandCoins, PackageSearch, CalendarPlus, BellPlus, Mail, BellRing, TicketPercent, LogOut} from "lucide-react";
 
 
 export function AppSidebar({
   ...props
 }:  React.ComponentProps<typeof Sidebar>) {
+
+  
+  
+
+
   return (
     <Sidebar
       collapsible="icon"
@@ -30,11 +35,11 @@ export function AppSidebar({
           className="data-[state=open]:text-sidebar-accent-foreground"
         >
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
-          
+              <span>hh</span>
           </div>
 
           <span className="text-2xl font-semibold">
-            <Link href={'/'}>Seller Dashboard</Link>
+            <Link href={'/'}>Shop Name</Link>
           </span>
         </SidebarMenuButton>
       </SidebarHeader>
@@ -65,19 +70,55 @@ export const data = {
       icon: Home,
     },
     {
-      title: "Templates",
-      url: "/templates",
+      title: "Orders",
+      url: "/dashboard/orders",
       icon: BookTemplate,
     },
     {
-      title: "Trash",
-      url: "/trash",
-      icon: Trash,
+      title: "Payments",
+      url: "/dashboard/payments",
+      icon: HandCoins,
     },
     {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings,
+      title: "Create Product",
+      url: "/dashboard/create-product",
+      icon: SquarePlus,
     },
+    {
+      title: "All Products",
+      url: "/dashboard/all-products",
+      icon: PackageSearch,
+    },
+    {
+      title: "Create Event",
+      url: "/dashboard/create-event",
+      icon: CalendarPlus,
+    },
+    {
+      title: "All Events",
+      url: "/dashboard/all-events",
+      icon: BellPlus,
+    },
+    {
+      title: "Inbox",
+      url: "/dashboard/inbox",
+      icon: Mail,
+    },
+    {
+      title: "Notifications",
+      url: "/dashboard/notifications",
+      icon: BellRing,
+    },
+    {
+      title: "Discount Codes",
+      url: "/dashboard/discount-codes",
+      icon: TicketPercent,
+    },
+    {
+      title: "Logout",
+      url: "/dashboard/logout",
+      icon: LogOut,
+    },
+   
   ],
 };

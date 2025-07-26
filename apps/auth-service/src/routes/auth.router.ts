@@ -24,7 +24,7 @@ router.post("/create-shop", createShop);
 
 router.post("/create-stripe-link", createStripeConnection);
 router.post("/login-seller", loginSeller);
-router.get("/logged-in-seller", isAuthenticated, isSeller , getSeller);
+router.get("/logged-in-seller", isAuthenticated, isSeller, getSeller);
 
 
 
