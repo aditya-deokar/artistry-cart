@@ -128,6 +128,9 @@ export const loginUser = async (
       return next(new AuthError("Invalid email or password"));
     }
 
+    res.clearCookie("access_token");
+    res.clearCookie("refresh_token");
+
     // Generate Access and Refresh Tokens
 
     const accessToken = jwt.sign(
@@ -172,7 +175,7 @@ export const loginUser = async (
 
 // Refresh Token User
 export const refreshToken = async (
-  req: Request,
+  req: any,
   res: Response,
   next: NextFunction
 ) => {
@@ -226,6 +229,8 @@ export const refreshToken = async (
     );
 
     setCookie(res, "access_token", newAccessToken);
+
+    req.role = decoded.role;
     return res.status(201).json({
       success:true
     })
@@ -529,12 +534,15 @@ export const loginSeller = async (
       return next(new AuthError("Invalid email or password"));
     }
 
+    res.clearCookie("access_token");
+    res.clearCookie("refresh_token");
+
     // Generate Access and Refresh Tokens
 
     const accessToken = jwt.sign(
       {
         id: user.id,
-        role: "user",
+        role: "seller",
       },
       process.env.ACCESS_TOKEN_SECRET as string,
       {
@@ -545,7 +553,7 @@ export const loginSeller = async (
     const refreshToken = jwt.sign(
       {
         id: user.id,
-        role: "user",
+        role: "seller",
       },
       process.env.REFRESH_TOKEN_SECRET as string,
       {
@@ -578,11 +586,12 @@ export const getSeller = async (
   next: NextFunction
 ) => {
   try {
-    const seller= req.seller;
+    const seller= req.user;
+    console.log(seller)
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      seller
+      seller:seller
     });
 
     

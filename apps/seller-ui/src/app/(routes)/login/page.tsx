@@ -50,7 +50,7 @@ const LoginPage = () => {
     },
     onSuccess: () => {
       setServerError(null);
-      router.push("/");
+      router.push("/dashboard");
     },
     onError: (error: AxiosError) => {
       const errorMessage =

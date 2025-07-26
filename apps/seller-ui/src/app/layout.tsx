@@ -28,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en"> 
-      <body className={`${roboto.variable} ${poppins.variable}`}>
+    <html lang="en" suppressHydrationWarning> 
+      <body className={`${roboto.variable} ${poppins.variable}`} suppressHydrationWarning>
          <ThemeProvider
         attribute={'class'}
         defaultTheme="dark"
