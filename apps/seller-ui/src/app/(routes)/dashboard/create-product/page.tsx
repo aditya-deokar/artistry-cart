@@ -5,9 +5,11 @@ import CustomProperties from '@/shared/components/custom-properties';
 import CustomSpecifications from '@/shared/components/custom-specifications';
 import ImagePlaceholder from '@/shared/components/image-placeholders';
 import Input from '@/shared/components/inputs/input';
+import axiosInstance from '@/utils/axiosinstance';
+import { useQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
-import React, { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import React, { useMemo, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 
 const CreateProduct = () => {
 
@@ -15,9 +17,35 @@ const CreateProduct = () => {
     const [isChanged, setIsChanged] = useState(false);
     const [image, setImage] = useState<(File | null)[]>([null]);
     const [loading, setLoading] = useState(false);
-
-
     const { register, control, watch, setValue, handleSubmit, formState: { errors } } = useForm();
+    const selectedCategory = watch("category");
+    const regularPrice = watch("regular_price");
+
+    const {data, isLoading, isError} = useQuery({
+        queryKey:["categories"],
+        queryFn: async()=>{
+            try {
+                const res= await axiosInstance.get("product/api/get-categories");
+                return res.data; 
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        staleTime: 1000 * 60 * 5,
+        retry: 2,
+
+    });
+
+    const categories = data?.categories || [];
+    const subCategoriesData = data?.subCategories || {};
+
+    const subcategories = useMemo(()=>{
+     return selectedCategory ? subCategoriesData[selectedCategory] || []  : [];
+    }, [selectedCategory, subCategoriesData])
+
+   
+    // console.log(categories, subCategoriesData);
+
 
     const onsubmit = (data: any) => {
         console.log(data);
@@ -111,6 +139,9 @@ const CreateProduct = () => {
                 {/* Right Side - Form inputs */}
 
                 <div className='md:w-[65%] '>
+                   <div className='w-full flex gap-6'>
+
+
                     <div className='w-2/4 flex flex-col '>
                         {/* Product Title Input */}
                         <div className=''>
@@ -213,7 +244,107 @@ const CreateProduct = () => {
                             <CustomProperties control={control} errors={errors}/>
                         </div>
 
+                        <div className='mt-2'>
+                            <label htmlFor="" className='block font-semibold mb-1 text-primary/80'>Cash On Delivery</label>
+                            <select
+                            {...register("cash_on_delivery", {
+                                required:"Cash On Delivery is Required!",
+                            })}
+                            defaultValue={"yes"}
+                            className='w-full border outline-none border-primary/50 bg-transparent'
+                            name="" id="">
+                                <option value="yes" >Yes</option>
+                                <option value="no" >No</option>
+                            </select>
+                            {errors.cash_on_delivery && (
+                                    <p className='text-red-500 text-xs mt-1'>{errors.cash_on_delivery?.message as string}</p>
+                            )}
+                        </div>
                     </div>
+
+                    <div className='w-2/4'>
+                            <label className='block font-semibold mb-1 text-primary/80'>Category</label>
+
+                            {isLoading ? (
+                                <p className='text-primary/50'>Loading Categories...</p>
+                            ): isError ? (
+                                <p className='text-red-500'>Failed to Load Categories</p>
+                            ): (
+                                <Controller
+                                    name='category'
+                                    control={control}
+                                    rules={{
+                                        required: "Category is Required"
+                                    }}
+                                    render={({field})=>(
+                                        <select
+                                        {...field}
+                                        className='w-full border outline-none border-primary/80 bg-transparent p-2 rounded-md'
+                                        >
+                                            <option value="" 
+                                            className='bg-secondary'>
+                                                Select Category
+                                            </option>
+                                            {categories?.map((cate:string)=>(
+                                                <option
+                                                key={cate}
+                                                value={cate} 
+                                                className='bg-secondary'>
+                                            {cate}
+                                            </option>
+                                            ))}
+                                        </select>
+                                    )}
+                                />
+                            )}
+
+                            {errors.category && (
+                                <p className='text-red-500 text-xs mt-1'>{errors.category?.message as string}</p>
+                            )}
+
+
+                            <div className='mt-2'>
+
+                                <label className='block font-semibold mb-1 text-primary/80'>Sub Category</label>
+
+                                <Controller
+                                    name='subcategory'
+                                    control={control}
+                                    rules={{
+                                        required: "Sub-Category is Required"
+                                    }}
+                                    render={({field})=>(
+                                        <select
+                                        {...field}
+                                        className='w-full border outline-none border-primary/80 bg-transparent p-2 rounded-md'
+                                        >
+                                            <option value="" 
+                                            className='bg-secondary'>
+                                                Select Sub Category
+                                            </option>
+                                            {subcategories?.map((cate:string)=>(
+                                                <option
+                                                key={cate}
+                                                value={cate} 
+                                                className='bg-secondary'>
+                                            {cate}
+                                            </option>
+                                            ))}
+                                        </select>
+                                    )}
+                                />
+                                {errors.subcategory && (
+                                    <p className='text-red-500 text-xs mt-1'>{errors.subcategory?.message as string}</p>
+                                )}
+                            </div>
+
+                            <div className='mt-2'>
+                                
+                            </div>
+
+                            
+                    </div>
+                   </div>
                 </div>
             </div>
 

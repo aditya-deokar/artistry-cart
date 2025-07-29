@@ -1,0 +1,200 @@
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+const initializeConfig = async () => {
+  try {
+    const existingConfig = await prisma.site_config.findFirst();
+    if (!existingConfig) {
+      await prisma.site_config.create({
+        data: {
+          categories: [
+            "Artwork",
+            "Paintings",
+            "Sculptures",
+            "Wall Decor",
+            "Handmade Crafts",
+            "Ceramics & Pottery",
+            "Woodwork",
+            "Furniture",
+            "Lamps & Lighting",
+            "Textile & Fabric Art",
+            "Artisan Jewelry",
+            "Home Decor",
+            "Garden & Outdoor Decor",
+            "Art Stationery",
+            "Art Prints",
+            "Custom Orders",
+            "Festive & Seasonal Items",
+            "Eco-Friendly Products",
+            "Spiritual & Religious Art",
+          ],
+          subCategories: {
+            "Artwork": [
+              "Mixed Media",
+              "Digital Art",
+              "Charcoal Sketches",
+              "Ink Drawings",
+              "Collage",
+              "Minimalist Art",
+            ],
+            "Paintings": [
+              "Oil Painting",
+              "Acrylic Painting",
+              "Watercolor",
+              "Portraits",
+              "Abstract",
+              "Realism",
+              "Landscape",
+              "Still Life",
+            ],
+            "Sculptures": [
+              "Bronze",
+              "Marble",
+              "Wood",
+              "Clay",
+              "Metal",
+              "Abstract Sculptures",
+              "Miniature",
+            ],
+            "Wall Decor": [
+              "Wall Hangings",
+              "Macramé",
+              "Wall Stickers",
+              "Canvas Art",
+              "Woven Tapestries",
+              "3D Wall Panels",
+            ],
+            "Handmade Crafts": [
+              "DIY Kits",
+              "Origami",
+              "Hand-cut Paper Crafts",
+              "Quilling",
+              "Puppets",
+              "Handmade Toys",
+            ],
+            "Ceramics & Pottery": [
+              "Vases",
+              "Mugs & Cups",
+              "Decorative Plates",
+              "Planters",
+              "Sculpted Figures",
+              "Bowls",
+              "Ceramic Jewelry",
+            ],
+            "Woodwork": [
+              "Carved Boxes",
+              "Wooden Toys",
+              "Wood Art Panels",
+              "Custom Carvings",
+              "Kitchen Utensils",
+              "Wood Burnt Art",
+            ],
+            "Furniture": [
+              "Handcrafted Tables",
+              "Chairs & Stools",
+              "Shelving Units",
+              "Storage Boxes",
+              "Benches",
+              "Rustic Furniture",
+              "Upcycled Pieces",
+            ],
+            "Lamps & Lighting": [
+              "Table Lamps",
+              "Wall Lights",
+              "Lanterns",
+              "Pendant Lights",
+              "Wooden Lamps",
+              "Upcycled Lighting",
+              "Eco-Friendly Lamps",
+            ],
+            "Textile & Fabric Art": [
+              "Embroidery",
+              "Patchwork",
+              "Tie-Dye",
+              "Woven Art",
+              "Fabric Collages",
+              "Appliqué",
+              "Textile Sculptures",
+            ],
+            "Artisan Jewelry": [
+              "Beaded Jewelry",
+              "Metalwork",
+              "Resin Jewelry",
+              "Clay Jewelry",
+              "Gemstone Pieces",
+              "Eco-Friendly Jewelry",
+            ],
+            "Home Decor": [
+              "Candle Holders",
+              "Decorative Bowls",
+              "Vases",
+              "Wall Clocks",
+              "Photo Frames",
+              "Trays & Centerpieces",
+            ],
+            " Garden & Outdoor Decor": [
+              "Garden Sculptures",
+              "Wind Chimes",
+              "Outdoor Lanterns",
+              "Plant Stands",
+              "Terracotta Art",
+              "Birdhouses",
+            ],
+            "Art Stationery": [
+              "Hand-painted Notebooks",
+              "Custom Greeting Cards",
+              "Art Prints",
+              "Envelopes & Seals",
+              "Sketchbooks",
+              "Art Bookmarks",
+            ],
+            "Art Prints": [
+              "Limited Editions",
+              "Canvas Prints",
+              "Digital Reproductions",
+              "Typography Prints",
+              "Poster Art",
+              "Vintage Style Prints",
+            ],
+            "Custom Orders": [
+              "Portrait Requests",
+              "Custom Jewelry",
+              "Name Plates",
+              "Made-to-order Furniture",
+              "Personalized Gifts",
+            ],
+            "Festive & Seasonal Items": [
+              "Diwali Decorations",
+              "Christmas Ornaments",
+              "Easter Crafts",
+              "Rakhi & Teej Items",
+              "Halloween Decor",
+              "New Year Gifts",
+            ],
+            "Eco-Friendly Products": [
+              "Upcycled Art",
+              "Reusable Decor",
+              "Bamboo Crafts",
+              "Coconut Shell Products",
+              "Natural Dye Art",
+              "Sustainable Packaging",
+            ],
+            "Spiritual & Religious Art": [
+              "Mandala Art",
+              "Pooja Decor",
+              "Idols & Figurines",
+              "Calligraphy of Verses",
+              "Yantras & Symbols",
+              "Sacred Geometry Art",
+            ],
+          },
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error initializing site configs", error)
+  }
+};
+
+export default initializeConfig;
