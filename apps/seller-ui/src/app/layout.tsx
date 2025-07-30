@@ -4,6 +4,7 @@ import './global.css';
 import { Poppins, Roboto} from "next/font/google"
 import Providers from './Providers';
 import { ThemeProvider } from '@/shared/provider/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 export const metadata = {
   title: 'Artistry Cart: Seller',
@@ -38,6 +39,7 @@ export default function RootLayout({
         >
         <Providers>
           {children}
+          <Toaster/>
         </Providers>
         </ThemeProvider>
       </body>

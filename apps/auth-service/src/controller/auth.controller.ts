@@ -14,8 +14,13 @@ import {
 import bcrypt from "bcryptjs";
 import { AuthError, ValidationError } from "../../../../packages/error-handler";
 import prisma from "../../../../packages/libs/prisma";
-import jwt, { JsonWebTokenError } from "jsonwebtoken";
+import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { setCookie } from "../utils/cookies/setCookie";
+
+interface TokenPayload {
+    id: string;
+    role: "user" | "seller";
+}
 
 // Register User
 export const userRegistration = async (
@@ -183,60 +188,72 @@ export const refreshToken = async (
     const refreshToken = req.cookies.refresh_token;
 
     if (!refreshToken) {
-      return new ValidationError("Unauthorized! No Refresh Token ");
+      return res.status(401).json({ message: "Unauthorized. Refresh token is missing." });
     }
 
     const decoded = jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET as string
-    ) as { id: string; role: string };
+    ) as TokenPayload;
 
-    if (!decoded || !decoded.id || decoded.role) {
-      return new JsonWebTokenError("Forbidden Invalid refresh tokens.");
+
+    if (!decoded.id || !decoded.role) {
+      return res.status(403).json({ message: "Forbidden. Invalid refresh token payload." });
     }
 
-    let account ;
-    if(decoded.role == "user"){
+    let account;
+    if (decoded.role === "user") {
       account = await prisma.users.findUnique({
-        where: {
-          id: decoded.id,
-        },
+        where: { id: decoded.id },
       });
-    }else if(decoded.role == "seller"){
+    } else if (decoded.role === "seller") {
       account = await prisma.sellers.findUnique({
-        where: {
-          id: decoded.id,
-        },
-        include:{
-          shop: true
-        }
+        where: { id: decoded.id },
+        include: { shop: true },
       });
     }
 
     if (!account) {
-      return new AuthError("Forbidden! user not found");
+      return res.status(403).json({ message: "Forbidden. No account found for this token." });
     }
 
+    // Generate a new access token
     const newAccessToken = jwt.sign(
-      {
-        id: decoded.id,
-        role: decoded.role,
-      },
+      { id: account.id, role: decoded.role },
       process.env.ACCESS_TOKEN_SECRET as string,
-      {
-        expiresIn: "15m",
-      }
+      { expiresIn: "15m" } // A short-lived access token
     );
 
+    
+    // Generate a new refresh token as well
+    const newRefreshToken = jwt.sign(
+      { id: account.id, role: decoded.role },
+      process.env.REFRESH_TOKEN_SECRET as string,
+      { expiresIn: "7d" } // A longer-lived refresh token
+    );
+
+    // Set both new tokens in cookies
     setCookie(res, "access_token", newAccessToken);
+    setCookie(res, "refresh_token", newRefreshToken); 
 
+    req.user = account;
     req.role = decoded.role;
-    return res.status(201).json({
-      success:true
-    })
 
+    
+    return res.status(200).json({
+      success: true,
+      message: "Tokens refreshed successfully.",
+    });
 
   } catch (error) {
+    
+    if (error instanceof TokenExpiredError) {
+      return res.status(401).json({ message: "Unauthorized. Refresh token has expired." });
+    }
+    if (error instanceof JsonWebTokenError) {
+      return res.status(401).json({ message: "Unauthorized. Refresh token is invalid." });
+    }
+
     return next(error);
   }
 };

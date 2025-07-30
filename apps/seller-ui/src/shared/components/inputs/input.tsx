@@ -1,43 +1,48 @@
-
 import React, { forwardRef } from 'react'
+import { Input as ShadcnInput } from '@/components/ui/input'
+import { Textarea as ShadcnTextarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 
 interface BaseProps {
-    label?: string;
-    type?: "text" | "number" | "password" | "email" | "textarea";
-    className?: string
+  label?: string;
+  type?: 'text' | 'number' | 'password' | 'email' | 'textarea';
+  className?: string;
 }
 
-type InputProps = BaseProps & React.InputHTMLAttributes<HTMLInputElement>;
+type InputProps = BaseProps & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'>;
+type TextareaProps = BaseProps & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+type Props = InputProps | TextareaProps;
 
-type TextareaProps= BaseProps & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+const isTextarea = (type?: string): type is 'textarea' => type === 'textarea';
 
-type Props= InputProps | TextareaProps;
-
-const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>( 
-    ({label, type="text", className, ...props}, ref)=>{
+const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
+  ({ label, type = 'text', className, ...props }, ref) => {
     return (
-        <div className='w-full'>
-            {label && (
-                <label className='block font-semibold text-primary/80 mb-1'>{label}</label>
-            )}
+      <div className="w-full space-y-2">
+        {label && (
+          <Label className="text-base font-medium">{label}</Label>
+        )}
 
-            {type == "textarea" ? (
-                <textarea ref={ref as React.Ref<HTMLTextAreaElement>}
-                className={`w-full border outline-none border-primary/80 bg-transparent p-2 rounded-md ${className}`}
-                {...(props as TextareaProps)}
-                />
-            ):(
-                <input type={type} 
-                    ref={ref as React.Ref<HTMLInputElement>}
-                    className={`w-full border outline-none border-primary/80 bg-transparent p-2 rounded-md ${className}`}
-                    {...(props as InputProps)}
-                />
-            )}
-        </div>
-    )
-}
-) 
+        {isTextarea(type) ? (
+          <ShadcnTextarea
+            ref={ref as React.Ref<HTMLTextAreaElement>}
+            className={cn('resize-none', className)}
+            {...(props as TextareaProps)}
+          />
+        ) : (
+          <ShadcnInput
+            ref={ref as React.Ref<HTMLInputElement>}
+            type={type}
+            className={className}
+            {...(props as InputProps)}
+          />
+        )}
+      </div>
+    );
+  }
+);
 
-Input.displayName = "Input";
+Input.displayName = 'Input';
 
 export default Input;
