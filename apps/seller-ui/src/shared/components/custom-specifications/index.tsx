@@ -68,9 +68,7 @@ const CustomSpecifications = ({control, errors} :any) => {
             </Button>
         </div>
 
-        {errors.brand && (
-            <p className='text-red-500 text-xs mt-1'>{errors.brand?.message as string}</p>
-        )}
+        
     </div>
   )
 }
