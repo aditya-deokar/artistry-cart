@@ -41,12 +41,14 @@ const ImagePlaceholder = ({ size, small, onImageChange, onRemove, defaultImage =
                 imagePreview ? (
                     <>
                     <Button
+                    type='button'
                     className='absolute top-3 right-3 p-2 !rounded shadow-lg'
                      onClick={()=> onRemove?.(index!)} variant={'destructive'}>
                         <X size={16}/>
                     </Button>
                     <Button 
                     variant={'outline'} 
+                    type='button'
                     onClick={()=> setOpenImageModal(true)}
                     className='absolute top-3 right-[70px] p-2 !rounded shadow-lg'>
                         <WandSparkles />

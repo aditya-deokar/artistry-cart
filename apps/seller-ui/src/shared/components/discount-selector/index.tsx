@@ -12,30 +12,35 @@ import { Label } from '@/components/ui/label'
 
 type DiscountTypeSelectorProps = {
   control: Control<any>
-  name: string
+  discount: any
   label?: string
+  name: string
 }
 
-const DiscountTypeSelector = ({
+const DiscountSelector = ({
   control,
+  discount,
   name,
-  label = "Discount Type"
+  label = "Discount"
 }: DiscountTypeSelectorProps) => {
   return (
     <div className="space-y-1.5">
-       <Label className="text-sm text-muted-foreground">{label}</Label>
+      <Label className="text-sm text-muted-foreground">{label}</Label>
       <Controller
         control={control}
         name={name}
-        rules={{ required: "Discount type is required" }}
+        rules={{ required: "Discount is required" }}
         render={({ field }) => (
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Discount Type" />
+              <SelectValue placeholder="Select Discount" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="percentage">Percentage</SelectItem>
-              <SelectItem value="flat">Flat Amount</SelectItem>
+              {discount.map((disc:any)=>(
+                <SelectItem value={disc.id}>{disc.publicName} {" "}  ({disc.discountValue} {disc.discountType === "percentage" ? "%" : " Rupees"} ) </SelectItem>
+              ))}
+              
+             
             </SelectContent>
           </Select>
         )}
@@ -44,4 +49,4 @@ const DiscountTypeSelector = ({
   )
 }
 
-export default DiscountTypeSelector
+export default DiscountSelector

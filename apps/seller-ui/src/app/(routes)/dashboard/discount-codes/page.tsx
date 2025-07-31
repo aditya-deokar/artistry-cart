@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { ChevronRight, Plus, Trash } from 'lucide-react'
 import Link from 'next/link'
-import React, { useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -36,6 +36,7 @@ import { AxiosError } from 'axios'
 const DiscountPage = () => {
 
     const closeRef = useRef<HTMLButtonElement>(null);
+    const closeDelRef = useRef<HTMLButtonElement>(null);
 
     const queryClient = useQueryClient();
 
@@ -76,9 +77,21 @@ const DiscountPage = () => {
         }
     })
 
+    const deleteDiscountCodeMutation = useMutation({
+        mutationFn: async (discountId) => {
+            await axiosInstance.delete(`/product/api/delete-discount-code/${discountId}`)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['shop-discounts']
+            });
+            closeDelRef.current?.click();
+        }
+    })
 
-    const handleDeleteClick = async (discount: any) => {
 
+    const handleDeleteClick = async (discountId: any) => {
+        deleteDiscountCodeMutation.mutate(discountId)
     }
 
     const onSubmit = async (data: any) => {
@@ -106,10 +119,9 @@ const DiscountPage = () => {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Edit profile</DialogTitle>
+                                <DialogTitle>Create Discount</DialogTitle>
                                 <DialogDescription>
-                                    Make changes to your profile here. Click save when you&apos;re
-                                    done.
+                                    fill the All fields to create discount.
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4">
@@ -166,7 +178,7 @@ const DiscountPage = () => {
                                         variant="outline">Cancel</Button>
                                 </DialogClose>
                                 <Button
-                                    // disabled={createDiscountCodeMutation.isPending}
+                                    disabled={createDiscountCodeMutation.isPending}
                                     onClick={handleSubmit(onSubmit)}>
                                     <Plus size={18} />
                                     {createDiscountCodeMutation.isPending ? "Creating.." : "Create"}
@@ -193,7 +205,7 @@ const DiscountPage = () => {
                 <span>Discount Codes</span>
             </div>
 
-            <div className='mt-8 bg-background p-6 rounded-lg '>
+            <div className='mt-8 bg-background pt-6 rounded-lg '>
                 <h3 className='text-lg font-semibold mb-4'>Your Discount Codes</h3>
                 {isLoading ? (
                     <p className='text-primary/80 text-center'>Loading discounts...</p>
@@ -232,14 +244,60 @@ const DiscountPage = () => {
                                     <TableCell className="p-3">{discount.discountCode}</TableCell>
 
                                     <TableCell className="p-3">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            className="text-red-500"
-                                            onClick={() => handleDeleteClick(discount)}
-                                        >
-                                            <Trash size={18} />
-                                        </Button>
+                                        
+
+
+
+                                        <Dialog>
+                                            <form>
+                                                <DialogTrigger asChild>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        className="text-red-500"
+                                                    >
+                                                        <Trash size={18} />
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="sm:max-w-[425px]">
+                                                    <DialogHeader>
+                                                        <DialogTitle>Delete Discount</DialogTitle>
+                                                    </DialogHeader>
+                                                    <div className="grid gap-4">
+                                                        <div className="grid gap-3">
+                                                            <p>You want to Delete {" "}
+                                                                <span className='text-red-700 font-medium'> {discount?.publicName} </span>
+                                                                 {" "} Dicount Code!</p>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    <DialogFooter>
+                                                        <DialogClose asChild>
+                                                            <Button
+                                                                ref={closeDelRef}
+                                                                variant="outline">Cancel</Button>
+                                                        </DialogClose>
+                                                        <Button
+                                                            variant={"destructive"}
+                                                            disabled={deleteDiscountCodeMutation.isPending}
+                                                            onClick={() => handleDeleteClick(discount.id)}>
+                                                            <Trash size={18} />
+                                                            
+                                                            {deleteDiscountCodeMutation.isPending ? "Deleting.." : "Delete"}
+                                                        </Button>
+
+                                                    </DialogFooter>
+                                                    {deleteDiscountCodeMutation.error && (
+                                                        <p className='text-red-500 text-xs mt-1'>
+                                                            {(deleteDiscountCodeMutation.error as AxiosError<{ message: string }>)?.response?.data?.message || "Something went wrong"}
+                                                        </p>
+                                                    )}
+
+                                                </DialogContent>
+                                            </form>
+                                        </Dialog>
+
+
                                     </TableCell>
                                 </TableRow>
                             ))}

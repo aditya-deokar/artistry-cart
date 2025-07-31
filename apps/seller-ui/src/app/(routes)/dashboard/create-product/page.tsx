@@ -7,6 +7,7 @@ import CashOnDeliverySelector from '@/shared/components/cash-on-delivery';
 import ColorSector from '@/shared/components/color-selector';
 import CustomProperties from '@/shared/components/custom-properties';
 import CustomSpecifications from '@/shared/components/custom-specifications';
+import DiscountSelector from '@/shared/components/discount-selector';
 import ImagePlaceholder from '@/shared/components/image-placeholders';
 import Input from '@/shared/components/inputs/input';
 import { TextEditor } from '@/shared/components/rich-editor';
@@ -21,11 +22,16 @@ import { Controller, useForm } from 'react-hook-form'
 
 const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
 
+interface UploadedImages{
+    fileId: string,
+    file_url: string
+}
+
 const CreateProduct = () => {
 
     const [openImageModal, setOpenImageModal] = useState(false);
     const [isChanged, setIsChanged] = useState(true);
-    const [image, setImage] = useState<(File | null)[]>([null]);
+    const [image, setImage] = useState<(UploadedImages | null)[]>([]);
     const [loading, setLoading] = useState(false);
     const { register, control, watch, setValue, handleSubmit, formState: { errors } } = useForm();
     const selectedCategory = watch("category");
@@ -46,6 +52,18 @@ const CreateProduct = () => {
 
     });
 
+
+    const { data: discountCodes = [], isLoading: discountLoading } = useQuery({
+        queryKey: ['shop-discounts'],
+        queryFn: async () => {
+            const res = await axiosInstance.get("/product/api/get-discount-codes");
+            return res?.data?.discount_codes || []
+        }
+    });
+
+
+
+
     const categories = data?.categories || [];
     const subCategoriesData = data?.subCategories || {};
 
@@ -61,39 +79,90 @@ const CreateProduct = () => {
         console.log(data);
     }
 
-    const handleImageChange = (file: File | null, index: number) => {
-        const updatedImages = [...image];
+    const convertFileBase64= (file:File)=>{
+        return new Promise((resolve, reject)=>{
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
 
-        updatedImages[index] = file;
+            reader.onload= ()=> resolve(reader.result)
+            reader.onerror =(error)=> reject(error);
+        })
+    }
+    const handleImageChange = async(file: File | null, index: number) => {
 
-        if (index == image.length - 1 && image.length < 8) {
-            updatedImages.push(null);
+        if(!file) return;
 
+        try {
+            const fileName =await convertFileBase64(file);
+
+            // console.log(fileName);
+
+            const response= await axiosInstance.post("/product/api/upload-product-image", { fileName });
+
+            const updatedImages =[...image];
+
+            const uploadedImage: UploadedImages= {
+                fileId: response.data.file_id,
+                file_url: response.data.file_url, 
+            }
+            
+            updatedImages[index] = uploadedImage;
+
+            if(index === image.length -1 && updatedImages.length < 8){
+                updatedImages.push(null);
+            }
+
+            setImage(updatedImages);
+            setValue("image", updatedImages);
+
+        } catch (error) {
+            console.log(error);
         }
-
-        setImage(updatedImages);
-        setValue("images", updatedImages);
     }
 
     const handleRemoveImage = (index: number) => {
-        setImage((prevImages) => {
-            let updatedImages = [...prevImages];
 
-            if (index == -1) {
-                updatedImages[0] = null;
+        try {
+            
+            let updatedImages = [...image];
 
-            } else {
-                updatedImages.splice(index, 1);
+            const imageToDelete = updatedImages[index];
 
+            if(imageToDelete && typeof imageToDelete === 'object' ){
+                // delete image
             }
 
-            if (!updatedImages.includes(null) && updatedImages.length < 8) {
-                updatedImages.push(null)
+            updatedImages.splice(index, 1);
+
+            // Add null placeholder
+            if(!updatedImages.includes(null) && updatedImages.length < 8){
+                updatedImages.push(null);
             }
 
-            return updatedImages;
-        })
-        setValue("images", image)
+            setImage(updatedImages);
+            setValue("images", updatedImages)
+
+        } catch (error) {
+            console.log(error)
+        }
+        // setImage((prevImages) => {
+        //     let updatedImages = [...prevImages];
+
+        //     if (index == -1) {
+        //         updatedImages[0] = null;
+
+        //     } else {
+        //         updatedImages.splice(index, 1);
+
+        //     }
+
+        //     if (!updatedImages.includes(null) && updatedImages.length < 8) {
+        //         updatedImages.push(null)
+        //     }
+
+        //     return updatedImages;
+        // })
+        // setValue("images", image)
     }
 
     const countWords = (text: string) => text.trim().split(/\s+/).length;
@@ -267,7 +336,7 @@ const CreateProduct = () => {
                         </div>
 
                         <div className='w-2/4 space-y-2'>
-                            <label className='block font-semibold mb-2 text-primary/80'>Category</label>
+                             <Label className="text-sm text-muted-foreground">Category</Label>
 
                             {isLoading ? (
                                 <p className='text-primary/50'>Loading Categories...</p>
@@ -307,7 +376,7 @@ const CreateProduct = () => {
 
                             <div className='space-y-2'>
 
-                                <label className='block font-semibold mb-2 text-primary/80'>Sub Category</label>
+                                <Label className="text-sm text-muted-foreground">Sub Category</Label>
 
                                 <Controller
                                     name="subcategory"
@@ -468,7 +537,12 @@ const CreateProduct = () => {
                             </div>
 
                             <div className='mt-2'>
-                                <Label className="text-base font-medium">Select Discount Codes(Optional)</Label>
+                                
+                                {discountLoading ? (
+                                    <p className='text-primary/80'>Loading Discount Codes...</p>
+                                ):(
+                                    <DiscountSelector control={control} discount={discountCodes} label='Select Discount Codes(Optional)' name='discounts'/>
+                                )}
                             </div>
 
 
