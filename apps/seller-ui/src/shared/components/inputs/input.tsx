@@ -21,7 +21,7 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
     return (
       <div className="w-full space-y-2">
         {label && (
-          <Label className="text-base font-medium">{label}</Label>
+          <Label className="text-sm text-muted-foreground">{label}</Label>
         )}
 
         {isTextarea(type) ? (

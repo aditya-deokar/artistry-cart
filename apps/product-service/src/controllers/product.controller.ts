@@ -3,6 +3,7 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "../../../../packages/libs/prisma";
 import { NotFoundError, ValidationError } from "../../../../packages/error-handler";
+import { imagekit } from "../../../../packages/libs/imageKit";
 
 // get Categories
 export const getCategories = async (
@@ -123,3 +124,48 @@ export const deleteDiscountCode = async(req:any, res:Response, next:NextFunction
         next(error)
     }
 }
+
+
+// Upload Product Image
+
+export const uploadProductImage = async(req:any, res:Response, next:NextFunction)=>{
+    try {
+        
+        const { fileName }= req.body;
+        
+        const response = await imagekit.upload({
+            file: fileName,
+            fileName:`product-${Date.now()}.jpg`,
+            folder: "/products"
+        })
+
+        res.status(201).json({
+            file_url: response.url,
+            file_id: response.fileId
+        })
+
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+// delete Product image
+export const deleteProductImage = async(req:any, res:Response, next:NextFunction)=>{
+    try {
+        
+        const { fileId }= req.body;
+        
+        const response = await imagekit.deleteFile(fileId);
+
+        res.status(200).json({
+            success: true,
+            response
+        })
+
+
+    } catch (error) {
+        next(error);
+    }
+} 
