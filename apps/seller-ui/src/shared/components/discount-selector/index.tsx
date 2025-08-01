@@ -36,8 +36,8 @@ const DiscountSelector = ({
               <SelectValue placeholder="Select Discount" />
             </SelectTrigger>
             <SelectContent>
-              {discount.map((disc:any)=>(
-                <SelectItem value={disc.id}>{disc.publicName} {" "}  ({disc.discountValue} {disc.discountType === "percentage" ? "%" : " Rupees"} ) </SelectItem>
+              {discount.map((disc:any,index:number)=>(
+                <SelectItem key={index} value={disc.id}>{disc.publicName} {" "}  ({disc.discountValue} {disc.discountType === "percentage" ? "%" : " Rupees"} ) </SelectItem>
               ))}
               
              

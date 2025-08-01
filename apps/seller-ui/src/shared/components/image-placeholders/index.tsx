@@ -2,6 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Pencil, WandSparkles, X } from 'lucide-react';
 import Image from 'next/image';
 import React, { useState } from 'react'
+import ImageEnhancement from '../image-enchance';
+import { UploadedImages } from '@/app/(routes)/dashboard/create-product/page';
 
 type Props = { 
     size: string, 
@@ -11,9 +13,13 @@ type Props = {
     defaultImage?: string | null, 
     index: any, 
     setOpenImageModal: (openImageModal: boolean)=> void
+    setSelectedImage: (e:string)=> void
+    selectedImage : string
+    image: (UploadedImages | null)[]
 }
 
-const ImagePlaceholder = ({ size, small, onImageChange, onRemove, defaultImage = null, index = null, setOpenImageModal }: Props) => {
+
+const ImagePlaceholder = ({ size, small, onImageChange, onRemove, defaultImage = null, index = null, setOpenImageModal ,setSelectedImage,selectedImage,  image }: Props) => {
 
 
     const [imagePreview, setImagePreview] = useState<string| null>(defaultImage);
@@ -42,17 +48,11 @@ const ImagePlaceholder = ({ size, small, onImageChange, onRemove, defaultImage =
                     <>
                     <Button
                     type='button'
-                    className='absolute top-3 right-3 p-2 !rounded shadow-lg'
+                    className='absolute top-3 right-3 p-2 !rounded shadow-lg hover:cursor-pointer'
                      onClick={()=> onRemove?.(index!)} variant={'destructive'}>
                         <X size={16}/>
                     </Button>
-                    <Button 
-                    variant={'outline'} 
-                    type='button'
-                    onClick={()=> setOpenImageModal(true)}
-                    className='absolute top-3 right-[70px] p-2 !rounded shadow-lg'>
-                        <WandSparkles />
-                    </Button>
+                    <ImageEnhancement selectedImage={selectedImage} index={index} image={image} setSelectedImage={setSelectedImage}  />
                     </>
                 ):(
                     <label htmlFor={`image-upload-${index}`} className='absolute top-3 right-3 p-2 rounded bg-secondary/40 shadow-lg cursor-pointer'>

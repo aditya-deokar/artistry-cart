@@ -18,11 +18,12 @@ import { ChevronRight, Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
 import React, { useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'sonner';
 
 
 const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
 
-interface UploadedImages{
+export interface UploadedImages {
     fileId: string,
     file_url: string
 }
@@ -31,7 +32,8 @@ const CreateProduct = () => {
 
     const [openImageModal, setOpenImageModal] = useState(false);
     const [isChanged, setIsChanged] = useState(true);
-    const [image, setImage] = useState<(UploadedImages | null)[]>([]);
+    const [image, setImage] = useState<(UploadedImages | null)[]>([null]);
+    const [selectedImage, setSelectedImage] = useState('');
     const [loading, setLoading] = useState(false);
     const { register, control, watch, setValue, handleSubmit, formState: { errors } } = useForm();
     const selectedCategory = watch("category");
@@ -79,36 +81,36 @@ const CreateProduct = () => {
         console.log(data);
     }
 
-    const convertFileBase64= (file:File)=>{
-        return new Promise((resolve, reject)=>{
+    const convertFileBase64 = (file: File) => {
+        return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
 
-            reader.onload= ()=> resolve(reader.result)
-            reader.onerror =(error)=> reject(error);
+            reader.onload = () => resolve(reader.result)
+            reader.onerror = (error) => reject(error);
         })
     }
-    const handleImageChange = async(file: File | null, index: number) => {
+    const handleImageChange = async (file: File | null, index: number) => {
 
-        if(!file) return;
+        if (!file) return;
 
         try {
-            const fileName =await convertFileBase64(file);
+            const fileName = await convertFileBase64(file);
 
             // console.log(fileName);
 
-            const response= await axiosInstance.post("/product/api/upload-product-image", { fileName });
+            const response = await axiosInstance.post("/product/api/upload-product-image", { fileName });
 
-            const updatedImages =[...image];
+            const updatedImages = [...image];
 
-            const uploadedImage: UploadedImages= {
+            const uploadedImage: UploadedImages = {
                 fileId: response.data.file_id,
-                file_url: response.data.file_url, 
+                file_url: response.data.file_url,
             }
-            
+
             updatedImages[index] = uploadedImage;
 
-            if(index === image.length -1 && updatedImages.length < 8){
+            if (index === image.length - 1 && updatedImages.length < 8) {
                 updatedImages.push(null);
             }
 
@@ -120,54 +122,40 @@ const CreateProduct = () => {
         }
     }
 
-    const handleRemoveImage = (index: number) => {
+    const handleRemoveImage = async (index: number) => {
+        // clone image array
+        const updatedImages = [...image];
+        const imageToDelete = updatedImages[index];
+
+        if (!imageToDelete || typeof imageToDelete !== "object") return;
 
         try {
-            
-            let updatedImages = [...image];
+            // 1. Delete image from server
+            await axiosInstance.delete("/product/api/delete-product-image", {
+                data: { fileId: imageToDelete.fileId },
+            });
 
-            const imageToDelete = updatedImages[index];
-
-            if(imageToDelete && typeof imageToDelete === 'object' ){
-                // delete image
-            }
-
+            // 2. Remove from local state only after successful deletion
             updatedImages.splice(index, 1);
 
-            // Add null placeholder
-            if(!updatedImages.includes(null) && updatedImages.length < 8){
+            // 3. Add null placeholder if needed
+            if (!updatedImages.includes(null) && updatedImages.length < 8) {
                 updatedImages.push(null);
             }
 
+            // 4. Update state and form value
             setImage(updatedImages);
-            setValue("images", updatedImages)
-
+            setValue("images", updatedImages);
         } catch (error) {
-            console.log(error)
+            // console.error("Failed to delete image:", error);
+            toast.error("Failed to delete image. Please try again.");
         }
-        // setImage((prevImages) => {
-        //     let updatedImages = [...prevImages];
+    };
 
-        //     if (index == -1) {
-        //         updatedImages[0] = null;
-
-        //     } else {
-        //         updatedImages.splice(index, 1);
-
-        //     }
-
-        //     if (!updatedImages.includes(null) && updatedImages.length < 8) {
-        //         updatedImages.push(null)
-        //     }
-
-        //     return updatedImages;
-        // })
-        // setValue("images", image)
-    }
 
     const countWords = (text: string) => text.trim().split(/\s+/).length;
 
-    const handleSaveDraft= ()=>{
+    const handleSaveDraft = () => {
 
     }
 
@@ -188,33 +176,29 @@ const CreateProduct = () => {
             {/* Content Layout */}
             <div className="py-4 w-full flex gap-6">
                 {/* Left side- Image Upload section */}
-                <div className='md:w-[35%] '>
-                    {image?.length > 0 && (
-                        <ImagePlaceholder
-                            setOpenImageModal={setOpenImageModal}
-                            size='765 x 850'
-                            small={false}
-                            index={0}
-                            onImageChange={handleImageChange}
-                            onRemove={handleRemoveImage}
-                        />
-                    )}
-
-                    <div className='grid grid-cols-2 gap-3 mt-4 '>
-                        {image?.slice(1).map((_, index) => (
-                            <ImagePlaceholder
+                <div className='md:w-[35%]'>
+                    <div className='grid grid-cols-2 gap-3 mt-0'>
+                        {image?.map((_, index:any) => (
+                            <div
                                 key={index}
-                                setOpenImageModal={setOpenImageModal}
-                                size='765 x 850'
-                                small={true}
-                                index={index + 1}
-                                onImageChange={handleImageChange}
-                                onRemove={handleRemoveImage}
-                            />
+                                className={index === 0 ? 'col-span-2' : ''} // First image spans 2 columns (full width)
+                            >
+                                <ImagePlaceholder
+                                    setOpenImageModal={setOpenImageModal}
+                                    size='765 x 850'
+                                    small={index !== 0}
+                                    index={index}
+                                    onImageChange={handleImageChange}
+                                    onRemove={handleRemoveImage}
+                                    setSelectedImage={setSelectedImage}
+                                    selectedImage={selectedImage}
+                                    image= {image}
+                                />
+                            </div>
                         ))}
                     </div>
-
                 </div>
+
 
 
 
@@ -228,7 +212,7 @@ const CreateProduct = () => {
                         <div className='w-2/4 flex flex-col '>
                             {/* Product Title Input */}
                             <div className=''>
-                                <Input label='Product Title' 
+                                <Input label='Product Title'
                                     placeholder='Enter product title'
                                     {...register("title", { required: "Title is required" })}
                                 />
@@ -336,7 +320,7 @@ const CreateProduct = () => {
                         </div>
 
                         <div className='w-2/4 space-y-2'>
-                             <Label className="text-sm text-muted-foreground">Category</Label>
+                            <Label className="text-sm text-muted-foreground">Category</Label>
 
                             {isLoading ? (
                                 <p className='text-primary/50'>Loading Categories...</p>
@@ -391,7 +375,7 @@ const CreateProduct = () => {
                                                 <SelectValue placeholder="Select Sub Category" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {subcategories?.map((sub:any) => (
+                                                {subcategories?.map((sub: any) => (
                                                     <SelectItem key={sub} value={sub}>
                                                         {sub}
                                                     </SelectItem>
@@ -537,11 +521,11 @@ const CreateProduct = () => {
                             </div>
 
                             <div className='mt-2'>
-                                
+
                                 {discountLoading ? (
                                     <p className='text-primary/80'>Loading Discount Codes...</p>
-                                ):(
-                                    <DiscountSelector control={control} discount={discountCodes} label='Select Discount Codes(Optional)' name='discounts'/>
+                                ) : (
+                                    <DiscountSelector control={control} discount={discountCodes} label='Select Discount Codes(Optional)' name='discounts' />
                                 )}
                             </div>
 
@@ -550,21 +534,21 @@ const CreateProduct = () => {
 
                         </div>
 
-                        
+
                     </div>
 
 
-                    
+
                 </div>
             </div>
 
             <div className='mt-6 flex justify-end gap-3'>
-                            {isChanged && (
-                                <Button type='button'
-                                onClick={handleSaveDraft}
-                                variant={"secondary"}
-                                >Save Draft</Button>
-                            )}
+                {isChanged && (
+                    <Button type='button'
+                        onClick={handleSaveDraft}
+                        variant={"secondary"}
+                    >Save Draft</Button>
+                )}
 
                 <Button type="submit" variant="default" disabled={loading}>
                     {loading ? (
