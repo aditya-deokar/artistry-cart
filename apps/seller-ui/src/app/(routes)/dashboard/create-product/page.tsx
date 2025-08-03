@@ -16,6 +16,7 @@ import axiosInstance from '@/utils/axiosinstance';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight, Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner';
@@ -24,8 +25,8 @@ import { toast } from 'sonner';
 const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
 
 export interface UploadedImages {
-    fileId: string,
-    file_url: string
+    file_id: string,
+    url: string
 }
 
 const CreateProduct = () => {
@@ -38,6 +39,8 @@ const CreateProduct = () => {
     const { register, control, watch, setValue, handleSubmit, formState: { errors } } = useForm();
     const selectedCategory = watch("category");
     const regularPrice = watch("regular_price");
+
+    const router = useRouter();
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ["categories"],
@@ -77,8 +80,20 @@ const CreateProduct = () => {
     // console.log(categories, subCategoriesData);
 
 
-    const onsubmit = (data: any) => {
+    const onsubmit = async(data: any) => {
         console.log(data);
+        try {
+            setLoading(true);
+            await axiosInstance.post("/product/api/create-product", data);
+            router.push("/dashboard/all-products");
+
+        } catch (error:any) {
+            toast.error(error?.data?.message)
+        }finally{
+            setLoading(false);
+        }
+
+        
     }
 
     const convertFileBase64 = (file: File) => {
@@ -104,8 +119,8 @@ const CreateProduct = () => {
             const updatedImages = [...image];
 
             const uploadedImage: UploadedImages = {
-                fileId: response.data.file_id,
-                file_url: response.data.file_url,
+                file_id: response.data.file_id,
+                url: response.data.file_url,
             }
 
             updatedImages[index] = uploadedImage;
@@ -132,7 +147,7 @@ const CreateProduct = () => {
         try {
             // 1. Delete image from server
             await axiosInstance.delete("/product/api/delete-product-image", {
-                data: { fileId: imageToDelete.fileId },
+                data: { fileId: imageToDelete.file_id },
             });
 
             // 2. Remove from local state only after successful deletion
@@ -420,10 +435,10 @@ const CreateProduct = () => {
                                     label="Video URL"
                                     placeholder="https://www.youtube.com/embed/xzxzxzy"
                                     {...register("video_url", {
-                                        pattern: {
-                                            value: /^https:\/\/www\.youtube\.com\/embed\/[a-zA-Z0-9_-]{11}$/,
-                                            message: "Enter a valid YouTube embed URL (11-character video ID)"
-                                        }
+                                        // pattern: {
+                                        //     value: /^https:\/\/www\.youtube\.com\/embed\/[a-zA-Z0-9_-]$/,
+                                        //     message: "Enter a valid YouTube embed URL "
+                                        // }
                                     })}
                                 />
                                 {errors.video_url && (

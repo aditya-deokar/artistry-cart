@@ -9,13 +9,15 @@ datasource db {
 }
 
 model images {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  file_id String
-  url     String
-  userId  String? @unique @db.ObjectId
-  shopId  String? @unique @db.ObjectId
-  users   users?  @relation(fields: [userId], references: [id])
-  shops   shops?  @relation(fields: [shopId], references: [id])
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  file_id   String
+  url       String
+  userId    String?   @unique @db.ObjectId
+  shopId    String?   @unique @db.ObjectId
+  users     users?    @relation(fields: [userId], references: [id])
+  shops     shops?    @relation(fields: [shopId], references: [id])
+  products  products? @relation(fields: [productId], references: [id])
+  productId String?   @db.ObjectId
 }
 
 model users {
@@ -65,6 +67,8 @@ model shops {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  products products[]
 }
 
 model sellers {
@@ -92,9 +96,51 @@ model discount_codes {
   discountType  String
   discountValue Float
   discountCode  String @unique
-  sellerId String @db.ObjectId
+  sellerId      String @db.ObjectId
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
+enum productStatus {
+  Active
+  Pending
+  Draft
+}
+
+model products {
+  id                    String        @id @default(auto()) @map("_id") @db.ObjectId
+  title                 String
+  description           String
+  detailed_description  String
+  warranty              String?
+  custom_specifications Json?
+  slug                  String        @unique
+  tags                  String[]
+  cash_on_delivery      Boolean?
+  brand                 String?
+  video_url             String?
+  category              String
+  subCategory           String
+  colors                String[]
+  sizes                 String[]
+  discountCodes         String      @db.ObjectId
+  stock                 Int
+  sale_price            Float
+  regular_price         Float
+  ratings               Float         @default(5)
+  isDeleted             Boolean?      @default(false)
+  customProperties      Json
+  images                images[]
+  status                productStatus @default(Active)
+
+  starting_date DateTime?
+  ending_date   DateTime?
+
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shopId String @db.ObjectId
+  Shop   shops  @relation(fields: [shopId], references: [id])
 }

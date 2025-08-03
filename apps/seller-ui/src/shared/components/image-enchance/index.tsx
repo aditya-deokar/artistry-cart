@@ -35,7 +35,7 @@ const ImageEnhancement = ({ setSelectedImage, selectedImage, image, index }: Pro
         setActiveEffect(transformation);
 
         try {
-            const transfromedUrl = `${selectedImage}?.tr=${transformation}`
+            const transfromedUrl = `${selectedImage}?tr=${transformation}`
 
             setSelectedImage(transfromedUrl)
         } catch (error) {
@@ -54,7 +54,7 @@ const ImageEnhancement = ({ setSelectedImage, selectedImage, image, index }: Pro
                     <Button variant={'outline'}
                         type='button'
                         onClick={() => {
-                            setSelectedImage(image[index]?.file_url!)
+                            setSelectedImage(image[index]?.url!)
                         }}
 
                         className='absolute top-3 right-[70px] p-2 !rounded shadow-lg'>
@@ -87,7 +87,7 @@ const ImageEnhancement = ({ setSelectedImage, selectedImage, image, index }: Pro
                                         onClick={()=> applyTransformation(effect)}
                                         disabled= {processing}
                                         // type='button'
-                                        className={`p-2 w-full !rounded shadow-lg ${activeEffect === effect ? 'bg-amber-400' : '' } `}>
+                                        className={`p-2 w-full !rounded shadow-lg ${activeEffect == effect ? '!bg-amber-400' : '' } `}>
                                             <Wand size={18}
                                              />
                                              {label}
