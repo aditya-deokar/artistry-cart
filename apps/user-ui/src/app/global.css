@@ -140,3 +140,92 @@
   }
 }
 
+
+@theme inline {
+  --font-display: var(--font-gambarino);
+  --font-sans: var(--font-raleway);
+}
+
+.top-header-element {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+
+.nav-element {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* Background Effects */
+.glow-background {
+  background-color: hsla(0, 0%, 0%, 0);
+  background-image:
+    radial-gradient(at 29% 43%, hsla(190, 70%, 90%, 0.08) 0px, transparent 50%),
+    radial-gradient(at 53% 28%, hsla(190, 90%, 90%, 0.18) 0px, transparent 50%),
+    radial-gradient(at 47% 71%, hsla(190, 70%, 90%, 0.13) 0px, transparent 40%),
+    radial-gradient(at 3% 95%, hsla(190, 0%, 10%, 0.2) 0px, transparent 50%),
+    radial-gradient(at 3% 3%, hsla(140, 80%, 10%, 0.2) 0px, transparent 50%),
+    radial-gradient(at 90% 5%, hsla(200, 80%, 5%, 0.2) 0px, transparent 50%),
+    radial-gradient(at 90% 80%, hsla(230, 80%, 10%, 0.2) 0px, transparent 50%);
+}
+
+
+/* --- NEW: Diagonal Reveal Transition --- */
+
+@keyframes diagonal-wipe-in {
+      from {
+        clip-path: polygon(0 0, 0 0, 0 0, 0 0);
+      }
+      to {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+      }
+    }
+    
+@keyframes fade-out-only {
+        to { opacity: 0; }
+    }
+
+    ::view-transition-old(root) {
+      animation: 0.4s ease-out both fade-out-only;
+    }
+
+    ::view-transition-new(root) {
+      animation: 0.5s cubic-bezier(0.76, 0, 0.24, 1) both diagonal-wipe-in;
+    }
+
+.navbar {
+  view-transition-name: navbar;
+}
+
+.nav-drawer-blur {
+  view-transition-name: nav-drawer-blur;
+}
+
+.nav-drawer {
+  view-transition-name: nav-drawer;
+}
+
+.footer {
+  view-transition-name: footer;
+}
+
+/* This is essential to make sure the persistent elements don't cross-fade */
+::view-transition-old(navbar),
+::view-transition-new(navbar),
+::view-transition-old(footer),
+::view-transition-new(footer) {
+  animation: none;
+  mix-blend-mode: normal; /* Ensure blend mode doesn't affect persistent elements */
+}
+
+
+/* --- Reduced Motion Preferences (Keep As Is) --- */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition,
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.001s !important; /* Use !important to ensure override */
+    animation-delay: 0s !important;
+  }
+}

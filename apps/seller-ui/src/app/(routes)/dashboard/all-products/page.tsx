@@ -29,7 +29,6 @@ const AllProductsPage = () => {
     const [globalFilter, setGlobalFilter] = useState("");
     const [analyticsData, setAnalyticsData] = useState(null);
     const [showAnalytics, setShowAnalytics] = useState(false);
-    // Add this state for dialog management
     const [deleteDialogOpen, setDeleteDialogOpen] = useState<string | null>(null);
 
     const queryClient = useQueryClient();
@@ -83,17 +82,23 @@ const AllProductsPage = () => {
         {
             accessorKey: "name",
             header: "Product Name",
+            // product name cell- visual indicator for deleted products
             cell: ({ row }: any) => {
                 const truncatedTitle = row.original.title.length > 25 ? `${row.original.title.substring(0, 15)}...` : row.original.title;
 
                 return (
-                    <Link
-                        href={`${process.env.NEXT_PUBLIC_USER_UI_LINK}/product/${row.original.slug}`}
-                        className="text-blue-400 hover:underline"
-                        title={row.original.title}
-                    >
-                        {truncatedTitle}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        <Link
+                            href={`${process.env.NEXT_PUBLIC_USER_UI_LINK}/product/${row.original.slug}`}
+                            className={`hover:underline ${row.original.isDeleted ? 'text-red-400 line-through' : 'text-blue-400'}`}
+                            title={row.original.title}
+                        >
+                            {truncatedTitle}
+                        </Link>
+                        {row.original.isDeleted && (
+                            <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Deleted</span>
+                        )}
+                    </div>
                 )
             }
         },
@@ -149,12 +154,12 @@ const AllProductsPage = () => {
                     <Button variant={"outline"}>
                         <BarChart size={18} />
                     </Button>
-                    
+
                     {/* Conditional Delete/Restore Button */}
                     {!row.original.isDeleted ? (
                         // Show Delete Button for Active Products
-                        <Dialog 
-                            open={deleteDialogOpen === row.original.id} 
+                        <Dialog
+                            open={deleteDialogOpen === row.original.id}
                             onOpenChange={(open) => {
                                 if (!open) {
                                     setDeleteDialogOpen(null);
@@ -180,7 +185,7 @@ const AllProductsPage = () => {
                                         <p>Are you sure you want to delete <b>{row.original?.title}</b>?</p>
                                         <p className="text-sm text-muted-foreground">You can restore this product within 24hr</p>
                                     </div>
-                                    
+
                                     <div className="flex gap-2">
                                         <Button
                                             variant={"outline"}
@@ -204,12 +209,12 @@ const AllProductsPage = () => {
                                         </Button>
                                     </div>
                                 </div>
-                                
+
                                 <DialogFooter>
                                     {deleteMutation.error && (
                                         <p className='text-red-500 text-xs mt-1'>
-                                            {(deleteMutation.error as AxiosError<{ message: string }>)?.response?.data?.message || 
-                                             "Delete failed"}
+                                            {(deleteMutation.error as AxiosError<{ message: string }>)?.response?.data?.message ||
+                                                "Delete failed"}
                                         </p>
                                     )}
                                 </DialogFooter>
@@ -217,8 +222,8 @@ const AllProductsPage = () => {
                         </Dialog>
                     ) : (
                         // Show Restore Button for Deleted Products
-                        <Dialog 
-                            open={deleteDialogOpen === row.original.id} 
+                        <Dialog
+                            open={deleteDialogOpen === row.original.id}
                             onOpenChange={(open) => {
                                 if (!open) {
                                     setDeleteDialogOpen(null);
@@ -244,10 +249,10 @@ const AllProductsPage = () => {
                                         <p>Are you sure you want to restore <b>{row.original?.title}</b>?</p>
                                         <p className="text-sm text-muted-foreground">This product will be available for sale again.</p>
                                     </div>
-                                    
-                                    
+
+
                                 </div>
-                                
+
                                 <DialogFooter>
                                     <div className="flex gap-2 justify-end">
                                         <Button
@@ -273,8 +278,8 @@ const AllProductsPage = () => {
                                     </div>
                                     {restoreProductMutation.error && (
                                         <p className='text-red-500 text-xs mt-1'>
-                                            {(restoreProductMutation.error as AxiosError<{ message: string }>)?.response?.data?.message || 
-                                             "Restore failed"}
+                                            {(restoreProductMutation.error as AxiosError<{ message: string }>)?.response?.data?.message ||
+                                                "Restore failed"}
                                         </p>
                                     )}
                                 </DialogFooter>

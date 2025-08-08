@@ -1,8 +1,11 @@
-import Header from '@/shared/widgets/header';
-import './global.css';
 
-import { Poppins, Roboto} from "next/font/google"
+import './global.css';
+import localFont from "next/font/local";
+import { ViewTransitions } from "next-view-transitions";
+import { Poppins, Raleway, Roboto} from "next/font/google"
 import Providers from './Providers';
+import { ThemeProvider } from '@/components/theme/theme-provider';
+import AnimatedHeader from '@/components/animations/AnimatedHeader';
 
 export const metadata = {
   title: 'Artistry Cart',
@@ -21,21 +24,41 @@ const poppins = Poppins({
   variable:"--font-poppins",
 })
 
+const raleway = Raleway({
+  variable: "--font-raleway",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const gambarino = localFont({
+  src: "./gambarino.woff2",
+  display: "swap",
+  variable: "--font-gambarino",
+});
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en"> 
-      <body className={`${roboto.variable} ${poppins.variable}`}>
-        <Providers>
-        <Header/>
-        {children}
+    <ViewTransitions>
+      <html lang="en"> 
+        <body className={`${roboto.variable} ${poppins.variable} ${raleway.variable} ${gambarino.variable} antialiased`}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+          <Providers>
+          
+          {children}
 
-        </Providers>
-      
-      </body>
-    </html>
+          </Providers>
+          </ThemeProvider>
+        </body>
+      </html>
+    </ViewTransitions>
   )
 }
