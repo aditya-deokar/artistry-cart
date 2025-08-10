@@ -5,7 +5,8 @@ import { ViewTransitions } from "next-view-transitions";
 import { Poppins, Raleway, Roboto} from "next/font/google"
 import Providers from './Providers';
 import { ThemeProvider } from '@/components/theme/theme-provider';
-import AnimatedHeader from '@/components/animations/AnimatedHeader';
+
+import ReactLenis from "lenis/react";
 
 export const metadata = {
   title: 'Artistry Cart',
@@ -45,18 +46,21 @@ export default function RootLayout({
     <ViewTransitions>
       <html lang="en"> 
         <body className={`${roboto.variable} ${poppins.variable} ${raleway.variable} ${gambarino.variable} antialiased`}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-          <Providers>
-          
-          {children}
+           <ReactLenis root options={{ lerp: 0.05, smoothWheel: true }} >
 
-          </Providers>
-          </ThemeProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+            <Providers>
+            
+            {children}
+
+            </Providers>
+            </ThemeProvider>
+          </ReactLenis>
         </body>
       </html>
     </ViewTransitions>

@@ -1,21 +1,22 @@
 // src/components/sections/ProductList.tsx
-import { FC } from "react";
+import { FC } from 'react';
 
-import { ProductCard } from "../products/ProductCard"; // We will create this
-import type { Product } from "@/lib/data";
-import { Bounded } from "../common/Bounded";
-import { RevealText } from "../animations/RevealText";
+import { ProductCard } from '../products/ProductCard';
+
+import { Bounded } from '../common/Bounded';
+import { RevealText } from '../animations/RevealText';
+import { ArtProduct } from '@/types/products';
 
 export type ProductListProps = {
   eyebrow: string;
   heading: string;
   body: string;
-  products: Product[];
+  products: ArtProduct[]; // Use the new ArtProduct[] type
 };
 
 export const ProductList: FC<ProductListProps> = ({ eyebrow, heading, body, products }) => {
   return (
-    <Bounded className="space-y-8 bg-background py-16 text-center  md:py-24">
+    <Bounded className="space-y-8 bg-background py-16 text-center md:py-24">
       <div className="mx-auto space-y-8">
         <p className="text-sm font-light tracking-[0.2em] uppercase">{eyebrow}</p>
         <RevealText
@@ -33,7 +34,8 @@ export const ProductList: FC<ProductListProps> = ({ eyebrow, heading, body, prod
 
         <div className="mt-12 grid grid-cols-1 gap-12">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            // Use a unique key from the new schema, like _id or slug
+            <ProductCard key={product.slug} product={product} />
           ))}
         </div>
       </div>

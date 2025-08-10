@@ -1,5 +1,7 @@
 // src/lib/data.ts
 
+import { ArtProduct } from "@/types/products";
+
 export type Product = {
   id: string;
   slug: string;
@@ -19,7 +21,7 @@ export type Product = {
   };
 };
 
-export const products: Product[] = [
+export const products1: Product[] = [
   {
     id: '1',
     slug: 'terra-canvas',
@@ -61,10 +63,249 @@ export const products: Product[] = [
   // Add more products as needed
 ];
 
-export const getProductBySlug = (slug: string): Product | undefined => {
+
+
+export const products = [
+  // Product 1: Handcrafted Wooden Bullock Cart
+  {
+    "title": "Classic Teak Bullock Cart",
+    "description": "A beautifully handcrafted miniature bullock cart, carved from a single block of aged teak wood. A perfect centerpiece representing traditional Indian village life.",
+    "tags": "wood, handmade, traditional, decor, miniature",
+    "warranty": "2 years",
+    "slug": "classic-teak-bullock-cart",
+    "brand": "Rural Artisans Collective",
+    "video_url": "https://youtu.be/example_video_1",
+    "regular_price": 7500,
+    "sale_price": 6800,
+    "stocks": 15,
+    "colors": [
+        "#8B4513" // SaddleBrown
+    ],
+    "customProperties": [
+        {
+            "label": "Wood Type",
+            "values": [
+                "Aged Teak"
+            ]
+        },
+        {
+            "label": "Finish",
+            "values": [
+                "Natural Oil Polish"
+            ]
+        }
+    ],
+    "cashOnDelivery": true,
+    "subcategory": "Wooden Sculptures",
+    "detailed_desc": "<p>This exquisite <strong>Teak Wood Bullock Cart</strong> is a testament to the timeless skill of rural artisans. Each detail, from the spoked wheels to the yoke, is meticulously carved by hand. The model is polished with natural oils to protect the wood and bring out its rich, warm grain. It serves as a stunning decorative piece that brings a touch of rustic charm and heritage to any home or office space. The piece is durable and designed to be a cherished collectible for years to come.</p>",
+    "selectedSizes": [
+        "Medium"
+    ],
+    "custom_specifications": [
+        {
+            "name": "Length",
+            "value": "45cm"
+        },
+        {
+            "name": "Height",
+            "value": "20cm"
+        },
+        {
+            "name": "Weight",
+            "value": "2.5kg"
+        }
+    ],
+    "category": "Handmade Crafts",
+    "discounts": "688a49a1adab1b4e7b8dc7d7", // Example ID
+    "image": [
+        {
+            "file_id": "688f27015c7cd75eb83d5dfc",
+            "url": "https://images.unsplash.com/photo-1579541513287-3f17a5d8d62c?q=80&w=752&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        },
+        {
+            "file_id": "688f27015c7cd75eb83d5dfc",
+            "url": "https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        },
+        
+    ]
+  },
+
+  // Product 2: Majestic Wooden Horse
+  {
+    "title": "Majestic Sheesham Horse",
+    "description": "A dynamic, hand-carved wooden horse statue made from premium Sheesham wood (Indian Rosewood). Its polished finish and elegant form capture a sense of motion and strength.",
+    "tags": "wood, horse, sculpture, handmade, carving",
+    "warranty": "1 year",
+    "slug": "majestic-sheesham-horse",
+    "brand": "Jaipur Carvers Guild",
+    "video_url": "https://youtu.be/example_video_2",
+    "regular_price": 9200,
+    "sale_price": 8500,
+    "stocks": 8,
+    "colors": [
+        "#654321" // Dark Brown
+    ],
+    "customProperties": [
+        {
+            "label": "Art Form",
+            "values": [
+                "Rajasthani Wood Carving"
+            ]
+        }
+    ],
+    "cashOnDelivery": true,
+    "subcategory": "Wooden Sculptures",
+    "detailed_desc": "<p>Capture the spirit of royalty with this <strong>Majestic Sheesham Horse</strong>. Carved by master artisans from the Jaipur Carvers Guild, this piece embodies grace and power. The natural dual-tone grain of the Sheesham wood is highlighted by a meticulous hand-polishing process. Ideal for display on a mantlepiece or as a significant feature in a study, this sculpture is a symbol of success and forward momentum, making it a perfect gift or a personal treasure.</p>",
+    "selectedSizes": [
+        "Large"
+    ],
+    "custom_specifications": [
+        {
+            "name": "Height",
+            "value": "55cm"
+        },
+        {
+            "name": "Material",
+            "value": "Sheesham Wood"
+        }
+    ],
+    "category": "Handmade Crafts",
+    "discounts": "688a49a1adab1b4e7b8dc7d8", // Example ID
+    "image": [
+        {
+            "file_id": "68w447015c7cd75eb83d5dfd",
+            "url": "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        },
+        {
+            "file_id": "68w447015c7cd75eb83d5dfd",
+            "url": "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        },
+        
+    ]
+  },
+
+  // Product 3: Terracotta Dancer Figurine
+  {
+    "title": "Terracotta Dancing Diva",
+    "description": "An elegant terracotta figurine depicting a classical dancer in a graceful pose. Hand-molded and baked by artisans from Panchmura village, known for its terracotta craft.",
+    "tags": "terracotta, clay, handmade, figurine, dancer",
+    "warranty": "6 months",
+    "slug": "terracotta-dancing-diva",
+    "brand": "Panchmura Potteries",
+    "video_url": "https://youtu.be/example_video_3",
+    "regular_price": 3200,
+    "sale_price": 2999,
+    "stocks": 30,
+    "colors": [
+        "#E2725B" // Terracotta
+    ],
+    "customProperties": [
+        {
+            "label": "Technique",
+            "values": [
+                "Hand-molded",
+                "Kiln-baked"
+            ]
+        }
+    ],
+    "cashOnDelivery": true,
+    "subcategory": "Clay & Pottery",
+    "detailed_desc": "<p>Experience the earthy elegance of Bankura's terracotta craft with this <strong>Dancing Diva figurine</strong>. Every curve and expression is shaped by hand, reflecting a rich cultural heritage. After shaping, the idol is sun-dried and baked in a traditional kiln, giving it its iconic reddish-brown hue and durable finish. This piece brings a touch of rustic sophistication and artistic tradition to your decor. As it is handmade, slight variations in color and form are natural, making each piece unique.</p>",
+    "selectedSizes": [
+        "Small",
+        "Medium"
+    ],
+    "custom_specifications": [
+        {
+            "name": "Height",
+            "value": "30cm"
+        },
+        {
+            "name": "Base Diameter",
+            "value": "12cm"
+        }
+    ],
+    "category": "Handmade Crafts",
+    "discounts": null,
+    "image": [
+        {
+            "file_id": "688f27012c7cd75eb83d5dfe",
+            "url": "https://plus.unsplash.com/premium_photo-1676668708126-39b12a0e9d96?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        },
+        {
+            "file_id": "688f27015c7cd45eb83d5dfe",
+            "url": "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        },
+        
+    ]
+  },
+
+  // Product 4: Brass Oil Lamp (Diya)
+  {
+    "title": "Ornate Peacock Brass Diya",
+    "description": "A traditional 'Annapakshi' oil lamp, intricately cast in brass with a majestic peacock design at its apex. Perfect for festive occasions and as a permanent decorative artifact.",
+    "tags": "brass, diya, lamp, handmade, puja, decor",
+    "warranty": "5 years",
+    "slug": "ornate-peacock-brass-diya",
+    "brand": "Swamimalai Metalworks",
+    "video_url": "https://youtu.be/example_video_4",
+    "regular_price": 4800,
+    "sale_price": 4550,
+    "stocks": 25,
+    "colors": [
+        "#B8860B" // DarkGoldenRod
+    ],
+    "customProperties": [
+        {
+            "label": "Casting Method",
+            "values": [
+                "Lost-wax casting"
+            ]
+        }
+    ],
+    "cashOnDelivery": false,
+    "subcategory": "Metal Crafts",
+    "detailed_desc": "<p>Illuminate your home with this <strong>Ornate Peacock Brass Diya</strong>, a masterpiece of the ancient lost-wax casting technique from Swamimalai. This heavy, durable brass lamp is designed to last for generations. The central motif is a beautifully detailed peacock, a symbol of grace and beauty in Indian culture. It can be used as a functional oil lamp during festivals or serve as an impressive piece of ethnic art, adding a touch of divine radiance to your interior.</p>",
+    "selectedSizes": [
+        "Standard"
+    ],
+    "custom_specifications": [
+        {
+            "name": "Height",
+            "value": "25cm"
+        },
+        {
+            "name": "Material",
+            "value": "Solid Brass"
+        },
+         {
+            "name": "Weight",
+            "value": "1.8kg"
+        }
+    ],
+    "category": "Handmade Crafts",
+    "discounts": "688a49a1adab1b4e7b8dc7d9", // Example ID
+    "image": [
+        {
+            "file_id": "688f27015c7cd75eb83d5dff",
+            "url": "https://images.unsplash.com/photo-1577083165633-14ebcdb0f658?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        },
+        {
+            "file_id": "688f27015c7cd75eb83d5ddf",
+            "url": "https://plus.unsplash.com/premium_photo-1676668708126-39b12a0e9d96?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        },
+      
+    ]
+  }
+]
+
+export const getProductBySlug = (slug: string): ArtProduct | undefined => {
   return products.find((p) => p.slug === slug);
 };
 
-export const getOtherProducts = (slug: string): Product[] => {
+export const getOtherProducts = (slug: string): ArtProduct[] => {
     return products.filter((p) => p.slug !== slug);
 }
+
+
+
