@@ -9,6 +9,7 @@ import { ProductList } from '@/components/sections/ProductList';
 import { ScrollText } from '@/components/sections/ScrollText';
 import { products } from '@/lib/data';
 
+
 export default function HomePage() {
   const featuredProduct = products[0]; // Example: feature the first product
 
@@ -32,10 +33,7 @@ export default function HomePage() {
         heading="Featured Creation: Terra Canvas"
         description="A sophisticated blend that captures the raw, grounding essence of nature. Perfect for moments of deep focus and inspiration."
         product={featuredProduct}
-        image={{
-            url: "/images/placeholder-product-main.jpg",
-            alt: "A stunning still life of the Terra Canvas bottle."
-        }}
+        
       />
       <ScrollText
         eyebrow="The Philosophy"

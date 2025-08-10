@@ -16,9 +16,9 @@ model images {
   shopId    String?   @unique @db.ObjectId
   users     users?    @relation(fields: [userId], references: [id])
   shops     shops?    @relation(fields: [shopId], references: [id])
-  products  products? @relation(fields: [productId], references: [id])
-  productId String?   @db.ObjectId
 }
+
+
 
 model users {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -131,9 +131,11 @@ model products {
   ratings               Float         @default(5)
   isDeleted             Boolean?      @default(false)
   customProperties      Json
-  images                images[]
+  images                Json[]
   status                productStatus @default(Active)
-
+  totalSales            Int?
+  
+  isEvent       Boolean?
   starting_date DateTime?
   ending_date   DateTime?
 

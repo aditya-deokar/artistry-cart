@@ -12,7 +12,7 @@ const nextConfig = {
   // See: https://nx.dev/recipes/next/next-config-setup
   nx: {},
   images: {
-    domains: ['plus.unsplash.com', 'images.unsplash.com', 'plus.unsplash.com']
+    domains: ['plus.unsplash.com', 'images.unsplash.com', 'plus.unsplash.com', 'ik.imagekit.io']
   }
 };
 
