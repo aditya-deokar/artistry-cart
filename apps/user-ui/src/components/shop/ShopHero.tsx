@@ -1,8 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import Image from 'next/image';
 
 const containerVariants = {
@@ -20,7 +18,7 @@ const itemVariants = {
 
 export const ShopHero = () => {
   return (
-    <section className="relative h-[60vh] min-h-[400px] w-full flex items-center justify-center text-center text-white overflow-hidden">
+    <section className="relative h-[30vh]  w-full flex items-center justify-center text-center text-white overflow-hidden">
       {/* Background Image - an abstract, artistic texture */}
       <Image
         src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=2070&auto=format&fit=crop"
@@ -52,18 +50,7 @@ export const ShopHero = () => {
         >
           Explore a curated world of unique artworks from independent artists and creators around the globe.
         </motion.p>
-        <motion.div variants={itemVariants} className="mt-8 flex justify-center gap-4">
-          <Link href="#product-grid">
-            <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white">
-              Shop Now
-            </Button>
-          </Link>
-          <Link href="/artists">
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-black">
-              Discover Artists
-            </Button>
-          </Link>
-        </motion.div>
+        
       </motion.div>
     </section>
   );

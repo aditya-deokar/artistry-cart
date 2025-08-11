@@ -9,6 +9,8 @@ import { Button } from '../ui/button';
 
 import { cn } from '@/lib/utils';
 import { ArtProduct } from '@/types/products';
+import ProductDialog from './ProductDialog';
+import ProductPage from './ProductPage';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -26,7 +28,10 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
   const timeleft = useCountdown(product.ending_date);
 
   return (
-    <motion.div variants={cardVariants} className="group relative flex flex-col">
+    <ProductDialog
+      trigger={
+
+        <motion.div variants={cardVariants} className="group relative flex flex-col">
       {/* The background is now semantically colored */}
       <div className={cn(
         "relative w-full aspect-[4/5] overflow-hidden rounded-lg",
@@ -39,7 +44,7 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
         </div>
         
         {/* --- IMAGE --- */}
-        <Link href={`/products/${product.slug}`}>
+        {/* <Link href={`/products/${product.slug}`}> */}
           {primaryImage && (
             <Image
               src={primaryImage.url}
@@ -49,7 +54,7 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
               className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
             />
           )}
-        </Link>
+        {/* </Link> */}
 
         {/* --- HOVER BUTTONS (Updated background to be theme-aware) --- */}
         <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -65,11 +70,11 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
       <div className="mt-4 text-left flex-grow flex flex-col">
         {/* --- TITLE & ARTIST (Updated text colors to be semantic) --- */}
         <h3 className="font-display text-lg text-foreground relative w-fit">
-          <Link href={`/products/${product.slug}`}>
+          {/* <Link href={`/products/${product.slug}`}> */}
             {product.title}
             {/* Accent color for brushstroke is fine to keep */}
             <span className="absolute bottom-[-2px] left-0 h-[2px] w-0 bg-amber-600 transition-all duration-300 group-hover:w-full"></span>
-          </Link>
+          {/* </Link> */}
         </h3>
         <p className="text-sm text-muted-foreground mt-1 hover:text-amber-800 transition-colors">
             by <Link href={`/artist/${product.Shop.id}`}>{product.Shop.name}</Link>
@@ -102,5 +107,13 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
         </div>
       </div>
     </motion.div>
+      }
+      >
+
+
+       <div className="max-w-6xl mx-auto">
+        <ProductPage product={product} />
+      </div>
+      </ProductDialog>
   );
 };
