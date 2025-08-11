@@ -25,6 +25,8 @@ import { ModeToggle } from '@/components/theme/ModeToggle'
 import { navItems } from '@/configs/constants'
 import { cn } from '@/lib/utils'
 
+import { TransitionLink } from '@/components/common/TransitionLink'
+
 // Props to accept classNames for GSAP targeting
 type HeaderProps = {
     topHeaderClassName?: string;
@@ -132,13 +134,13 @@ const Header = ({ topHeaderClassName, navClassName ,className}: HeaderProps) => 
 
                     <div className='flex items-center gap-2'>
                         {navItems.map((item: any) => (
-                            <Link
+                            <TransitionLink
                                 href={item.href}
                                 key={item.title}
-                                className={cn('font-medium text-lg px-4 py-2 ', navClassName)}
+                                className={cn('font-medium text-primary/80 hover:text-primary/90 text-lg px-4 py-2 ', navClassName)}
                             >
                                 {item.title}
-                            </Link>
+                            </TransitionLink>
                         ))}
                     </div>
 

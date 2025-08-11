@@ -542,3 +542,53 @@ export const getAllProducts = async (
   }
 };
 
+
+export const getProductBySlug = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+ 
+    const { slug } = req.params;
+
+  
+    if (!slug) {
+    
+      return res.status(400).json({
+        success: false,
+        message: 'Product slug is required.',
+      });
+    }
+
+    
+    const product = await prisma.products.findUnique({
+      where: {
+        slug: slug,
+      },
+  
+      include: {
+        Shop: true,
+      },
+    });
+
+ 
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found.',
+      });
+    }
+
+   
+    res.status(200).json({
+      success: true,
+      product: product, 
+    });
+
+  } catch (error) {
+    
+    console.error("Error fetching product by slug:", error);
+    next(error);
+  }
+};
