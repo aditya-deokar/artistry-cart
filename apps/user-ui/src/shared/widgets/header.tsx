@@ -26,6 +26,7 @@ import { navItems } from '@/configs/constants'
 import { cn } from '@/lib/utils'
 
 import { TransitionLink } from '@/components/common/TransitionLink'
+import { useStore } from '@/store'
 
 // Props to accept classNames for GSAP targeting
 type HeaderProps = {
@@ -37,6 +38,10 @@ type HeaderProps = {
 const Header = ({ topHeaderClassName, navClassName ,className}: HeaderProps) => {
     const [isSticky, setIsSticky] = useState(false);
     const { user, isLoading } = useUser();
+
+    const wishlist = useStore((state:any) => state.wishlist);
+    const cart = useStore((state:any) => state.cart);
+
 
     useEffect(() => {
         const handleScroll = () => {
@@ -92,13 +97,17 @@ const Header = ({ topHeaderClassName, navClassName ,className}: HeaderProps) => 
                     <Button asChild variant="ghost" size="icon" className='relative'>
                         <Link href={"/wishlist"}>
                             <HeartIcon />
-                            <Badge variant="destructive" className='absolute top-[-5px] right-[-5px] px-1.5'>0</Badge>
+                            <Badge variant="destructive" className='absolute top-[-5px] right-[-5px] px-1.5'>
+                                {wishlist?.length}
+                            </Badge>
                         </Link>
                     </Button>
                     <Button asChild variant="ghost" size="icon" className='relative'>
                         <Link href={"/cart"}>
                             <ShoppingCart />
-                            <Badge variant="destructive" className='absolute top-[-5px] right-[-5px] px-1.5'>1</Badge>
+                            <Badge variant="destructive" className='absolute top-[-5px] right-[-5px] px-1.5'>
+                                {cart?.length}
+                            </Badge>
                         </Link>
                     </Button>
                 </div>
