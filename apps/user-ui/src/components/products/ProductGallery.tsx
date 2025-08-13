@@ -46,9 +46,9 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ productTitle, im
 
       {/* Thumbnails Selection Area */}
       <div className="grid grid-cols-5 gap-3">
-        {images.map((image) => (
+        {images.map((image, id) => (
           <button
-            key={image.file_id}
+            key={id}
             onClick={() => setSelectedImage(image)}
             className={cn(
               "relative aspect-square w-full rounded-md overflow-hidden transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background",

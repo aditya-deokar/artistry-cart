@@ -240,63 +240,7 @@ export const products = [
     ]
   },
 
-  // Product 4: Brass Oil Lamp (Diya)
-  {
-    "title": "Ornate Peacock Brass Diya",
-    "description": "A traditional 'Annapakshi' oil lamp, intricately cast in brass with a majestic peacock design at its apex. Perfect for festive occasions and as a permanent decorative artifact.",
-    "tags": "brass, diya, lamp, handmade, puja, decor",
-    "warranty": "5 years",
-    "slug": "ornate-peacock-brass-diya",
-    "brand": "Swamimalai Metalworks",
-    "video_url": "https://youtu.be/example_video_4",
-    "regular_price": 4800,
-    "sale_price": 4550,
-    "stocks": 25,
-    "colors": [
-        "#B8860B" // DarkGoldenRod
-    ],
-    "customProperties": [
-        {
-            "label": "Casting Method",
-            "values": [
-                "Lost-wax casting"
-            ]
-        }
-    ],
-    "cashOnDelivery": false,
-    "subcategory": "Metal Crafts",
-    "detailed_desc": "<p>Illuminate your home with this <strong>Ornate Peacock Brass Diya</strong>, a masterpiece of the ancient lost-wax casting technique from Swamimalai. This heavy, durable brass lamp is designed to last for generations. The central motif is a beautifully detailed peacock, a symbol of grace and beauty in Indian culture. It can be used as a functional oil lamp during festivals or serve as an impressive piece of ethnic art, adding a touch of divine radiance to your interior.</p>",
-    "selectedSizes": [
-        "Standard"
-    ],
-    "custom_specifications": [
-        {
-            "name": "Height",
-            "value": "25cm"
-        },
-        {
-            "name": "Material",
-            "value": "Solid Brass"
-        },
-         {
-            "name": "Weight",
-            "value": "1.8kg"
-        }
-    ],
-    "category": "Handmade Crafts",
-    "discounts": "688a49a1adab1b4e7b8dc7d9", // Example ID
-    "image": [
-        {
-            "file_id": "688f27015c7cd75eb83d5dff",
-            "url": "https://images.unsplash.com/photo-1577083165633-14ebcdb0f658?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        },
-        {
-            "file_id": "688f27015c7cd75eb83d5ddf",
-            "url": "https://plus.unsplash.com/premium_photo-1676668708126-39b12a0e9d96?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        },
-      
-    ]
-  }
+ 
 ]
 
 export const getProductBySlug = (slug: string): ArtProduct | undefined => {

@@ -16,7 +16,7 @@ type HeroProps = {
 
 export const Hero: FC<HeroProps> = ({ heading, body, buttonText, buttonLink, imageUrl }) => {
   return (
-    <Bounded className="relative min-h-screen overflow-hidden ">
+    <Bounded className="relative h-svh overflow-hidden flex items-center">
       {/* bounded- dark:bg-primary/20 bg-primary/80 */}
       {/* <FadeIn vars={{ scale: 1, opacity: 0.5 }} className="absolute inset-0 opacity-0 motion-safe:scale-125">
         <Image
@@ -28,7 +28,7 @@ export const Hero: FC<HeroProps> = ({ heading, body, buttonText, buttonLink, ima
         />
       </FadeIn> */}
 
-      <div className="relative flex h-screen flex-col justify-center">
+      <div className="relative flex flex-col justify-center">
         <RevealText
           text={heading}
           as="h1"

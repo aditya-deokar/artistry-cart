@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { CreateDiscountCodes, createProduct, deleteDiscountCode, deleteProductImage, deleteShopProducts, getAllProducts, getCategories, getDiscountCodes, getProductBySlug, getShopProducts, restoreShopProducts, uploadProductImage } from "../controllers/product.controller";
+import { CreateDiscountCodes, createProduct, deleteDiscountCode, deleteProductImage, deleteShopProducts, getAllProducts, getCategories, getDiscountCodes, getProductBySlug, getShopProducts, restoreShopProducts, uploadProductImage, validateCoupon } from "../controllers/product.controller";
 import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
 
 
@@ -23,6 +23,11 @@ router.put("/restore-product/:productId",isAuthenticated, restoreShopProducts);
 
 router.get("/get-all-products", getAllProducts);
 router.get("/get-product/:slug", getProductBySlug);
+
+
+router.post("/coupon/validate", validateCoupon);
+
+
 
 
 

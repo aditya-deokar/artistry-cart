@@ -48,6 +48,8 @@ export type ArtProduct = {
   images: ImageInfo[];
   custom_specifications: CustomSpecification[];
   Shop: ShopInfo; // The related artist/shop
+
+  quantity?: number
 };
 
 // Type for the API response which includes pagination
