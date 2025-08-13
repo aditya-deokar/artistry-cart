@@ -1,29 +1,20 @@
 'use client';
 
 import React from 'react';
-import { useStore } from '@/store'; // Assuming a single store entry point
+import { useStore } from '@/store'; 
 import { AnimatePresence } from 'framer-motion';
 
 // --- UI & Helper Components ---
 import { Bounded } from '@/components/common/Bounded';
 
-
-// --- Hooks (Preserved as requested) ---
-import useDeviceTracking from '@/hooks/useDeviceTracking';
-import useLocationTracking from '@/hooks/useLocationTracking';
-import useUser from '@/hooks/useUser';
 import { EmptyWishlist } from '@/components/wishlist/EmptyWishlist';
 import { WishlistItem } from '@/components/wishlist/WishlistItem';
 
 const WishlistPage = () => {
-    // --- Hooks (Preserved) ---
-    const { user } = useUser();
-    const location = useLocationTracking();
-    const deviceInfo = useDeviceTracking();
+
 
     // Select state slices
     const wishlistItems = useStore((state) => state.wishlist);
-    const cartItems = useStore((state) => state.cart);
 
     // Select actions from the nested 'actions' object
     const { addToCart, removeFromWishlist } = useStore((state) => state.actions);
@@ -34,7 +25,7 @@ const WishlistPage = () => {
     return (
         <Bounded className="py-16 md:py-24">
             <div className="max-w-4xl mx-auto">
-                {/* --- Page Header (UI remains consistent) --- */}
+               
                 <div className="text-center mb-12">
                     <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground">
                         My Art Wishlist

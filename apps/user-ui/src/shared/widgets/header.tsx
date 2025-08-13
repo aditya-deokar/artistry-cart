@@ -37,10 +37,7 @@ type HeaderProps = {
 
 const Header = ({ topHeaderClassName, navClassName ,className}: HeaderProps) => {
     const [isSticky, setIsSticky] = useState(false);
-    const { user, isLoading } = useUser();
-
-    const wishlist = useStore((state:any) => state.wishlist);
-    const cart = useStore((state:any) => state.cart);
+    
 
 
     useEffect(() => {
@@ -55,63 +52,7 @@ const Header = ({ topHeaderClassName, navClassName ,className}: HeaderProps) => 
     return (
         <header className={`w-full  z-50 ${className}`}>
             {/* ======== TOP HEADER (NON-STICKY) ======== */}
-            <div className='w-[80%] py-5 m-auto flex items-center justify-between'>
-                <div className={cn('flex items-center gap-8', topHeaderClassName)}>
-                    <Link href={'/'}>
-                        <span className='text-2xl font-extrabold'>Artistry Cart</span>
-                    </Link>
-                </div>
-
-                <div className={cn('w-1/2 relative', topHeaderClassName)}>
-                    <input type='text' placeholder='Search for Products...'
-                        className='w-full px-4 font-poppins font-medium border-[2.5px] border-border outline-none h-[50px]' />
-                    <div className='w-[60px] cursor-pointer flex items-center justify-center h-[50px] bg-border absolute top-0 right-0'>
-                        <Search />
-                    </div>
-                </div>
-
-                <div className={cn('flex items-center gap-5', topHeaderClassName)}>
-                    <ModeToggle />
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon"><User2 /></Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            {user && !isLoading ? (
-                                <>
-                                    <DropdownMenuLabel>Hi, {user?.name?.split(" ")[0]}</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <Link href="/profile"><DropdownMenuItem className="cursor-pointer">Profile</DropdownMenuItem></Link>
-                                    <DropdownMenuItem className="cursor-pointer">Logout</DropdownMenuItem>
-                                </>
-                            ) : (
-                                <>
-                                    <DropdownMenuLabel>Hello, Sign in</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <Link href="/login"><DropdownMenuItem className="cursor-pointer">Login</DropdownMenuItem></Link>
-                                    <Link href="/register"><DropdownMenuItem className="cursor-pointer">Register</DropdownMenuItem></Link>
-                                </>
-                            )}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <Button asChild variant="ghost" size="icon" className='relative'>
-                        <Link href={"/wishlist"}>
-                            <HeartIcon />
-                            <Badge variant="destructive" className='absolute top-[-5px] right-[-5px] px-1.5'>
-                                {wishlist?.length}
-                            </Badge>
-                        </Link>
-                    </Button>
-                    <Button asChild variant="ghost" size="icon" className='relative'>
-                        <Link href={"/cart"}>
-                            <ShoppingCart />
-                            <Badge variant="destructive" className='absolute top-[-5px] right-[-5px] px-1.5'>
-                                {cart?.length}
-                            </Badge>
-                        </Link>
-                    </Button>
-                </div>
-            </div>
+            <TopHeader topHeaderClassName={topHeaderClassName}/>
 
             <div className='border-b' />
 
@@ -161,3 +102,74 @@ const Header = ({ topHeaderClassName, navClassName ,className}: HeaderProps) => 
 }
 
 export default Header;
+
+
+
+
+export const TopHeader = ({topHeaderClassName}:{ topHeaderClassName: string }) => {
+
+    const { user, isLoading } = useUser();
+
+    const wishlist = useStore((state:any) => state.wishlist);
+    const cart = useStore((state:any) => state.cart);
+  return (
+    <div className='w-[80%] py-5 m-auto flex items-center justify-between'>
+                <div className={cn('flex items-center gap-8', topHeaderClassName)}>
+                    <TransitionLink href={'/'}>
+                        <span className='text-2xl font-extrabold'>Artistry Cart</span>
+                    </TransitionLink>
+                </div>
+
+                <div className={cn('w-1/2 relative', topHeaderClassName)}>
+                    <input type='text' placeholder='Search for Products...'
+                        className='w-full px-4 font-poppins font-medium border-[2.5px] border-border outline-none h-[50px]' />
+                    <div className='w-[60px] cursor-pointer flex items-center justify-center h-[50px] bg-border absolute top-0 right-0'>
+                        <Search />
+                    </div>
+                </div>
+
+                <div className={cn('flex items-center gap-5', topHeaderClassName)}>
+                    <ModeToggle />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon"><User2 /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            {user && !isLoading ? (
+                                <>
+                                    <DropdownMenuLabel>Hi, {user?.name?.split(" ")[0]}</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <TransitionLink href="/profile"><DropdownMenuItem className="cursor-pointer">Profile</DropdownMenuItem></TransitionLink>
+                                    <DropdownMenuItem className="cursor-pointer">Logout</DropdownMenuItem>
+                                </>
+                            ) : (
+                                <>
+                                    <DropdownMenuLabel>Hello, Sign in</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <TransitionLink href="/login"><DropdownMenuItem className="cursor-pointer">Login</DropdownMenuItem></TransitionLink>
+                                    <TransitionLink href="/register"><DropdownMenuItem className="cursor-pointer">Register</DropdownMenuItem></TransitionLink>
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button asChild variant="ghost" size="icon" className='relative'>
+                        <TransitionLink href={"/wishlist"}>
+                            <HeartIcon />
+                            <Badge variant="destructive" className='absolute top-[-5px] right-[-5px] px-1.5'>
+                                {wishlist?.length}
+                            </Badge>
+                        </TransitionLink>
+                    </Button>
+                    <Button asChild variant="ghost" size="icon" className='relative'>
+                        <TransitionLink href={"/cart"}>
+                            <ShoppingCart />
+                            <Badge variant="destructive" className='absolute top-[-5px] right-[-5px] px-1.5'>
+                                {cart?.length}
+                            </Badge>
+                        </TransitionLink>
+                    </Button>
+                </div>
+            </div>
+  )
+}
+

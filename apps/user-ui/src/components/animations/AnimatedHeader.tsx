@@ -43,7 +43,7 @@ const AnimatedHeader = () => {
         <Header
             topHeaderClassName="top-header-element"
             navClassName="nav-element"
-            className="absolute"
+            // className="absolute"
         />
     </div>
   );
