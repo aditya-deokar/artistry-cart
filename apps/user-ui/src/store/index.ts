@@ -8,10 +8,18 @@ export type CartItem = ArtProduct & {
   quantity: number;
 };
 
-// Define the shape of the store's state.
+export type DiscountCode = {
+  id: string;
+  publicName: string;
+  discountType: 'percentage' | 'flat'; 
+  discountValue: number;
+  discountCode: string;
+};
+
 export interface StoreState {
   cart: CartItem[];
   wishlist: ArtProduct[];
+  appliedCoupon: DiscountCode | null; 
 }
 
 // Define all the actions that can be performed on the store.
@@ -22,6 +30,9 @@ export interface StoreActions {
   clearCart: () => void;
   addToWishlist: (product: ArtProduct, user:any , location:any , deviceInfo :string) => void;
   removeFromWishlist: (productId: string , user :any , location: any, deviceInfo:string) => void;
+
+  applyCoupon: (coupon: DiscountCode) => void; 
+  removeCoupon: () => void;
 }
 
 // Combine state and actions into the final store type.
@@ -37,6 +48,7 @@ export const useStore = create<Store>()(
       // --- STATE ---
       cart: [],
       wishlist: [],
+      appliedCoupon: null,
 
       // --- ACTIONS ---
       // All actions are grouped under the 'actions' key for organized access.
@@ -52,21 +64,14 @@ export const useStore = create<Store>()(
           }
         },
 
-        /**
-         * Removes a product from the wishlist by its ID.
-         * @param {string} productId - The ID of the product to remove.
-         */
+        
         removeFromWishlist:(productId , user, location, deviceInfo) => {
           set(state => ({
             wishlist: state.wishlist.filter(item => item.id !== productId),
           }));
         },
 
-        /**
-         * Adds a product to the cart. If the product already exists,
-         * its quantity is incremented.
-         * @param {ArtProduct} product - The product to add.
-         */
+       
         addToCart: (product, user, location, deviceInfo) => {
           const { cart } = get();
           const existingItem = cart.find(item => item.id === product.id);
@@ -87,22 +92,14 @@ export const useStore = create<Store>()(
           }
         },
 
-        /**
-         * Removes a product completely from the cart by its ID.
-         * @param {string} productId - The ID of the product to remove.
-         */
+        
         removeFromCart: (productId, user, location, deviceInfo) => {
           set(state => ({
             cart: state.cart.filter(item => item.id !== productId),
           }));
         },
 
-        /**
-         * Updates the quantity of a specific item in the cart.
-         * If quantity is set to 0 or less, the item is removed.
-         * @param {string} productId - The ID of the product to update.
-         * @param {number} newQuantity - The new quantity.
-         */
+       
         updateQuantity: (productId, newQuantity) => {
           if (newQuantity <= 0) {
             // If quantity is 0 or less, remove the item from the cart
@@ -118,12 +115,22 @@ export const useStore = create<Store>()(
           }
         },
 
-        /**
-         * Clears all items from the shopping cart.
-         */
+      
+        // Clears all items from the shopping cart.   
         clearCart: () => {
           set({ cart: [] });
         },
+
+
+        applyCoupon: (coupon) => {
+          set({ appliedCoupon: coupon });
+        },
+        // Removes the currently applied coupon from the state. 
+        removeCoupon: () => {
+          set({ appliedCoupon: null });
+        },
+
+
       },
     }),
     {

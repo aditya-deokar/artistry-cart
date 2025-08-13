@@ -1,5 +1,3 @@
-// get Product Category
-
 import { NextFunction, Request, Response } from "express";
 import prisma from "../../../../packages/libs/prisma";
 import {
@@ -9,7 +7,7 @@ import {
 } from "../../../../packages/error-handler";
 import { imagekit } from "../../../../packages/libs/imageKit";
 import { Prisma } from "@prisma/client";
-// import { Prisma } from "@prisma/client";
+
 
 // get Categories
 export const getCategories = async (
@@ -282,7 +280,7 @@ export const createProduct = async (
         discountCodes: discounts,
         sizes: selectedSizes,
         stock: parseInt(stocks),
-        images, 
+        images,
       },
     });
 
@@ -300,25 +298,21 @@ export const getShopProducts = async (
   res: Response,
   next: NextFunction
 ) => {
-    try {
-        const products= await prisma.products.findMany({
-            where:{
-                shopId: req.user?.shop?.id,
-            },
-        });
+  try {
+    const products = await prisma.products.findMany({
+      where: {
+        shopId: req.user?.shop?.id,
+      },
+    });
 
-        res.status(200).json({
-            success: true,
-            products
-        })
-
-        
-    } catch (error) {
-        next(error)
-    }
-
-}
-
+    res.status(200).json({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // delete product
 export const deleteShopProducts = async (
@@ -327,51 +321,50 @@ export const deleteShopProducts = async (
   next: NextFunction
 ) => {
   try {
-    const { productId }= req.params;
+    const { productId } = req.params;
     const sellerId = req.user?.shop?.id;
 
     const product = await prisma.products.findUnique({
-      where:{
-        id: productId
+      where: {
+        id: productId,
       },
-      select:{
+      select: {
         id: true,
         shopId: true,
-        isDeleted: true
-      }
+        isDeleted: true,
+      },
     });
 
-    if(!product){
-      return next(new ValidationError("Product not found"))
-
+    if (!product) {
+      return next(new ValidationError("Product not found"));
     }
 
-    if(product.shopId !== sellerId){
-      return next(new ValidationError("Unauthorized action"))
+    if (product.shopId !== sellerId) {
+      return next(new ValidationError("Unauthorized action"));
     }
 
-    if(product.isDeleted){
-      return next(new ValidationError("Product is already deleted"))
+    if (product.isDeleted) {
+      return next(new ValidationError("Product is already deleted"));
     }
 
     const deletedProduct = await prisma.products.update({
-      where:{
-        id:productId
+      where: {
+        id: productId,
       },
-      data:{
-        isDeleted:true,
-        deletedAt: new Date(Date.now() + 24 *60 *60 *1000)
-      }
+      data: {
+        isDeleted: true,
+        deletedAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
     });
 
     return res.status(200).json({
-      message:"Product is scheduled for deletion in 24 hours. You can restore it within this 24 hr"
-    })
+      message:
+        "Product is scheduled for deletion in 24 hours. You can restore it within this 24 hr",
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
-
+};
 
 // restore product
 export const restoreShopProducts = async (
@@ -379,58 +372,55 @@ export const restoreShopProducts = async (
   res: Response,
   next: NextFunction
 ) => {
-
   try {
-    const { productId }= req.params;
+    const { productId } = req.params;
     const sellerId = req.user?.shop?.id;
 
     const product = await prisma.products.findUnique({
-      where:{
-        id: productId
+      where: {
+        id: productId,
       },
-      select:{
+      select: {
         id: true,
         shopId: true,
-        isDeleted: true
-      }
+        isDeleted: true,
+      },
     });
 
-    if(!product){
-      return next(new ValidationError("Product not found"))
-
+    if (!product) {
+      return next(new ValidationError("Product not found"));
     }
 
-    if(product.shopId !== sellerId){
-      return next(new ValidationError("Unauthorized action"))
+    if (product.shopId !== sellerId) {
+      return next(new ValidationError("Unauthorized action"));
     }
 
-    if(!product.isDeleted){
+    if (!product.isDeleted) {
       return res.status(400).json({
-        message: "Product is not in deleted state"
+        message: "Product is not in deleted state",
       });
     }
 
-
     await prisma.products.update({
-      where:{
-        id:productId
+      where: {
+        id: productId,
       },
-      data:{
-        isDeleted:false,
-        deletedAt: null
-      }
+      data: {
+        isDeleted: false,
+        deletedAt: null,
+      },
     });
 
     return res.status(200).json({
-      message:"Product successfully restored!"
-    })
+      message: "Product successfully restored!",
+    });
   } catch (error) {
     return res.status(500).json({
-      message: "Error restoring product", error
-    })
+      message: "Error restoring product",
+      error,
+    });
   }
-}
-
+};
 
 export const getAllProducts = async (
   req: any,
@@ -444,16 +434,20 @@ export const getAllProducts = async (
     const skip = (page - 1) * limit;
 
     const category = req.query.category as string;
-    const sortBy = req.query.sortBy as string || 'newest';
-    const minPrice = req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined;
-    const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined;
+    const sortBy = (req.query.sortBy as string) || "newest";
+    const minPrice = req.query.minPrice
+      ? parseFloat(req.query.minPrice as string)
+      : undefined;
+    const maxPrice = req.query.maxPrice
+      ? parseFloat(req.query.maxPrice as string)
+      : undefined;
     const search = req.query.search as string;
 
     // --- 2. BUILD DYNAMIC PRISMA 'where' CLAUSE ---
     const whereClause: Prisma.productsWhereInput = {
       // Base conditions for all queries
       isDeleted: false,
-      status: 'Active',
+      status: "Active",
       // Correctly handle events: show non-events OR active events
       OR: [
         { isEvent: false },
@@ -461,13 +455,13 @@ export const getAllProducts = async (
         {
           isEvent: true,
           starting_date: { lte: new Date() }, // Event has started
-          ending_date: { gte: new Date() },   // Event has not ended
+          ending_date: { gte: new Date() }, // Event has not ended
         },
       ],
     };
 
     // Conditionally add filters to the 'where' clause
-    if (category && category !== 'all') {
+    if (category && category !== "all") {
       whereClause.category = category;
     }
 
@@ -478,36 +472,36 @@ export const getAllProducts = async (
         lte: maxPrice,
       };
     }
-    
+
     if (search) {
-        whereClause.AND = [
-            ...(whereClause.AND as any[] || []), // Keep existing AND conditions if any
-            {
-                OR: [
-                    { title: { contains: search, mode: 'insensitive' } },
-                    { description: { contains: search, mode: 'insensitive' } },
-                    { brand: { contains: search, mode: 'insensitive' } },
-                    { tags: { has: search.toLowerCase() } },
-                ]
-            }
-        ]
+      whereClause.AND = [
+        ...((whereClause.AND as any[]) || []), // Keep existing AND conditions if any
+        {
+          OR: [
+            { title: { contains: search, mode: "insensitive" } },
+            { description: { contains: search, mode: "insensitive" } },
+            { brand: { contains: search, mode: "insensitive" } },
+            { tags: { has: search.toLowerCase() } },
+          ],
+        },
+      ];
     }
 
     // --- 3. BUILD DYNAMIC PRISMA 'orderBy' CLAUSE ---
     let orderByClause: Prisma.productsOrderByWithRelationInput = {};
     switch (sortBy) {
-      case 'price-asc':
-        orderByClause = { sale_price: 'asc' };
+      case "price-asc":
+        orderByClause = { sale_price: "asc" };
         break;
-      case 'price-desc':
-        orderByClause = { sale_price: 'desc' };
+      case "price-desc":
+        orderByClause = { sale_price: "desc" };
         break;
       // case 'popularity':
       //   orderByClause = { totalSales: 'desc' };
       //   break;
-      case 'newest':
+      case "newest":
       default:
-        orderByClause = { createdAt: 'desc' };
+        orderByClause = { createdAt: "desc" };
         break;
     }
 
@@ -542,53 +536,76 @@ export const getAllProducts = async (
   }
 };
 
-
 export const getProductBySlug = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
- 
     const { slug } = req.params;
 
-  
     if (!slug) {
-    
       return res.status(400).json({
         success: false,
-        message: 'Product slug is required.',
+        message: "Product slug is required.",
       });
     }
 
-    
     const product = await prisma.products.findUnique({
       where: {
         slug: slug,
       },
-  
+
       include: {
         Shop: true,
       },
     });
 
- 
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found.',
+        message: "Product not found.",
       });
     }
 
-   
     res.status(200).json({
       success: true,
-      product: product, 
+      product: product,
+    });
+  } catch (error) {
+    console.error("Error fetching product by slug:", error);
+    next(error);
+  }
+};
+
+export const validateCoupon = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  const { couponCode } = req.body;
+
+  // 1. Input Validation
+  if (!couponCode || typeof couponCode !== "string") {
+    return res.status(400).json({ message: "Coupon code is required." });
+  }
+
+  try {
+    const discount = await prisma.discount_codes.findUnique({
+      where: {
+        discountCode: couponCode.toUpperCase(),
+      },
     });
 
+    if (!discount) {
+      return res
+        .status(404)
+        .json({ message: "This coupon code is not valid." });
+    }
+
+    return res.status(200).json(discount);
   } catch (error) {
-    
-    console.error("Error fetching product by slug:", error);
+    console.error("Coupon validation error:", error);
     next(error);
   }
 };
