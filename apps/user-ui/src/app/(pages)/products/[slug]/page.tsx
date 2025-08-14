@@ -32,10 +32,6 @@ type ProductPageProps = {
   };
 };
 
-// export async function generateStaticParams() {
-//   const products: ArtProduct[] = allProducts;
-//   return products.map((product) => ({ slug: product.slug }));
-// }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const product = getProductBySlug(params.slug);
