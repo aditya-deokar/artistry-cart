@@ -62,7 +62,7 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
         </div>
         
         {/* --- IMAGE --- */}
-        <Link href={`/products/${product.slug}`}>
+        <Link href={`/product/${product.slug}`}>
           {primaryImage && (
             <Image
               src={primaryImage.url}
@@ -125,7 +125,7 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
         {/* --- PRICE (Updated old price color) --- */}
         <div className="flex items-baseline gap-2 mt-2">
             <p className="font-semibold text-base text-amber-600">{formatPrice(product.sale_price)}</p>
-            {product.sale_price < product.regular_price && 
+            {product?.sale_price < product.regular_price && 
                 <p className="text-sm text-muted-foreground line-through">{formatPrice(product.regular_price)}</p>
             }
         </div>

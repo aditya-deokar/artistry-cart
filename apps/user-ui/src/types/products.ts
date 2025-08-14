@@ -1,10 +1,9 @@
-// src/types/product.ts
-
 // Type for the nested Shop/Artist information
 export type ShopInfo = {
   id: string;
   name: string;
-  // You can add more artist details here later, like an avatar
+  bio?: string;
+  // Add any other shop details you might need
 };
 
 // Type for a single image object
@@ -23,42 +22,33 @@ export type CustomSpecification = {
 export type ArtProduct = {
   id: string;
   title: string;
+  slug: string;
   description: string;
   detailed_description: string;
-  slug: string;
   tags: string[];
   category: string;
   subCategory: string;
   stock: number;
-  sale_price: number;
+  sale_price: number | null; // Can be null
   regular_price: number;
   
-  // Optional & Relational Fields
+  // New & Optional Fields from your JSON
   warranty?: string | null;
-  brand?: string | null; // This is the artist/brand name
+  brand?: string | null;
   ratings?: number;
-  totalSales?: number | null;
+  totalSales?: number;
+  video_url?: string | null;
+  cash_on_delivery?: boolean;
+  colors?: string[];
+  sizes?: string[];
 
   // Event-specific fields
-  isEvent?: boolean | null;
-  starting_date?: string | null; // Dates from JSON are strings
+  isEvent?: boolean;
+  starting_date?: string | null;
   ending_date?: string | null;
 
   // Nested JSON and relations
   images: ImageInfo[];
   custom_specifications: CustomSpecification[];
-  Shop: ShopInfo; // The related artist/shop
-
-  quantity?: number
-};
-
-// Type for the API response which includes pagination
-export type ProductAPIResponse = {
-  products: ArtProduct[];
-  pagination: {
-    total: number;
-    currentPage: number;
-    totalPages: number;
-    limit: number;
-  };
-};
+  Shop: ShopInfo; 
+}
