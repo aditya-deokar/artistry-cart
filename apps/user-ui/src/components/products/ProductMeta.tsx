@@ -20,10 +20,10 @@ export const ProductMeta: React.FC<{ product: ArtProduct }> = ({ product }) => {
         )}
         {product.tags && product.tags.length > 0 && (
             <div className="flex items-start gap-3 text-sm">
-                <TagIcon /> <span className="text-primary/70 mt-1">Tags:</span>
+                <TagIcon  /> <span className="text-primary/70 mt-1">Tags:</span>
                 <div className="flex flex-wrap gap-2">
                     {product.tags.map(tag => (
-                        <span key={tag} className="px-3 py-1 bg-neutral-800 rounded-full text-xs font-medium">
+                        <span key={tag} className="px-3 py-1 rounded-full text-xs font-medium">
                             {tag.trim()}
                         </span>
                     ))}

@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 type ReadMoreProps = {
   htmlContent: string;
-  maxHeight?: number; // Max height in pixels before truncating
+  maxHeight?: number; 
 };
 
 export const ReadMoreDescription: React.FC<ReadMoreProps> = ({ htmlContent, maxHeight = 150 }) => {

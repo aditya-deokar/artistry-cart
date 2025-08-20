@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Heart, ShoppingCart, Clock, TrendingUp } from 'lucide-react';
+import { ShoppingCart, Clock, TrendingUp } from 'lucide-react';
 import { formatPrice } from '@/lib/formatters';
 import { Button } from '../ui/button';
 
@@ -13,6 +13,7 @@ import { useStore } from '@/store';
 import useUser from '@/hooks/useUser';
 import useLocationTracking from '@/hooks/useLocationTracking';
 import useDeviceTracking from '@/hooks/useDeviceTracking';
+import WishlistButton from '../products/WishlistButton';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -40,7 +41,7 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
   const cartItems = useStore((state) => state.cart);
 
   // Select actions from the nested 'actions' object
-  const { addToCart, removeFromWishlist,addToWishlist } = useStore((state) => state.actions);
+  const { addToCart } = useStore((state) => state.actions);
 
   
   const isWishlisted = wishlistItems.some((item:any)=> item.id == product.id );
@@ -76,14 +77,8 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
 
         {/* --- HOVER BUTTONS (Updated background to be theme-aware) --- */}
         <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Button
-            onClick={()=> isWishlisted ? removeFromWishlist(product.id, user, location, deviceInfo) :  addToWishlist({...product, quantity:1}, user, location, deviceInfo)}
-            variant="outline" size="icon" className="bg-background rounded-full shadow-md hover:bg-background">
-                <Heart
-                fill={ isWishlisted ? "red" : "transparent"} 
-                stroke={isWishlisted ? "red" : "#4B5563"}
-                size={18} />
-            </Button>
+            
+            <WishlistButton product={product} productId={product.id}/>
             <Button
             onClick={()=> !isInCart && addToCart({...product, quantity:1 }, user, location, deviceInfo)}
             variant="outline" size="icon" className="bg-background rounded-full shadow-md hover:bg-background">
@@ -95,13 +90,13 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
       <div className="mt-4 text-left flex-grow flex flex-col">
         {/* --- TITLE & ARTIST (Updated text colors to be semantic) --- */}
         <h3 className="font-display text-lg text-foreground relative w-fit">
-          <Link href={`/products/${product.slug}`}>
+          <Link href={`/product/${product.slug}`}>
             {product.title}
             <span className="absolute bottom-[-2px] left-0 h-[2px] w-0 bg-amber-600 transition-all duration-300 group-hover:w-full"></span>
           </Link>
         </h3>
         <p className="text-sm text-muted-foreground mt-1 hover:text-amber-800 transition-colors">
-            by <Link href={`/artist/${product.Shop.id}`}>{product.Shop.name}</Link>
+            by <Link href={`/artist/${product?.Shop?.id}`}>{product?.Shop?.name}</Link>
         </p>
         
         <div className="flex-grow" />

@@ -51,7 +51,7 @@ export const ProductGalleryV2: React.FC<ProductGalleryProps> = ({
         <div className="flex md:flex-col gap-3 order-2 md:order-1">
           {images.map((image, index) => (
             <button
-              key={image.file_id}
+              key={index}
               onClick={() => setSelectedImage(image)}
               className={cn(
                 "relative aspect-square w-full rounded-md overflow-hidden transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background",

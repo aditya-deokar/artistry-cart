@@ -6,9 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { formatPrice } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
-const categories = ['Paintings', 'Sculptures', 'Prints', 'Digital Art', 'Handmade Crafts'];
 
-export const FilterSidebar = ({ filters, setFilters }) => {
+
+export const FilterSidebar = ({ filters, setFilters, categories }:{filters: any, setFilters:any, categories:any}) => {
     const handleCategoryChange = (category) => {
         setFilters(prev => ({ ...prev, category, page: 1 })); // Reset to page 1 on filter change
     };

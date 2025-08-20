@@ -28,7 +28,7 @@ export const CartItem = ({ item, onRemove, onUpdateQuantity }: CartItemProps) =>
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className="flex items-start gap-4 p-4 border-b border-border"
     >
-      <Link href={`/products/${item.slug}`} className="w-24 h-24 flex-shrink-0">
+      <Link href={`/product/${item.slug}`} className="w-24 h-24 flex-shrink-0">
         <div className="aspect-square relative rounded-md overflow-hidden bg-muted">
           {primaryImage && <Image src={primaryImage.url} alt={item.title} fill className="object-cover" />}
         </div>
@@ -54,7 +54,7 @@ export const CartItem = ({ item, onRemove, onUpdateQuantity }: CartItemProps) =>
       </div>
 
       <div className="flex flex-col items-end justify-between h-24 text-sm">
-        <span className="font-medium text-lg">{formatPrice(item.sale_price * item.quantity)}</span>
+        <span className="font-medium text-lg">{formatPrice(item?.sale_price * item.quantity)}</span>
         <QuantitySelector 
             quantity={item.quantity}
             maxStock={item.stock}

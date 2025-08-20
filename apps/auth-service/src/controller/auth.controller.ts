@@ -16,6 +16,7 @@ import { AuthError, ValidationError } from "../../../../packages/error-handler";
 import prisma from "../../../../packages/libs/prisma";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { setCookie } from "../utils/cookies/setCookie";
+import { createUniqueSlug, generateSlug } from "../utils/slugify";
 
 interface TokenPayload {
     id: string;
@@ -424,16 +425,61 @@ export const verifySeller = async(req:Request, res: Response, next:NextFunction)
 
 
 // create new Shop
-export const createShop = async(req:Request, res: Response, next:NextFunction)=>{
+// export const createShop = async(req:Request, res: Response, next:NextFunction)=>{
+//   try {
+//     const { name, bio, address, opening_hours, website, category, sellerId } = req.body;
+
+//     if(!name || !bio|| !address || !opening_hours || !category || !sellerId){
+//       return next(new ValidationError("All fields are required!"))
+//     }
+
+//     const shopData : any={
+//       name: name,
+//       bio: bio,
+//       address: address,
+//       opening_hours: opening_hours,
+//       category: category,
+//       sellerId: sellerId,
+//     };
+
+//     if(website && website.trim() !== ""){
+//       shopData.website = website;
+//     }
+
+//     const shop= await prisma.shops.create({
+//       data:shopData
+//     });
+
+//     res.status(201).json({
+//       success: true,
+//       shop
+//     })
+
+//   } catch (error) {
+//     next(error);
+//   }
+// }
+
+// create new Shop
+export const createShop = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, bio, address, opening_hours, website, category, sellerId } = req.body;
 
-    if(!name || !bio|| !address || !opening_hours || !category || !sellerId){
-      return next(new ValidationError("All fields are required!"))
+    // 1. Validation remains the same
+    if (!name || !bio || !address || !opening_hours || !category || !sellerId) {
+      return next(new ValidationError("All fields are required!"));
     }
 
-    const shopData : any={
+    // 2. Generate the base slug from the shop name
+    const baseSlug = generateSlug(name);
+
+    // 3. Ensure the slug is unique by checking the database
+    const uniqueSlug = await createUniqueSlug(baseSlug, prisma);
+
+    // 4. Prepare the shop data, now including the unique slug
+    const shopData: any = {
       name: name,
+      slug: uniqueSlug, 
       bio: bio,
       address: address,
       opening_hours: opening_hours,
@@ -441,23 +487,24 @@ export const createShop = async(req:Request, res: Response, next:NextFunction)=>
       sellerId: sellerId,
     };
 
-    if(website && website.trim() !== ""){
+    if (website && website.trim() !== "") {
       shopData.website = website;
     }
 
-    const shop= await prisma.shops.create({
-      data:shopData
+    // 5. Create the shop in the database with the new data
+    const shop = await prisma.shops.create({
+      data: shopData,
     });
 
     res.status(201).json({
       success: true,
-      shop
-    })
+      shop, 
+    });
 
   } catch (error) {
     next(error);
   }
-}
+};
 
 
 const stripe= new Stripe(process.env.STRIPE_SECRETE_KEY!, {
