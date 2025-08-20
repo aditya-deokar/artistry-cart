@@ -69,6 +69,24 @@ const ProductPage = () => {
         staleTime: 1000 * 60 * 2, // 2 minutes
     });
 
+    const { data:CategoryData, isLoading:CategoryLoading, isError:CategoryError } = useQuery({
+        queryKey: ["categories"],
+        queryFn: async () => {
+            try {
+                const res = await axiosInstance.get("product/api/get-categories");
+                return res.data;
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        staleTime: 1000 * 60 * 5,
+        retry: 2,
+
+    });
+
+    const categories = CategoryData?.categories || [];
+
+
     const handlePageChange = (newPage: number) => {
         setFilters(prev => ({ ...prev, page: newPage }));
         window.scrollTo(0, 0); // Scroll to top on page change
@@ -92,7 +110,7 @@ const ProductPage = () => {
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     <aside className="lg:col-span-1">
-                        <FilterSidebar filters={filters} setFilters={setFilters} />
+                        <FilterSidebar categories={categories} filters={filters} setFilters={setFilters} />
                     </aside>
                     <section className="lg:col-span-3">
                         {isLoading && <div className="absolute inset-0 bg-white/50 z-20"></div>} {/* Subtle loading overlay */}

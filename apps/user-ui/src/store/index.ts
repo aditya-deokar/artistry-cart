@@ -25,11 +25,11 @@ export interface StoreState {
 
 // Define all the actions that can be performed on the store.
 export interface StoreActions {
-  addToCart: (product: ArtProduct, user:any , location:any , deviceInfo :string) => void;
+  addToCart: (product: CartItem, user:any , location:any , deviceInfo :string) => void;
   removeFromCart: (productId: string , user :any , location: any, deviceInfo:string) => void;
   updateQuantity: (productId: string, newQuantity: number) => void;
   clearCart: () => void;
-  addToWishlist: (product: ArtProduct, user:any , location:any , deviceInfo :string) => void;
+  addToWishlist: (product: CartItem, user:any , location:any , deviceInfo :string) => void;
   removeFromWishlist: (productId: string , user :any , location: any, deviceInfo:string) => void;
 
   applyCoupon: (coupon: DiscountCode) => void; 

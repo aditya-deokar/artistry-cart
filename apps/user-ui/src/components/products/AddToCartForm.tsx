@@ -30,14 +30,14 @@ export const AddToCartForm: React.FC<AddToCartFormProps> = ({ stock }) => {
     <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex items-center justify-between">
             <span className="font-medium">Quantity</span>
-            <div className="flex items-center gap-3 border border-neutral-700 rounded-full">
+            <div className="flex items-center gap-3 border border-neutral-700 rounded-full px-3">
                 <button type="button" onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1 || isOutOfStock} className="p-2 disabled:opacity-30">&minus;</button>
                 <span className="w-10 text-center font-medium">{quantity}</span>
                 <button type="button" onClick={() => handleQuantityChange(1)} disabled={quantity >= stock || isOutOfStock} className="p-2 disabled:opacity-30">+</button>
             </div>
         </div>
         <div className="flex flex-col gap-4">
-            <button type="submit" className="w-full uppercase py-3.5 bg-accent text-white rounded-full font-semibold hover:bg-accent/90 disabled:bg-neutral-600" disabled={isOutOfStock}>
+            <button type="submit" className="w-full uppercase py-3.5 bg-accent text-primary rounded-full font-semibold  disabled:bg-neutral-600" disabled={isOutOfStock}>
                 {isOutOfStock ? 'Sold Out' : 'Add to Cart'}
             </button>
             <div className="text-center"><StockStatus /></div>

@@ -9,7 +9,7 @@ export const SizeSelector: React.FC<{ sizes: string[] }> = ({ sizes }) => {
             <span className="text-sm font-medium">Size: {selectedSize}</span>
             <div className="flex gap-2 mt-2">
                 {sizes.map(size => (
-                    <button key={size} onClick={() => setSelectedSize(size)} className={`px-4 py-2 text-sm border rounded-full transition-colors ${selectedSize === size ? 'bg-accent text-white border-accent' : 'border-neutral-700 hover:border-neutral-500'}`}>
+                    <button key={size} onClick={() => setSelectedSize(size)} className={`px-4 py-2 text-sm border rounded-full transition-colors ${selectedSize === size ? 'bg-accent text-primary border-foreground' : 'border-neutral-300 hover:border-neutral-500'}`}>
                         {size}
                     </button>
                 ))}

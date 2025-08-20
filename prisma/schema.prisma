@@ -13,9 +13,7 @@ model images {
   file_id   String
   url       String
   userId    String?   @unique @db.ObjectId
-  shopId    String?   @unique @db.ObjectId
   users     users?    @relation(fields: [userId], references: [id])
-  shops     shops?    @relation(fields: [shopId], references: [id])
 }
 
 
@@ -51,9 +49,10 @@ model shopReviews {
 model shops {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   name          String
+  slug          String        @unique 
   bio           String?
   category      String
-  avatar        images?
+  avatar        Json?
   coverBanner   String?
   address       String
   opening_hours String?

@@ -1,4 +1,4 @@
-import { type Metadata } from 'next';
+
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
@@ -16,6 +16,9 @@ import { AddToCartForm } from '@/components/products/AddToCartForm';
 import { ProductMeta } from '@/components/products/ProductMeta';
 import { ProductDetailsTabs } from '@/components/products/ProductDetailsTabs';
 import { ColorSelector, SizeSelector } from '@/components/products/Selector';
+import WishlistButton from '@/components/products/WishlistButton';
+import { DeliveryInfo } from '@/components/products/DeliveryInfo';
+
 
 
 
@@ -25,7 +28,7 @@ type ProductPageProps = {
   };
 };
 
-// Helper function to fetch data - this is great for both the page and metadata
+
 async function fetchProductDetails(slug: string): Promise<ArtProduct | null> {
   try {
     const response = await axiosInstance.get(`/product/api/get-product/${slug}`);
@@ -36,30 +39,32 @@ async function fetchProductDetails(slug: string): Promise<ArtProduct | null> {
   }
 }
 
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const product = await fetchProductDetails(params?.slug);
+// export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+//   const product = await fetchProductDetails(params?.slug);
 
-  if (!product) {
-    return { title: 'Product Not Found' };
-  }
+//   if (!product) {
+//     return { title: 'Product Not Found' };
+//   }
 
-  const primaryImage = product.images?.find(img => img !== null);
+//   const primaryImage = product.images?.find(img => img !== null);
 
-  return {
-    title: `${product.title} by ${product.Shop.name} | Artistry Cart`,
-    description: product.description,
-    openGraph: {
-      title: `${product.title} - Artistry Cart`,
-      description: product.description,
-      images: primaryImage ? [{ url: primaryImage.url, width: 1200, height: 630 }] : [],
-    },
-  };
-}
+//   return {
+//     title: `${product.title} by ${product.Shop.name} | Artistry Cart`,
+//     description: product.description,
+//     openGraph: {
+//       title: `${product.title} - Artistry Cart`,
+//       description: product.description,
+//       images: primaryImage ? [{ url: primaryImage.url, width: 1200, height: 630 }] : [],
+//     },
+//   };
+// }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const product = await fetchProductDetails(params.slug);
+  const { slug } = await params;
+  const product = await fetchProductDetails(slug);
+
   
-  // You would also fetch related products here
+  
   // const otherProducts = await getOtherProducts(params.slug);
 
   if (!product) {
@@ -84,7 +89,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
         />
 
         <div className="flex flex-col gap-6 text-primary">
-          <div>
+          <div className='relative'>
+            
+            <div className='absolute top-0 right-0'>
+              <WishlistButton product={product} productId={product.id}/>
+            </div>
              <p className="text-sm font-medium text-primary/70">{product.category}</p>
              <h1 className="font-display text-4xl leading-tight md:text-5xl">
                {product.title}
@@ -120,6 +129,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
           {product.colors && product.colors.length > 0 && <ColorSelector colors={product.colors} />}
 
           <AddToCartForm stock={product.stock} />
+
+          <DeliveryInfo product={product} />
 
           <ProductMeta product={product} />
 

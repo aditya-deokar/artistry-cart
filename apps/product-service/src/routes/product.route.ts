@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import { CreateDiscountCodes, createProduct, deleteDiscountCode, deleteProductImage, deleteShopProducts, getAllProducts, getCategories, getDiscountCodes, getProductBySlug, getShopProducts, restoreShopProducts, uploadProductImage, validateCoupon } from "../controllers/product.controller";
 import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
+import { createShopReview, getAllShops, getProductsForShop, getReviewsForShop, getShopBySlug } from "../controllers/shop.controller";
 
 
 
@@ -26,6 +27,16 @@ router.get("/get-product/:slug", getProductBySlug);
 
 
 router.post("/coupon/validate", validateCoupon);
+
+
+
+// shop
+router.get('/get-all-shops', getAllShops);
+router.get('/get-shop/:slug', getShopBySlug);
+router.get('/get-shop-products/:shopId', getProductsForShop);
+router.get('/get-shop-reviews/:shopId', getReviewsForShop);
+
+router.post('/create-review', isAuthenticated, createShopReview);
 
 
 

@@ -8,6 +8,7 @@ import router from './routes/product.route';
 
 
 
+
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 6002;
 

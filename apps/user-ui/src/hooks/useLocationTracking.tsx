@@ -1,43 +1,75 @@
-'use client'
-import React, { useEffect, useState } from 'react'
+'use client';
 
-const LOCATION_STORAGE_KEY= 'user_location';
-const LOCATION_EXPIRY_DAYS= 20;
+import { useState, useEffect } from 'react';
 
-const getStoredLocation = () => {
-    const storedData = localStorage.getItem(LOCATION_STORAGE_KEY)
-    
-    if(!storedData) return null;
 
-    const parsedData= JSON.parse(storedData);
-    const expiryTime = LOCATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000 // 20 days
-    const isExpired = Date.now() - parsedData.timestamp > expiryTime;
-
-    return isExpired ? null : parsedData;
+export interface LocationData {
+  city: string;
+  country: string;
+  postalCode?: string;
 }
 
-const useLocationTracking = () => {
 
-    const [location, setLocation   ] = useState<{country: string ; city: string} | null>(getStoredLocation());
-
-    useEffect(() => {
-      if(location) return;
-
-      fetch("http:/ip-api.com/json/").then((res)=> res.json()).then((data)=>{
-        const newLocation ={
-            country: data?.country,
-            city: data?.city,
-            timeStamp: Date.now(),
-        };
-
-        localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify(newLocation));
-        setLocation(newLocation);
-      }).catch((error)=> console.log("Failed to get location", error));
-    
-      
-    }, [])
-    
-  return location
+interface LocationState {
+  location: LocationData | null;
+  loading: boolean;
+  error: string | null;
 }
 
-export default useLocationTracking
+
+const useLocationTracking = (): LocationState => {
+  const [location, setLocation] = useState<LocationData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // This effect runs once when the component mounts
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser.");
+      setLoading(false);
+      return;
+    }
+
+    const handleSuccess = async (position: GeolocationPosition) => {
+      const { latitude, longitude } = position.coords;
+
+      try {
+       
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch location data.');
+        }
+
+        const data = await response.json();
+        const address = data.address;
+        
+        setLocation({
+          city: address.city || address.town || address.village,
+          country: address.country,
+          postalCode: address.postcode,
+        });
+
+      } catch (err) {
+        setError("Could not resolve location from coordinates.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const handleError = (error: GeolocationPositionError) => {
+      setError(`Geolocation error: ${error.message}`);
+      setLoading(false);
+    };
+
+    // Request the user's location
+    navigator.geolocation.getCurrentPosition(handleSuccess, handleError);
+
+  }, []); 
+
+  return { location, loading, error };
+};
+
+export default useLocationTracking;

@@ -44,8 +44,8 @@ export default function RootLayout({
 }) {
   return (
     <ViewTransitions>
-      <html lang="en"> 
-        <body className={`${roboto.variable} ${poppins.variable} ${raleway.variable} ${gambarino.variable} antialiased`}>
+      <html lang="en" suppressHydrationWarning> 
+        <body className={`${roboto.variable} ${poppins.variable} ${raleway.variable} ${gambarino.variable} antialiased`} suppressHydrationWarning>
            <ReactLenis root options={{ lerp: 0.05, smoothWheel: true }} >
 
             <ThemeProvider
