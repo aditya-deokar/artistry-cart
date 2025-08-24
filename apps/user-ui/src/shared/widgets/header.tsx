@@ -1,176 +1,176 @@
 'use client'
 
-import {
-    AlignLeft,
-    ChevronDown,
-    HeartIcon,
-    Search,
-    ShoppingCart,
-    User2
-} from 'lucide-react'
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from '@/components/ui/button'
-import { Badge } from "@/components/ui/badge"
-import useUser from '@/hooks/useUser'
-import { ModeToggle } from '@/components/theme/ModeToggle'
-import { navItems } from '@/configs/constants'
-import { cn } from '@/lib/utils'
+import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { HeartIcon, ShoppingCart, User2, Menu, X } from 'lucide-react';
 
-import { TransitionLink } from '@/components/common/TransitionLink'
-import { useStore } from '@/store'
-import { GlobalSearch } from '@/components/search/GlobalSearch'
+// UI Components
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from '@/components/ui/button';
+import { Badge } from "@/components/ui/badge";
+import { ModeToggle } from '@/components/theme/ModeToggle';
 
-// Props to accept classNames for GSAP targeting
+// Hooks, Utils, and State
+import useUser from '@/hooks/useUser';
+import { navItems } from '@/configs/constants';
+import { cn } from '@/lib/utils';
+import { useStore } from '@/store';
+import { TransitionLink } from '@/components/common/TransitionLink';
+import { GlobalSearch } from '@/components/search/GlobalSearch';
+
+// Props for GSAP or other styling needs
 type HeaderProps = {
-    topHeaderClassName?: string;
-    navClassName?: string;
     className?: string;
+    logoContainerClassName?: string;
+    navContainerClassName?: string;
+    iconsContainerClassName?: string;
 }
 
-const Header = ({ topHeaderClassName, navClassName ,className}: HeaderProps) => {
-    const [isSticky, setIsSticky] = useState(false);
-    
-
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 120) setIsSticky(true);
-            else setIsSticky(false);
-        }
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
+// --- Mobile Menu Sub-Component ---
+const MobileMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     return (
-        <header className={`w-full  z-50 ${className}`}>
-            {/* ======== TOP HEADER (NON-STICKY) ======== */}
-            <TopHeader topHeaderClassName={topHeaderClassName}/>
-
-            <div className='border-b' />
-
-          
-            <nav className={cn(
-                "w-full relative"
-            )}>
-                <div className="w-[80%] m-auto flex items-center justify-between h-[60px]">
-                    <div className={navClassName}>
-                        {/* <DropdownMenu>
-                           <DropdownMenuTrigger asChild>
-                               <Button variant="secondary" className="h-[50px]">
-                                   <AlignLeft className="mr-2 h-5 w-5" />
-                                   <span className='pr-2'>All Departments</span>
-                                   <ChevronDown className="h-5 w-5" />
-                               </Button>
-                           </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-[260px]">
-                            <DropdownMenuLabel>Browse Categories</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>Electronics</DropdownMenuItem>
-                            <DropdownMenuItem>Fashion</DropdownMenuItem>
-                            <DropdownMenuItem>Home & Kitchen</DropdownMenuItem>
-                            <DropdownMenuItem>Books</DropdownMenuItem>
-                        </DropdownMenuContent>
-                        </DropdownMenu> */}
-                    </div>
-
-                    <div className='flex items-center gap-2'>
-                        {navItems.map((item: any) => (
-                            <TransitionLink
-                                href={item.href}
-                                key={item.title}
-                                className={cn('font-medium text-primary/80 hover:text-primary/90 text-lg px-4 py-2 ', navClassName)}
-                            >
-                                {item.title}
-                            </TransitionLink>
-                        ))}
-                    </div>
-
-                     <div className={navClassName}></div>
-                </div>
-            </nav>
-        </header>
-    )
-}
-
-export default Header;
-
-
-
-
-export const TopHeader = ({topHeaderClassName}:{ topHeaderClassName: string }) => {
-
-    const { user, isLoading } = useUser();
-
-    const wishlist = useStore((state:any) => state.wishlist);
-    const cart = useStore((state:any) => state.cart);
-  return (
-    <div className='w-[80%] py-5 m-auto flex items-center justify-between'>
-                <div className={cn('flex items-center gap-8', topHeaderClassName)}>
-                    <TransitionLink href={'/'}>
-                        <span className='text-2xl font-extrabold'>Artistry Cart</span>
-                    </TransitionLink>
+        <div
+            className={cn(
+                "fixed inset-0 z-40 transition-opacity duration-300 ease-in-out md:hidden bg-red-50",
+                isOpen ? "opacity-100 bg-background" : "opacity-0 pointer-events-none"
+            )}
+            onClick={onClose}
+        >
+            <div
+                className={cn(
+                    "fixed top-0 right-0 h-full w-4/5 max-w-sm bg-background p-6 shadow-xl transition-transform duration-300 ease-in-out ",
+                    isOpen ? "translate-x-0" : "translate-x-full"
+                )}
+                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the menu
+            >
+                <div className="flex justify-end mb-8">
+                    <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close menu">
+                        <X size={24} />
+                    </Button>
                 </div>
 
-                <div className={cn('w-1/2 relative', topHeaderClassName)}>
-                    {/* <input type='text' placeholder='Search for Products...'
-                        className='w-full px-4 font-poppins font-medium border-[2.5px] border-border outline-none h-[50px]' />
-                    <div className='w-[60px] cursor-pointer flex items-center justify-center h-[50px] bg-border absolute top-0 right-0'>
-                        <Search />
-                    </div> */}
+                <div className="mb-8">
                     <GlobalSearch />
                 </div>
 
-                <div className={cn('flex items-center gap-5', topHeaderClassName)}>
-                    <ModeToggle />
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon"><User2 /></Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            {user && !isLoading ? (
-                                <>
-                                    <DropdownMenuLabel>Hi, {user?.name?.split(" ")[0]}</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <TransitionLink href="/profile"><DropdownMenuItem className="cursor-pointer">Profile</DropdownMenuItem></TransitionLink>
-                                    <DropdownMenuItem className="cursor-pointer">Logout</DropdownMenuItem>
-                                </>
-                            ) : (
-                                <>
-                                    <DropdownMenuLabel>Hello, Sign in</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <TransitionLink href="/login"><DropdownMenuItem className="cursor-pointer">Login</DropdownMenuItem></TransitionLink>
-                                    <TransitionLink href="/register"><DropdownMenuItem className="cursor-pointer">Register</DropdownMenuItem></TransitionLink>
-                                </>
-                            )}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <Button asChild variant="ghost" size="icon" className='relative'>
-                        <TransitionLink href={"/wishlist"}>
-                            <HeartIcon />
-                            <Badge variant="destructive" className='absolute top-[-5px] right-[-5px] px-1.5'>
-                                {wishlist?.length}
-                            </Badge>
+                <nav className="flex flex-col space-y-4 bg-background pl-6 pb-6">
+                    {navItems.map((item) => (
+                        <TransitionLink
+                            href={item.href}
+                            key={item.title}
+                            className="text-xl font-medium text-primary/80 hover:text-primary"
+                            onClick={onClose} // Close menu on navigation
+                        >
+                            {item.title}
                         </TransitionLink>
-                    </Button>
-                    <Button asChild variant="ghost" size="icon" className='relative'>
-                        <TransitionLink href={"/cart"}>
-                            <ShoppingCart />
-                            <Badge variant="destructive" className='absolute top-[-5px] right-[-5px] px-1.5'>
-                                {cart?.length}
-                            </Badge>
-                        </TransitionLink>
-                    </Button>
+                    ))}
+                </nav>
+            </div>
+        </div>
+    );
+};
+
+
+// --- Main Header Component ---
+const Header = ({ className, logoContainerClassName, navContainerClassName, iconsContainerClassName }: HeaderProps) => {
+    const { user, isLoading } = useUser();
+    const wishlist = useStore((state: any) => state.wishlist);
+    const cart = useStore((state: any) => state.cart);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const pathname = usePathname();
+
+    // Close the mobile menu automatically on route changes
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [pathname]);
+
+    return (
+        <header className={cn("w-full  sticky top-0 z-50 bg-background/80 backdrop-blur-2xl", className)}>
+            <div className="border-b border-neutral-800/50">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex h-20 items-center justify-between gap-4">
+
+                        {/* --- Logo --- */}
+                        <div className={cn("flex-shrink-0", logoContainerClassName)}>
+                            <TransitionLink href={'/'} className="text-2xl font-extrabold tracking-tight">
+                                Artistry Cart
+                            </TransitionLink>
+                        </div>
+
+                        {/* --- Desktop Search & Navigation --- */}
+                        <div className={cn("hidden md:flex flex-grow items-center justify-center gap-6", navContainerClassName)}>
+                            <nav className="flex items-center gap-2">
+                                {navItems.map((item: any) => (
+                                    <TransitionLink
+                                        href={item.href}
+                                        key={item.title}
+                                        className='font-medium text-primary/80 hover:text-primary text-base px-3 py-2'
+                                    >
+                                        {item.title}
+                                    </TransitionLink>
+                                ))}
+                            </nav>
+                            <div className="w-full max-w-md">
+                                <GlobalSearch />
+                            </div>
+                        </div>
+
+                        {/* --- Icons & Mobile Menu Trigger --- */}
+                        <div className={cn("flex items-center justify-end gap-2", iconsContainerClassName)}>
+                            <ModeToggle />
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon"><User2 /></Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    {user && !isLoading ? (
+                                        <>
+                                            <DropdownMenuLabel>Hi, {user?.name?.split(" ")[0]}</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <TransitionLink href="/profile"><DropdownMenuItem className="cursor-pointer">Profile</DropdownMenuItem></TransitionLink>
+                                            <DropdownMenuItem className="cursor-pointer">Logout</DropdownMenuItem>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <DropdownMenuLabel>Hello, Sign in</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <TransitionLink href="/login"><DropdownMenuItem className="cursor-pointer">Login</DropdownMenuItem></TransitionLink>
+                                            <TransitionLink href="/register"><DropdownMenuItem className="cursor-pointer">Register</DropdownMenuItem></TransitionLink>
+                                        </>
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            <Button asChild variant="ghost" size="icon" className='relative'>
+                                <TransitionLink href={"/wishlist"}>
+                                    <HeartIcon />
+                                    {wishlist?.length > 0 && <Badge  className='absolute -top-1 -right-1 h-5 w-5 justify-center p-0 bg-secondary'>{wishlist.length}</Badge>}
+                                </TransitionLink>
+                            </Button>
+
+                            <Button asChild variant="ghost" size="icon" className='relative'>
+                                <TransitionLink href={"/cart"}>
+                                    <ShoppingCart />
+                                    {cart?.length > 0 && <Badge  className='absolute -top-1 -right-1 h-5 w-5 justify-center p-0 bg-secondary'>{cart.length}</Badge>}
+                                </TransitionLink>
+                            </Button>
+
+                            {/* Mobile Menu Button */}
+                            <div className="md:hidden ">
+                                <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)} aria-label="Open menu">
+                                    <Menu size={24} />
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-  )
-}
 
+            {/* --- Mobile Menu Component Instance --- */}
+            <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+        </header>
+    );
+};
+
+export default Header;

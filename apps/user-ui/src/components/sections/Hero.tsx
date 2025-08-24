@@ -6,6 +6,7 @@ import { FadeIn } from '../animations/FadeIn';
 import { RevealText } from '../animations/RevealText';
 import { ButtonLink } from '../common/ButtonLink';
 
+
 type HeroProps = {
   heading: string;
   body: string;
@@ -17,8 +18,10 @@ type HeroProps = {
 export const Hero: FC<HeroProps> = ({ heading, body, buttonText, buttonLink, imageUrl }) => {
   return (
     <Bounded className="relative h-svh overflow-hidden flex items-center">
+
+      
       {/* bounded- dark:bg-primary/20 bg-primary/80 */}
-      {/* <FadeIn vars={{ scale: 1, opacity: 0.5 }} className="absolute inset-0 opacity-0 motion-safe:scale-125">
+      <FadeIn vars={{ scale: 1, opacity: 0.5 }} className="absolute inset-0 opacity-0 motion-safe:scale-125">
         <Image
           src='https://plus.unsplash.com/premium_photo-1753982324901-aecaf58fa83c?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
           alt="Hero background for Artistry Cart"
@@ -26,7 +29,7 @@ export const Hero: FC<HeroProps> = ({ heading, body, buttonText, buttonLink, ima
           fill
           className="object-cover motion-reduce:opacity-70"
         />
-      </FadeIn> */}
+      </FadeIn>
 
       <div className="relative flex flex-col justify-center">
         <RevealText

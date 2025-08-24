@@ -21,47 +21,7 @@ export type Product = {
   };
 };
 
-export const products1: Product[] = [
-  {
-    id: '1',
-    slug: 'terra-canvas',
-    title: 'Terra Canvas',
-    description: 'An earthy and robust scent that captures the essence of a forest floor.',
-    longDescription:
-      'Discover Terra Canvas, an eau de parfum that grounds you in the rich, complex aromas of the natural world. With top notes of bergamot and heart notes of cedarwood, it settles into a warm, amber finish.',
-    price: 120,
-    scentProfile: 'woody',
-    mood: 'grounded',
-    featureImage: {
-      url: '/images/placeholder-product-feature-1.jpg',
-      alt: 'Artistic depiction of earthy tones and textures.',
-    },
-    bottleImage: {
-      url: '/images/placeholder-bottle-1.png',
-      alt: 'A bottle of Terra Canvas fragrance.',
-    },
-  },
-  {
-    id: '2',
-    slug: 'aqua-hue',
-    title: 'Aqua Hue',
-    description: 'A fresh and invigorating aroma reminiscent of a cool ocean breeze.',
-    longDescription:
-      'Aqua Hue is a vibrant eau de parfum that evokes the crispness of sea salt and the zest of citrus. It’s a refreshing journey for the senses, perfect for the modern creator.',
-    price: 110,
-    scentProfile: 'fresh',
-    mood: 'refreshing',
-    featureImage: {
-      url: '/images/placeholder-product-feature-2.jpg',
-      alt: 'Abstract art with cool blue and white waves.',
-    },
-    bottleImage: {
-      url: '/images/placeholder-bottle-2.png',
-      alt: 'A bottle of Aqua Hue fragrance.',
-    },
-  },
-  // Add more products as needed
-];
+
 
 
 
@@ -99,47 +59,6 @@ export const products = [
       {
         file_id: "68971e0f5c7cd75eb8cd8ad1",
         url: "https://ik.imagekit.io/adityadeokar/products/product-1754734093736_qlZ2Y-zbB.jpg",
-      },
-    ],
-    status: "Active",
-    Shop: {
-      id: "6881cc1c089195fea5a29fe9",
-      name: "Saivijay Art",
-      slug: "saivijay-art",
-      bio: "art related products",
-      address: "rui, shirdi",
-      website: "https://aditya.com",
-    },
-  },
-  {
-    id: "68971da717662b51011f7951",
-    title: "Majestic Sheesham Horse",
-    description:
-      "A dynamic, hand-carved wooden horse statue made from premium Sheesham wood (Indian Rosewood). Its polished finish and elegant form capture a sense of motion and strength.",
-    detailed_description: `Capture the spirit of royalty with this Majestic Sheesham Horse. Carved by master artisans from the Jaipur Carvers Guild, this piece embodies grace and power. The natural dual-tone grain of the Sheesham wood is highlighted by meticulous polishing.`,
-    warranty: "1 year",
-    custom_specifications: [
-      { name: "Height", value: "55cm" },
-      { name: "Material", value: "Sheesham Wood" },
-    ],
-    slug: "majestic-sheesham-horse",
-    tags: ["wood", "horse", "sculpture", "handmade", "carving"],
-    cash_on_delivery: true,
-    brand: "Jaipur Carvers Guild",
-    video_url: "https://youtu.be/example_video_2",
-    category: "Handmade Crafts",
-    subCategory: "Wooden Sculptures",
-    colors: ["#654321"],
-    sizes: ["Large"],
-    discountCodes: "688a49a1adab1b4e7b8dc7d8",
-    stock: 8,
-    sale_price: 8500,
-    regular_price: 9200,
-    ratings: 5,
-    images: [
-      {
-        file_id: "68w447015c7cd75eb83d5dfd",
-        url: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=1170&auto=format&fit=crop",
       },
     ],
     status: "Active",

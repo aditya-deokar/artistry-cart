@@ -125,7 +125,7 @@ model products {
   sizes                 String[]
   discountCodes         String      @db.ObjectId
   stock                 Int
-  sale_price            Float
+  sale_price            Float?
   regular_price         Float
   ratings               Float         @default(5)
   isDeleted             Boolean?      @default(false)
@@ -144,4 +144,19 @@ model products {
 
   shopId String @db.ObjectId
   Shop   shops  @relation(fields: [shopId], references: [id])
+}
+
+
+model banners {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String    // e.g., "Summer Art Fair 2025"
+  description String?   // e.g., "Get 20% off all landscape paintings"
+  imageUrl    String    // The URL for the banner image
+  linkUrl     String    // The URL the banner links to (e.g., /search?q=landscapes)
+  isActive    Boolean   @default(true)
+  startDate   DateTime
+  endDate     DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

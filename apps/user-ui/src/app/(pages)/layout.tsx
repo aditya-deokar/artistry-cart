@@ -1,9 +1,5 @@
 
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import { TopHeader } from '@/shared/widgets/header';
-// import Header from '@/shared/widgets/header';
-
-
 
 export default function RootLayout({
   children,
@@ -12,7 +8,7 @@ export default function RootLayout({
 }) {
   return (
    <>
-   <TopHeader topHeaderClassName='' />
+   
    <Breadcrumbs />
    {children}
    </>

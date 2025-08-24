@@ -11,7 +11,7 @@ router.post('/verify-user', verifyUser);
 router.post('/login-user', loginUser);
 
 router.post("/refresh-token", refreshToken)
-router.get("/logged-in-user", isAuthenticated, getUser)
+router.get("/logged-in-user", getUser)
 
 
 router.post('/forgot-password-user', userForgotPassword);

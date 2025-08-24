@@ -42,7 +42,7 @@ export const ProductImageSlider: React.FC<PropType> = ({ images, options }) => {
         {images.map((image, index) => (
           <div
             className="relative flex-[0_0_100%] h-full transition-opacity duration-700 ease-in-out"
-            key={image.file_id}
+            key={index}
             style={{ opacity: index === selectedIndex ? 1 : 0 }}
           >
             <Image
