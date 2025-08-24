@@ -2,6 +2,7 @@ import express, { Router } from "express";
 import { CreateDiscountCodes, createProduct, deleteDiscountCode, deleteProductImage, deleteShopProducts, getAllProducts, getCategories, getDiscountCodes, getProductBySlug, getShopProducts, restoreShopProducts, uploadProductImage, validateCoupon } from "../controllers/product.controller";
 import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
 import { createShopReview, getAllShops, getProductsForShop, getReviewsForShop, getShopBySlug } from "../controllers/shop.controller";
+import { fullSearch, liveSearch } from "../controllers/search.controller";
 
 
 
@@ -40,7 +41,14 @@ router.post('/create-review', isAuthenticated, createShopReview);
 
 
 
+// search
+// Endpoint for the instant search dropdown
+// GET /api/search/live?q=terracotta
+router.get('/search/live', liveSearch);
 
+// Endpoint for the dedicated search results page
+// GET /api/search/full?q=terracotta&page=1&category=crafts
+router.get('/search/full', fullSearch);
 
 
 export default router;

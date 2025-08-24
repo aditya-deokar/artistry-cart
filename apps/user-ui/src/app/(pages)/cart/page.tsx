@@ -17,7 +17,7 @@ const CartPage = () => {
     // Calculate subtotal, memoized for performance.
     // This calculation runs only when the cart's contents change.
     const subtotal = useMemo(() => {
-        return cart.reduce((acc, item) => acc + item.sale_price * item.quantity, 0);
+        return cart.reduce((acc, item) => acc + item?.sale_price! * item.quantity, 0);
     }, [cart]);
 
     return (

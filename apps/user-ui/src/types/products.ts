@@ -3,6 +3,7 @@ export type ShopInfo = {
   id: string;
   name: string;
   bio?: string;
+  slug?:string;
   // Add any other shop details you might need
 };
 

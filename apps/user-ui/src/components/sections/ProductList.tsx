@@ -33,9 +33,9 @@ export const ProductList: FC<ProductListProps> = ({ eyebrow, heading, body, prod
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-12">
-          {products.map((product) => (
+          {products.map((product, index) => (
             // Use a unique key from the new schema, like _id or slug
-            <ProductCard key={product.slug} product={product} />
+            <ProductCard key={index} product={product} />
           ))}
         </div>
       </div>

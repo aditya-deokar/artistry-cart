@@ -17,24 +17,25 @@ export default function HomePage() {
     <>
       <AnimatedHeader />
       <Hero
-        heading="Artistry in Every Bottle"
-        body="Our fragrances are crafted to awaken your creativity. Discover a scent that tells your story."
-        buttonText="Explore the Collection"
-        buttonLink="/products"
-        imageUrl="/images/placeholder-hero.jpg"
+        heading="Crafted with Nature’s Touch"
+        body="Discover timeless handmade wooden creations that bring warmth, elegance, and artistry into your home."
+        buttonText="Shop the Collection"
+        buttonLink="/product"
+        imageUrl="/images/wooden-hero.jpg"
       />
+
       <ProductList
-        eyebrow="The Collection"
-        heading="Curated Essences"
-        body="Each fragrance in our collection is a masterpiece, formulated with the finest ingredients to inspire your next creation."
+        eyebrow="Our Creations"
+        heading="Handmade Wooden Masterpieces"
+        body="Each product is meticulously crafted by skilled artisans, blending tradition with creativity to give you unique pieces that last a lifetime."
         products={products}
       />
-      <ProductFeature
+      {/* <ProductFeature
         heading="Featured Creation: Terra Canvas"
         description="A sophisticated blend that captures the raw, grounding essence of nature. Perfect for moments of deep focus and inspiration."
         product={featuredProduct}
         
-      />
+      /> */}
       <ScrollText
         eyebrow="The Philosophy"
         text="We believe scent is a form of art. A medium of expression. A catalyst for creativity."

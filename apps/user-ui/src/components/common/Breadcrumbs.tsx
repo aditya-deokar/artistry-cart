@@ -24,10 +24,10 @@ export const Breadcrumbs = () => {
         {/* Home Link */}
         <li>
           <Link
-            href="/shop"
+            href="/"
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
-            Shop
+            Home
           </Link>
         </li>
 
