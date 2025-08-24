@@ -22,7 +22,7 @@ export const ProductFeature: FC<ProductFeatureProps> = ({ heading, description, 
   const secondaryImage = product?.images[1] || primaryImage;
 
   return (
-    <Bounded className="overflow-hidden bg-background py-16 md:py-24 h-fit">
+    <Bounded className="overflow-hidden bg-background py-16 md:py-24 h-[150vh]">
       <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-3 lg:grid-rows-[auto,auto] mb-16">
 
         {/* MAIN FEATURE IMAGE */}
@@ -33,7 +33,7 @@ export const ProductFeature: FC<ProductFeatureProps> = ({ heading, description, 
               alt={product.title}
               width={500}
               height={800}
-              className="h-fit w-full object-cover rounded-md"
+              className=" w-full object-cover rounded-md"
             />
           )}
         </FadeIn>
@@ -64,7 +64,7 @@ export const ProductFeature: FC<ProductFeatureProps> = ({ heading, description, 
             <div className="space-y-1">
               <h3 className="font-display text-4xl">{product.title}</h3>
               {/* Use the dynamic subcategory */}
-              <p className="mt-2 text-gray-400">{product.subcategory}</p>
+              <p className="mt-2 text-gray-400">{product.subCategory}</p>
               <ButtonLink
                 href={`/products/${product.slug}`}
                 variant="Secondary"

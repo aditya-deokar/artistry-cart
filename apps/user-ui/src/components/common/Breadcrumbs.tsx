@@ -19,7 +19,7 @@ export const Breadcrumbs = () => {
   const segments = pathname.split('/').filter(Boolean);
 
   return (
-    <nav aria-label="Breadcrumb" className="w-[80%]">
+    <nav aria-label="Breadcrumb" className="container mx-auto">
       <ol className="container mx-auto flex items-center gap-2 px-4 sm:px-6 lg:px-8 py-3 text-sm">
         {/* Home Link */}
         <li>

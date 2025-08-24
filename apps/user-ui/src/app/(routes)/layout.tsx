@@ -1,7 +1,4 @@
-import AnimatedHeader from '@/components/animations/AnimatedHeader';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-// import Header from '@/shared/widgets/header';
-
 
 
 export default function RootLayout({
@@ -11,7 +8,7 @@ export default function RootLayout({
 }) {
   return (
    <>
-   <AnimatedHeader />
+   
    <Breadcrumbs />
    {children}
    </>

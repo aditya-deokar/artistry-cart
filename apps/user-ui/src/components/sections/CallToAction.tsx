@@ -22,6 +22,7 @@ export const CallToAction: FC<CallToActionProps> = ({
   buttonLink,
 }) => {
   return (
+      
     <Bounded
       // Make sure you have a background.avif or change the path
       className="relative overflow-hidden bg-[url('/background.avif')] bg-cover bg-center py-16 text-gray-50 md:py-28 h-svh"
@@ -52,5 +53,6 @@ export const CallToAction: FC<CallToActionProps> = ({
         </FadeIn>
       </div>
     </Bounded>
+   
   );
 };

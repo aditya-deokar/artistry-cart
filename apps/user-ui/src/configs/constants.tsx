@@ -1,8 +1,5 @@
 export const navItems:NavItemsTypes[] =[
-    {
-        title: "Home",
-        href: "/"
-    },
+    
     {
         title: "Products",
         href: "/product"

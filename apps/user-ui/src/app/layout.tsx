@@ -7,6 +7,7 @@ import Providers from './Providers';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 
 import ReactLenis from "lenis/react";
+import Header from '@/shared/widgets/header';
 
 export const metadata = {
   title: 'Artistry Cart',
@@ -55,7 +56,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
             <Providers>
-            
+              <Header />
             {children}
 
             </Providers>

@@ -5,7 +5,7 @@ import { FC, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Bounded } from "../common/Bounded";
+
 
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -44,7 +44,7 @@ export const ScrollText: FC<ScrollTextProps> = ({ eyebrow, text }) => {
           start: "top 75%",
           end: "top top",
           scrub: 2,
-          markers:true,
+          // markers:true,
 
         },
       });
@@ -58,7 +58,7 @@ export const ScrollText: FC<ScrollTextProps> = ({ eyebrow, text }) => {
           scrub: 3,
           anticipatePin:1,
           pinSpacing: true,
-          markers:true,
+          // markers:true,
         },
       });
      colorTl.to(letters, {
