@@ -61,7 +61,7 @@ export const SearchResultsView: React.FC = () => {
     const pagination = data?.pagination;
 
     return (
-        <Bounded>
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="py-4 text-center">
                 <h1 className="font-display text-5xl">Search Results</h1>
                 {query && <p className="mt-4 text-lg text-primary/70">Showing results for: <span className="text-accent font-semibold">"{query}"</span></p>}
@@ -92,6 +92,6 @@ export const SearchResultsView: React.FC = () => {
                     )}
                 </section>
             </main>
-        </Bounded>
+    </main>
     );
 };

@@ -3,6 +3,7 @@ import { CreateDiscountCodes, createProduct, deleteDiscountCode, deleteProductIm
 import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
 import { createShopReview, getAllShops, getProductsForShop, getReviewsForShop, getShopBySlug } from "../controllers/shop.controller";
 import { fullSearch, liveSearch } from "../controllers/search.controller";
+import { getOffersPageData } from "../controllers/offers.controller";
 
 
 
@@ -50,5 +51,8 @@ router.get('/search/live', liveSearch);
 // GET /api/search/full?q=terracotta&page=1&category=crafts
 router.get('/search/full', fullSearch);
 
+
+
+router.get('/offers/get-page-data', getOffersPageData);
 
 export default router;

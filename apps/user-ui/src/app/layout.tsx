@@ -8,6 +8,8 @@ import { ThemeProvider } from '@/components/theme/theme-provider';
 
 import ReactLenis from "lenis/react";
 import Header from '@/shared/widgets/header';
+import { Toaster } from '@/components/ui/sonner';
+
 
 export const metadata = {
   title: 'Artistry Cart',
@@ -56,6 +58,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
             <Providers>
+              <Toaster position='top-center'/>
               <Header />
             {children}
 
