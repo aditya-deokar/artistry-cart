@@ -17,9 +17,9 @@ type ProductFeatureProps = {
 
 export const ProductFeature: FC<ProductFeatureProps> = ({ heading, description, product }) => {
   // Select images dynamically from the product's image array
-  const primaryImage = product.image[0];
+  const primaryImage = product.images.find(img => img !== null);
   // Use the second image for the highlight, or fall back to the primary if it doesn't exist
-  const secondaryImage = product.image[1] || primaryImage;
+  const secondaryImage = product?.images[1] || primaryImage;
 
   return (
     <Bounded className="overflow-hidden bg-background py-16 md:py-24 h-fit">

@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils'
 
 import { TransitionLink } from '@/components/common/TransitionLink'
 import { useStore } from '@/store'
+import { GlobalSearch } from '@/components/search/GlobalSearch'
 
 // Props to accept classNames for GSAP targeting
 type HeaderProps = {
@@ -56,10 +57,9 @@ const Header = ({ topHeaderClassName, navClassName ,className}: HeaderProps) => 
 
             <div className='border-b' />
 
-            {/* ======== BOTTOM NAVIGATION (STICKY ON SCROLL) ======== */}
+          
             <nav className={cn(
-                "w-full ",
-                isSticky ? "fixed top-0 left-0 z-[999] " : "relative"
+                "w-full relative"
             )}>
                 <div className="w-[80%] m-auto flex items-center justify-between h-[60px]">
                     <div className={navClassName}>
@@ -121,11 +121,12 @@ export const TopHeader = ({topHeaderClassName}:{ topHeaderClassName: string }) =
                 </div>
 
                 <div className={cn('w-1/2 relative', topHeaderClassName)}>
-                    <input type='text' placeholder='Search for Products...'
+                    {/* <input type='text' placeholder='Search for Products...'
                         className='w-full px-4 font-poppins font-medium border-[2.5px] border-border outline-none h-[50px]' />
                     <div className='w-[60px] cursor-pointer flex items-center justify-center h-[50px] bg-border absolute top-0 right-0'>
                         <Search />
-                    </div>
+                    </div> */}
+                    <GlobalSearch />
                 </div>
 
                 <div className={cn('flex items-center gap-5', topHeaderClassName)}>

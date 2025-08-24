@@ -32,7 +32,7 @@ export const Hero: FC<HeroProps> = ({ heading, body, buttonText, buttonLink, ima
         <RevealText
           text={heading}
           as="h1"
-          className="font-display max-w-xl text-6xl leading-none text-primary md:text-7xl lg:text-8xl"
+          className="font-display max-w-2xl text-6xl leading-none text-primary md:text-7xl lg:text-8xl"
           staggerAmount={0.2}
           duration={1.7}
         />
