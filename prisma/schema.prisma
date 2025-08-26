@@ -9,27 +9,84 @@ datasource db {
 }
 
 model images {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  file_id   String
-  url       String
-  userId    String?   @unique @db.ObjectId
-  users     users?    @relation(fields: [userId], references: [id])
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  file_id String
+  url     String
 }
 
-
-
 model users {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  email     String   @unique
-  password  String?
-  following String[]
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String  @unique
+  password String?
+  avatar   Json? // Use Json type for consistency: { url, file_id }
+  role     String  @default("USER") // "USER" or "SELLER" or "ADMIN"
 
-  avatar      images?
+  // Relations
+  orders      orders[]
+  addresses   addresses[]
   shopReviews shopReviews[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+
+model addresses {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  postalCode   String
+  country      String
+  isDefault    Boolean @default(false)
+
+  // Relation to User
+  userId String @db.ObjectId
+  user   users  @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// --- NEW ORDERS & ORDER_ITEMS MODELS ---
+model orders {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  totalAmount     Float
+  status          String // e.g., "PENDING", "SHIPPED", "DELIVERED", "CANCELLED"
+  shippingAddress Json // Store a snapshot of the address at time of order
+
+  // Relation to User
+  userId String @db.ObjectId
+  user   users  @relation(fields: [userId], references: [id])
+
+  // Relation to OrderItems
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  quantity Int
+  price    Float // Price per item at the time of purchase
+
+  // Relation to Order
+  orderId String @db.ObjectId
+  order   orders @relation(fields: [orderId], references: [id])
+
+  // Relation to Product
+  productId String   @db.ObjectId
+  product   products @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model shopReviews {
@@ -49,7 +106,7 @@ model shopReviews {
 model shops {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   name          String
-  slug          String        @unique 
+  slug          String        @unique
   bio           String?
   category      String
   avatar        Json?
@@ -123,7 +180,7 @@ model products {
   subCategory           String
   colors                String[]
   sizes                 String[]
-  discountCodes         String      @db.ObjectId
+  discountCodes         String        @db.ObjectId
   stock                 Int
   sale_price            Float?
   regular_price         Float
@@ -133,27 +190,28 @@ model products {
   images                Json[]
   status                productStatus @default(Active)
   totalSales            Int?
-  
+
   isEvent       Boolean?
   starting_date DateTime?
   ending_date   DateTime?
 
   deletedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   shopId String @db.ObjectId
   Shop   shops  @relation(fields: [shopId], references: [id])
+
+  orderItems OrderItem[]
 }
 
-
 model banners {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  title       String    // e.g., "Summer Art Fair 2025"
-  description String?   // e.g., "Get 20% off all landscape paintings"
-  imageUrl    String    // The URL for the banner image
-  linkUrl     String    // The URL the banner links to (e.g., /search?q=landscapes)
-  isActive    Boolean   @default(true)
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String // e.g., "Summer Art Fair 2025"
+  description String? // e.g., "Get 20% off all landscape paintings"
+  imageUrl    String // The URL for the banner image
+  linkUrl     String // The URL the banner links to (e.g., /search?q=landscapes)
+  isActive    Boolean  @default(true)
   startDate   DateTime
   endDate     DateTime
 
