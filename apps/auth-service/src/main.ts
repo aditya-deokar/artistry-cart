@@ -1,39 +1,49 @@
-import express from 'express';
-import cors from 'cors';
-import { errorMiddleware } from '../../../packages/error-handler/error-middelware';
-import cookieParser from 'cookie-parser';
-import router from './routes/auth.router';
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import { errorMiddleware } from "../../../packages/error-handler/error-middelware";
+import router from "./routes/auth.router";
 
-
-const host = process.env.HOST ?? 'localhost';
+const host = process.env.HOST ?? "localhost";
 const port = process.env.PORT ? Number(process.env.PORT) : 6001;
 
 const app = express();
 
-app.use(cors({
-  origin: ["http://localhost:3000"],
-  allowedHeaders: ['Authorization', 'Content-Type'],
-  credentials: true,
-}));
+//  Correct CORS setup (withCredentials support)
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000", // frontend dev
+      process.env.FRONTEND_URL || "", // allow env-based frontend
+    ].filter(Boolean),
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Authorization", "Content-Type"],
+    credentials: true, // allow cookies
+  })
+);
 
-app.use(express.json({ limit: '10mb' }));
-
+//  Parse JSON & Cookies
+app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
 
-// Health check
-app.get('/', (req, res) => {
-  res.send({ message: 'Hello API Auth Service' });
+//  Health check
+app.get("/", (req, res) => {
+  res.send({ message: "Hello API Auth Service" });
 });
 
-
+//  Auth routes
 app.use("/api", router);
+
+//  Global error handler
 app.use(errorMiddleware);
 
-const server = app.listen(port, () => {
-  console.log(`Auth Service is Running at http://${host}:${port}/api`);
-  console.log(`Swagger Docs Available at http://${host}:${port}/api-docs`);
+//  Start server
+const server = app.listen(port, host, () => {
+  console.log(`🚀 Auth Service running at http://${host}:${port}/api`);
+ 
 });
 
-server.on('error', (err) => {
-  console.log("Server Error:", err);
+// ✅ Catch server-level errors
+server.on("error", (err) => {
+  console.error("❌ Server Error:", err);
 });
