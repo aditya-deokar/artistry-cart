@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser"
 import { errorMiddleware } from "../../../packages/error-handler/error-middelware"
+import router from './routes/order.route';
 const app = express();
 
 app.use(
@@ -25,6 +26,8 @@ app.get('/', (req, res) => {
   res.send({ message: 'Welcome to order-service!' });
 });
 
+// Routes
+app.use("/order/api", router)
 
 app.use(errorMiddleware)
 const port = process.env.PORT || 6004;
