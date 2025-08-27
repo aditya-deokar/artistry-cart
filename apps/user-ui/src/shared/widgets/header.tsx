@@ -86,7 +86,7 @@ const Header = ({ className, logoContainerClassName, navContainerClassName, icon
 
     return (
         <header className={cn("w-full  sticky top-0 z-50 bg-background/80 backdrop-blur-2xl", className)}>
-            <div className="border-b border-neutral-800/50">
+            <div className="border-b border-border">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex h-20 items-center justify-between gap-4">
 

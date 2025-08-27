@@ -50,7 +50,7 @@ const CartPage = () => {
 
                             {/* Order Summary */}
                             <div className="lg:col-span-1">
-                                <OrderSummary subtotal={subtotal} />
+                                <OrderSummary  subtotal={subtotal} />
                             </div>
                         </div>
                     </>

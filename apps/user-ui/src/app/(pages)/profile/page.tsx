@@ -8,7 +8,7 @@ export default function ProfilePage() {
     const { data: user, isLoading, isError } = useQuery({
         queryKey: ['userProfile'],
         queryFn: async () => {
-            const res = await axiosInstance.get('/users/api/me');
+            const res = await axiosInstance.get('/auth/api/me');
             return res.data.user;
         },
     });

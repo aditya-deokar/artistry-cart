@@ -19,10 +19,10 @@ export const ProfileNavLink: React.FC<ProfileNavLinkProps> = ({ href, icon, chil
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-md font-semibold transition-colors",
+        "flex items-center gap-3 p-3 rounded-md font-semibold transition-colors ",
         isActive
-          ? "bg-accent text-white"
-          : "text-primary/80 hover:bg-neutral-800"
+          ? "bg-secondary/50 text-primary"
+          : "text-primary/70 hover:bg-secondary/30"
       )}
     >
       {icon}

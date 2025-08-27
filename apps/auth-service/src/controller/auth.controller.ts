@@ -179,6 +179,35 @@ export const loginUser = async (
   }
 };
 
+// Logout user
+export const logoutUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Clear the tokens
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    res.clearCookie("refresh_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return res.status(200).json({
+      message: "Logout successful!",
+    });
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+};
+
+
 // Refresh Token User
 export const refreshToken = async (
   req: any,

@@ -2,6 +2,10 @@ import React from 'react';
 import Image from 'next/image';
 import { ProfileNavLink } from './ProfileNavLink';
 import { User, ShoppingBag, MapPin, Shield, Store, LogOut } from 'lucide-react';
+import axiosInstance from '@/utils/axiosinstance';
+import {  useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+
 
 // Define the shape of the user data this component needs
 interface UserData {
@@ -11,6 +15,8 @@ interface UserData {
 }
 
 export const ProfileSidebar: React.FC<{ user: UserData }> = ({ user }) => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
   const navLinks = [
     { href: '/profile', label: 'My Profile', icon: <User size={20} /> },
@@ -19,10 +25,20 @@ export const ProfileSidebar: React.FC<{ user: UserData }> = ({ user }) => {
     { href: '/profile/security', label: 'Security', icon: <Shield size={20} /> },
   ];
 
+
+  const logOutHandler= async ()=>{
+    await axiosInstance.get("/auth/api/logout-user").then((res)=>{
+        queryClient.invalidateQueries({
+          queryKey: ['user']
+        })
+        router.push("/login")
+    })
+  }
+
   return (
-    <div className="p-6 bg-neutral-900/50 border border-neutral-800 rounded-lg lg:sticky top-24">
-      <div className="flex items-center gap-4 pb-4 border-b border-neutral-800">
-        <div className="relative w-16 h-16 rounded-full bg-neutral-800">
+    <div className="p-6 bg-background/50 border border-border rounded-lg lg:sticky top-24">
+      <div className="flex items-center gap-4 pb-4 border-b border-border">
+        <div className="relative w-16 h-16 rounded-full bg-background">
           {user.avatar?.url && (
             <Image src={user.avatar.url} alt={user.name} fill className="rounded-full object-cover" />
           )}
@@ -48,7 +64,9 @@ export const ProfileSidebar: React.FC<{ user: UserData }> = ({ user }) => {
       </nav>
 
       <div className="mt-6 pt-4 border-t border-neutral-800">
-        <button className="flex items-center gap-3 w-full p-3 rounded-md text-red-500 font-semibold hover:bg-red-500/10 transition-colors">
+        <button
+        onClick={()=> logOutHandler()}
+        className="flex items-center gap-3 w-full p-3 rounded-md text-red-400 font-semibold hover:text-red-700 transition-colors">
             <LogOut size={20} />
             Logout
         </button>
