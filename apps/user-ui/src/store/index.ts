@@ -3,16 +3,25 @@ import { ArtProduct } from '@/types/products';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-
-// Define the shape of a single item in the cart, which includes a quantity.
+// ---------------- TYPES ----------------
 export type CartItem = ArtProduct & {
   quantity: number;
+};
+
+export type Address = {
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  isDefault?: boolean;
 };
 
 export type DiscountCode = {
   id: string;
   publicName: string;
-  discountType: 'percentage' | 'flat'; 
+  discountType: 'percentage' | 'flat';
   discountValue: number;
   discountCode: string;
 };
@@ -20,28 +29,29 @@ export type DiscountCode = {
 export interface StoreState {
   cart: CartItem[];
   wishlist: CartItem[];
-  appliedCoupon: DiscountCode | null; 
+  appliedCoupon: DiscountCode | null;
+  address: Address | null;   
 }
 
-// Define all the actions that can be performed on the store.
 export interface StoreActions {
-  addToCart: (product: CartItem, user:any , location:any , deviceInfo :string) => void;
-  removeFromCart: (productId: string , user :any , location: any, deviceInfo:string) => void;
+  addToCart: (product: CartItem, user: any, location: any, deviceInfo: string) => void;
+  removeFromCart: (productId: string, user: any, location: any, deviceInfo: string) => void;
   updateQuantity: (productId: string, newQuantity: number) => void;
   clearCart: () => void;
-  addToWishlist: (product: CartItem, user:any , location:any , deviceInfo :string) => void;
-  removeFromWishlist: (productId: string , user :any , location: any, deviceInfo:string) => void;
+  addToWishlist: (product: CartItem, user: any, location: any, deviceInfo: string) => void;
+  removeFromWishlist: (productId: string, user: any, location: any, deviceInfo: string) => void;
 
-  applyCoupon: (coupon: DiscountCode) => void; 
+  applyCoupon: (coupon: DiscountCode) => void;
   removeCoupon: () => void;
+
+  setAddress: (address: Address) => void;   
+  clearAddress: () => void;                 
 }
 
-// Combine state and actions into the final store type.
-// The actions are nested under an 'actions' key as per your component's usage.
+// ---------------- STORE ----------------
 export type Store = StoreState & {
   actions: StoreActions;
 };
-
 
 export const useStore = create<Store>()(
   persist(
@@ -50,156 +60,142 @@ export const useStore = create<Store>()(
       cart: [],
       wishlist: [],
       appliedCoupon: null,
+      address: null, 
 
       // --- ACTIONS ---
-      // All actions are grouped under the 'actions' key for organized access.
       actions: {
-        
-        addToWishlist: (product,user, location, deviceInfo) => {
+        addToWishlist: (product, user, location, deviceInfo) => {
           const { wishlist } = get();
-          // Check if the item is already in the wishlist to avoid duplicates
-          if (!wishlist.some(item => item.id === product.id)) {
-            set(state => ({
+          if (!wishlist.some((item) => item.id === product.id)) {
+            set((state) => ({
               wishlist: [...state.wishlist, product],
             }));
           }
 
-          // send kafka event
-          if(user?.id && location && deviceInfo){
+          if (user?.id && location && deviceInfo) {
             sendKafkaEvent({
               userId: user?.id,
               productId: product?.id,
               shopId: product?.Shop?.id,
-              action: "add_to_wishlist",
-              country: location?.country || "Unknown",
-              city: location?.city || "Unknown",
-              device: deviceInfo || "Unknown Device",
-            })
+              action: 'add_to_wishlist',
+              country: location?.country || 'Unknown',
+              city: location?.city || 'Unknown',
+              device: deviceInfo || 'Unknown Device',
+            });
           }
         },
 
-        
-        removeFromWishlist:(productId , user, location, deviceInfo) => {
-          const removeProduct =get().cart.find((item)=> item.id === productId)
+        removeFromWishlist: (productId, user, location, deviceInfo) => {
+          const removeProduct = get().cart.find((item) => item.id === productId);
 
-          set(state => ({
-            wishlist: state.wishlist.filter(item => item.id !== productId),
+          set((state) => ({
+            wishlist: state.wishlist.filter((item) => item.id !== productId),
           }));
 
-          // send kafka event
-          if(user?.id && location && deviceInfo && removeProduct){
+          if (user?.id && location && deviceInfo && removeProduct) {
             sendKafkaEvent({
               userId: user?.id,
               productId: removeProduct?.id,
               shopId: removeProduct?.Shop?.id,
-              action: "remove_from_wishlist",
-              country: location?.country || "Unknown",
-              city: location?.city || "Unknown",
-              device: deviceInfo || "Unknown Device",
-            })
+              action: 'remove_from_wishlist',
+              country: location?.country || 'Unknown',
+              city: location?.city || 'Unknown',
+              device: deviceInfo || 'Unknown Device',
+            });
           }
         },
 
-       
         addToCart: (product, user, location, deviceInfo) => {
           const { cart } = get();
-          const existingItem = cart.find(item => item.id === product.id);
+          const existingItem = cart.find((item) => item.id === product.id);
 
           if (existingItem) {
-            // If item exists, map over the cart and update the quantity
-            const updatedCart = cart.map(item =>
-              item.id === product.id
-                ? { ...item, quantity: item.quantity + 1 }
-                : item
+            const updatedCart = cart.map((item) =>
+              item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
             );
             set({ cart: updatedCart });
           } else {
-            // If item is new, add it to the cart with quantity 1
-            set(state => ({
+            set((state) => ({
               cart: [...state.cart, { ...product, quantity: 1 }],
             }));
           }
 
-          // send kafka event
-          if(user?.id && location && deviceInfo){
+          if (user?.id && location && deviceInfo) {
             sendKafkaEvent({
               userId: user?.id,
               productId: product?.id,
               shopId: product?.Shop?.id,
-              action: "add_to_cart",
-              country: location?.country || "Unknown",
-              city: location?.city || "Unknown",
-              device: deviceInfo || "Unknown Device",
-            })
+              action: 'add_to_cart',
+              country: location?.country || 'Unknown',
+              city: location?.city || 'Unknown',
+              device: deviceInfo || 'Unknown Device',
+            });
           }
-
         },
 
-        
         removeFromCart: (productId, user, location, deviceInfo) => {
+          const removeProduct = get().cart.find((item) => item.id === productId);
 
-          const removeProduct =get().cart.find((item)=> item.id === productId)
-
-          set(state => ({
-            cart: state.cart.filter(item => item.id !== productId),
+          set((state) => ({
+            cart: state.cart.filter((item) => item.id !== productId),
           }));
 
-          // send kafka event
-          if(user?.id && location && deviceInfo && removeProduct){
+          if (user?.id && location && deviceInfo && removeProduct) {
             sendKafkaEvent({
               userId: user?.id,
               productId: removeProduct?.id,
               shopId: removeProduct?.Shop?.id,
-              action: "remove_from_cart",
-              country: location?.country || "Unknown",
-              city: location?.city || "Unknown",
-              device: deviceInfo || "Unknown Device",
-            })
+              action: 'remove_from_cart',
+              country: location?.country || 'Unknown',
+              city: location?.city || 'Unknown',
+              device: deviceInfo || 'Unknown Device',
+            });
           }
         },
 
-       
         updateQuantity: (productId, newQuantity) => {
           if (newQuantity <= 0) {
-            // If quantity is 0 or less, remove the item from the cart
-            get().actions.removeFromCart(productId, user, location, deviceInfo);
+           
+            set((state) => ({
+              cart: state.cart.filter((item) => item.id !== productId),
+            }));
           } else {
-            set(state => ({
-              cart: state.cart.map(item =>
-                item.id === productId
-                  ? { ...item, quantity: newQuantity }
-                  : item
+            set((state) => ({
+              cart: state.cart.map((item) =>
+                item.id === productId ? { ...item, quantity: newQuantity } : item
               ),
             }));
           }
         },
 
-      
-        // Clears all items from the shopping cart.   
         clearCart: () => {
           set({ cart: [] });
         },
 
-
         applyCoupon: (coupon) => {
           set({ appliedCoupon: coupon });
         },
-        // Removes the currently applied coupon from the state. 
         removeCoupon: () => {
           set({ appliedCoupon: null });
         },
 
-
+        
+        setAddress: (address) => {
+          set({ address });
+        },
+        clearAddress: () => {
+          set({ address: null });
+        },
       },
     }),
     {
-      // Configuration for the persistence middleware
-      name: 'artistry-cart-storage', // The key in localStorage
+      name: 'artistry-cart-storage',
       storage: createJSONStorage(() => localStorage),
-      // Only persist the cart and wishlist state, not the actions.
       partialize: (state): Partial<Store> => ({
         cart: state.cart,
         wishlist: state.wishlist,
+        appliedCoupon: state.appliedCoupon,
+        address: state.address, 
       }),
     }
   )

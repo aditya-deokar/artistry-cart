@@ -9,7 +9,7 @@ export const OrderHistoryView = () => {
     const { data, isLoading, isError } = useQuery({
         queryKey: ['userOrders'],
         queryFn: async () => {
-            const res = await axiosInstance.get('/users/api/me/orders');
+            const res = await axiosInstance.get('/auth/api/me/orders');
             return res.data; // Expects { orders: [], pagination: {} }
         },
     });
