@@ -20,9 +20,9 @@ app.use(cors({
 
 app.use(morgan('dev'));
 
-app.use(express.json({ limit:'100mb' }));
+app.use(express.json({ limit:'30mb' }));
 
-app.use(express.urlencoded({ limit:'100mb' , extended:true}));
+app.use(express.urlencoded({ limit:'30mb' , extended:true}));
 
 app.use(cookieParser());
 
@@ -51,6 +51,7 @@ app.get('/gateway-health', (req, res) => {
   res.send({ message: 'Welcome to api-gateway!' });
 });
 
+app.use("/order", proxy("http://localhost:6004"))
 app.use("/auth", proxy("http://localhost:6001") );
 app.use("/product", proxy("http://localhost:6002") );
 

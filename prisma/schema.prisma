@@ -31,7 +31,6 @@ model users {
   updatedAt DateTime @updatedAt
 }
 
-
 model addresses {
   id           String  @id @default(auto()) @map("_id") @db.ObjectId
   addressLine1 String
@@ -54,14 +53,20 @@ model addresses {
 
 // --- NEW ORDERS & ORDER_ITEMS MODELS ---
 model orders {
-  id              String @id @default(auto()) @map("_id") @db.ObjectId
-  totalAmount     Float
-  status          String // e.g., "PENDING", "SHIPPED", "DELIVERED", "CANCELLED"
-  shippingAddress Json // Store a snapshot of the address at time of order
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  totalAmount       Float
+  status            String // e.g., "PENDING", "SHIPPED", "DELIVERED", "CANCELLED"
+  shippingAddressId String? // Store a snapshot of the address at time of order
+  couponCode        String?
+  discountAmount    Float?
+  deliveryStatus    String @default("Ordered")
 
   // Relation to User
   userId String @db.ObjectId
   user   users  @relation(fields: [userId], references: [id])
+
+  shopId String @db.ObjectId
+  shops  shops  @relation(fields: [shopId], references: [id])
 
   // Relation to OrderItems
   items OrderItem[]
@@ -73,13 +78,13 @@ model orders {
 }
 
 model OrderItem {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  quantity Int
-  price    Float // Price per item at the time of purchase
-
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  quantity        Int
+  price           Float // Price per item at the time of purchase
+  selectedOptions Json?
   // Relation to Order
-  orderId String @db.ObjectId
-  order   orders @relation(fields: [orderId], references: [id])
+  orderId         String @db.ObjectId
+  order           orders @relation(fields: [orderId], references: [id])
 
   // Relation to Product
   productId String   @db.ObjectId
@@ -125,6 +130,7 @@ model shops {
   updatedAt DateTime @updatedAt
 
   products products[]
+  orders   orders[]
 }
 
 model sellers {
@@ -217,4 +223,39 @@ model banners {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model productAnalytics {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId    String   @unique
+  shopId       String
+  views        Int      @default(0)
+  cartAdds     Int      @default(0)
+  wishlistAdds Int      @default(0)
+  purchases    Int      @default(0)
+  lastViewedAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model shopAnalytics {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  totalVisitors Int      @default(0)
+  countryStats  Json?
+  cityStats     Json?
+  deviceStats   Json?
+  lastVisitedAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model uniqueShopVisitor {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  shopId    String   @db.ObjectId
+  userId    String   @db.ObjectId
+  visitedAt DateTime @default(now())
+
+  @@unique([shopId, userId])
 }

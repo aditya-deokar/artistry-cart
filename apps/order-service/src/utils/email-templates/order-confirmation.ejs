@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Your Artistry Cart Order Confirmation</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #faf6f1;
+        color: #333;
+      }
+      .container {
+        max-width: 650px;
+        margin: 0 auto;
+        background: #fffdf9;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      }
+      .header {
+        background: linear-gradient(135deg, #ff8a65, #fbc02d);
+        padding: 24px;
+        text-align: center;
+        color: #fff;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: 1px;
+      }
+      .content {
+        padding: 24px;
+      }
+      .content h2 {
+        font-size: 22px;
+        margin-bottom: 16px;
+        color: #444;
+      }
+      .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      .cart-table th, .cart-table td {
+        border-bottom: 1px solid #eee;
+        padding: 12px;
+        text-align: left;
+      }
+      .cart-table th {
+        background: #faf0e6;
+        color: #444;
+      }
+      .total {
+        font-size: 18px;
+        font-weight: bold;
+        text-align: right;
+        margin: 16px 0;
+      }
+      .btn {
+        display: inline-block;
+        padding: 14px 28px;
+        margin: 20px 0;
+        background: linear-gradient(135deg, #ff7043, #ffa726);
+        color: #fff !important;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      .footer {
+        background: #faf0e6;
+        padding: 16px;
+        text-align: center;
+        font-size: 13px;
+        color: #777;
+      }
+      .art-border {
+        height: 8px;
+        background: repeating-linear-gradient(
+          45deg,
+          #ff8a65,
+          #ff8a65 10px,
+          #fbc02d 10px,
+          #fbc02d 20px,
+          #81c784 20px,
+          #81c784 30px,
+          #64b5f6 30px,
+          #64b5f6 40px
+        );
+      }
+    </style>
+  </head>
+  <body>
+    <div class="art-border"></div>
+    <div class="container">
+      <div class="header">
+        <h1>Thank You, <%= name %>!</h1>
+        <p>Your Artistry Cart order has been confirmed 🎨</p>
+      </div>
+      <div class="content">
+        <h2>Order Summary</h2>
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th>Artwork</th>
+              <th>Qty</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% cart.forEach(item => { %>
+              <tr>
+                <td><%= item.title %></td>
+                <td><%= item.quantity %></td>
+                <td>₹<%= item.sale_price * item.quantity %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <p class="total">Total: ₹<%= totalAmount %></p>
+        <div style="text-align:center;">
+          <a href="<%= trackingUrl %>" class="btn">Track Your Order</a>
+        </div>
+      </div>
+      <div class="footer">
+        <p>Every piece you buy supports an artist’s dream. ✨</p>
+        <p>&copy; <%= new Date().getFullYear() %> Artistry.com</p>
+      </div>
+    </div>
+  </body>
+</html>
