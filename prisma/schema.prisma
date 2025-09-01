@@ -26,6 +26,8 @@ model users {
   orders      orders[]
   addresses   addresses[]
   shopReviews shopReviews[]
+  notifications Notification[]
+  analytics     UserAnalytics?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -258,4 +260,39 @@ model uniqueShopVisitor {
   visitedAt DateTime @default(now())
 
   @@unique([shopId, userId])
+}
+
+
+model UserAnalytics {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Establishes the one-to-one relationship with a User
+  userId      String   @unique @db.ObjectId
+  user        users     @relation(fields: [userId], references: [id])
+
+  lastVisited DateTime
+
+  // The Json type is perfectly suited for MongoDB's flexible schema
+  actions     Json[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  message       String
+  isRead        Boolean   @default(false)
+  redirect_link String?
+
+  // The ID of the user who triggered the notification (e.g., the buyer)
+  createrId     String    @db.ObjectId
+  user          users      @relation(fields: [createrId], references: [id])
+
+  // The ID of the entity receiving the notification (can be a seller's user ID or "admin")
+  recieverId    String
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
