@@ -413,7 +413,7 @@ export const createOrder = async (
           const firstProduct= shopGrouped[shop.id][0];
           const productTitle = firstProduct?.title || "new item";
 
-          await prisma.notifications.create({
+          await prisma.notification.create({
             data:{
               title: "New Order Received",
               message: `A Customer just ordered ${productTitle} from your shop.`,
@@ -426,7 +426,7 @@ export const createOrder = async (
 
         // Notification for Admin
        
-          await prisma.notifications.create({
+          await prisma.notification.create({
             data:{
               title: "Platform Order Alert",
               message: `A New Order was placed by ${name}.`,

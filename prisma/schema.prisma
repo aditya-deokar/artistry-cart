@@ -23,9 +23,12 @@ model users {
   role     String  @default("USER") // "USER" or "SELLER" or "ADMIN"
 
   // Relations
-  orders      orders[]
-  addresses   addresses[]
-  shopReviews shopReviews[]
+  orders         orders[]
+  addresses      addresses[]
+  shopReviews    shopReviews[]
+  notifications  Notification[]
+  analytics      UserAnalytics?
+  discountUsage  discount_usage[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -51,7 +54,6 @@ model addresses {
   @@index([userId])
 }
 
-// --- NEW ORDERS & ORDER_ITEMS MODELS ---
 model orders {
   id                String  @id @default(auto()) @map("_id") @db.ObjectId
   totalAmount       Float
@@ -71,6 +73,8 @@ model orders {
   // Relation to OrderItems
   items OrderItem[]
 
+  discountUsage discount_usage[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -81,10 +85,13 @@ model OrderItem {
   id              String @id @default(auto()) @map("_id") @db.ObjectId
   quantity        Int
   price           Float // Price per item at the time of purchase
+  originalPrice   Float? // Original price before any discounts
+  discountAmount  Float? // Discount applied per item
   selectedOptions Json?
+
   // Relation to Order
-  orderId         String @db.ObjectId
-  order           orders @relation(fields: [orderId], references: [id])
+  orderId String @db.ObjectId
+  order   orders @relation(fields: [orderId], references: [id])
 
   // Relation to Product
   productId String   @db.ObjectId
@@ -126,6 +133,9 @@ model shops {
 
   sellers sellers @relation(fields: [sellerId], references: [id])
 
+  events        events[]
+  discountCodes discount_codes[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -142,8 +152,12 @@ model sellers {
   password     String?
   stripeId     String?
   shop         shops?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+
+  events        events[]
+  discountCodes discount_codes[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model site_config {
@@ -152,24 +166,13 @@ model site_config {
   subCategories Json
 }
 
-model discount_codes {
-  id            String @id @default(auto()) @map("_id") @db.ObjectId
-  publicName    String
-  discountType  String
-  discountValue Float
-  discountCode  String @unique
-  sellerId      String @db.ObjectId
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 enum productStatus {
   Active
   Pending
   Draft
 }
 
+// Enhanced Products model with pricing support
 model products {
   id                    String        @id @default(auto()) @map("_id") @db.ObjectId
   title                 String
@@ -186,10 +189,15 @@ model products {
   subCategory           String
   colors                String[]
   sizes                 String[]
-  discountCodes         String        @db.ObjectId
+  discountCodes         String?        @db.ObjectId
   stock                 Int
-  sale_price            Float?
-  regular_price         Float
+  
+  // Enhanced pricing fields
+  sale_price            Float?        // Non-event sale price
+  regular_price         Float         // Base price (never changes)
+  current_price         Float         // Cached current effective price
+  is_on_discount        Boolean       @default(false) // Cache for quick queries
+  
   ratings               Float         @default(5)
   isDeleted             Boolean?      @default(false)
   customProperties      Json
@@ -197,18 +205,147 @@ model products {
   status                productStatus @default(Active)
   totalSales            Int?
 
+  // Event relation (simplified)
   isEvent       Boolean?
   starting_date DateTime?
   ending_date   DateTime?
 
   deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   shopId String @db.ObjectId
   Shop   shops  @relation(fields: [shopId], references: [id])
 
-  orderItems OrderItem[]
+  eventId String? @db.ObjectId
+  event   events? @relation(fields: [eventId], references: [id])
+
+  // Enhanced relations
+  orderItems           OrderItem[]
+  priceHistory         ProductPricing[]
+  eventProductDiscounts EventProductDiscount[]
+
+  @@index([current_price])
+  @@index([is_on_discount])
+  @@index([eventId])
+}
+
+// NEW: Product Pricing History Model
+model ProductPricing {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId        String   @db.ObjectId
+  product          products @relation(fields: [productId], references: [id])
+  
+  // Pricing details
+  basePrice        Float    // Original price at time of pricing
+  discountedPrice  Float?   // Final price after discount
+  discountAmount   Float?   // Absolute discount amount applied
+  discountPercent  Float?   // Percentage discount applied
+  
+  // Discount source tracking
+  discountSource   String?  // "EVENT", "PRODUCT_SALE", "CATEGORY", "MANUAL", "BULK"
+  sourceId         String?  @db.ObjectId  // EventId, CategoryId, etc.
+  sourceName       String?  // For display purposes ("Summer Sale 2025")
+  
+  // Validity period
+  validFrom        DateTime
+  validUntil       DateTime?
+  isActive         Boolean  @default(true)
+  
+  // Metadata
+  createdBy        String?  @db.ObjectId  // SellerId who set this price
+  reason           String?  // "Event pricing", "Clearance", "Flash sale", etc.
+  notes            String?  // Additional notes
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@index([productId])
+  @@index([validFrom, validUntil])
+  @@index([isActive])
+  @@index([discountSource])
+}
+
+// Enhanced Events model
+model events {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  title            String
+  description      String
+  banner_image     Json?    // { url, file_id }
+  event_type       String   // "FLASH_SALE", "SEASONAL", "CLEARANCE", "NEW_ARRIVAL"
+  
+  // Enhanced discount fields
+  discount_percent Float?   // Overall event discount percentage
+  discount_type    String?  // "PERCENTAGE", "FIXED_AMOUNT", "TIERED"
+  discount_value   Float?   // The discount value
+  max_discount     Float?   // Maximum discount cap for percentage discounts
+  min_order_value  Float?   // Minimum order value to qualify for event discount
+  
+  starting_date    DateTime
+  ending_date      DateTime
+  is_active        Boolean  @default(true)
+  
+  // Seller relation
+  sellerId         String   @db.ObjectId
+  seller           sellers  @relation(fields: [sellerId], references: [id])
+  
+  // Shop relation
+  shopId           String   @db.ObjectId
+  shop             shops    @relation(fields: [shopId], references: [id])
+  
+  // Products in this event
+  products         products[]
+  
+  // NEW: Product-specific discounts within this event
+  productDiscounts EventProductDiscount[]
+  
+  // Analytics
+  views            Int      @default(0)
+  clicks           Int      @default(0)
+  conversions      Int      @default(0) // Track successful purchases
+  totalRevenue     Float    @default(0) // Track revenue generated
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@index([sellerId])
+  @@index([shopId])
+  @@index([starting_date, ending_date])
+  @@index([is_active])
+  @@index([event_type])
+}
+
+// NEW: Event Product Specific Discounts Model
+model EventProductDiscount {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  eventId          String   @db.ObjectId
+  event            events   @relation(fields: [eventId], references: [id])
+  productId        String   @db.ObjectId
+  product          products @relation(fields: [productId], references: [id])
+  
+  // Discount details
+  discountType     String   // "PERCENTAGE", "FIXED_AMOUNT", "SPECIAL_PRICE", "BUY_X_GET_Y"
+  discountValue    Float    // Percentage or fixed amount
+  maxDiscount      Float?   // Cap for percentage discounts
+  
+  // Special pricing
+  specialPrice     Float?   // Override price for this product in this event
+  
+  // Conditions
+  minQuantity      Int?     // Minimum quantity to get discount
+  maxQuantity      Int?     // Maximum quantity eligible for discount
+  
+  // Metadata
+  priority         Int      @default(1) // For handling multiple discounts
+  isActive         Boolean  @default(true)
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@unique([eventId, productId])
+  @@index([eventId])
+  @@index([productId])
+  @@index([isActive])
 }
 
 model banners {
@@ -258,4 +395,104 @@ model uniqueShopVisitor {
   visitedAt DateTime @default(now())
 
   @@unique([shopId, userId])
+}
+
+model UserAnalytics {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Establishes the one-to-one relationship with a User
+  userId      String   @unique @db.ObjectId
+  user        users     @relation(fields: [userId], references: [id])
+
+  lastVisited DateTime
+
+  // The Json type is perfectly suited for MongoDB's flexible schema
+  actions     Json[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  message       String
+  isRead        Boolean   @default(false)
+  redirect_link String?
+
+  // The ID of the user who triggered the notification (e.g., the buyer)
+  createrId     String    @db.ObjectId
+  user          users      @relation(fields: [createrId], references: [id])
+
+  // The ID of the entity receiving the notification (can be a seller's user ID or "admin")
+  recieverId    String
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model discount_codes {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  publicName            String
+  description           String?
+  discountType          String   // "PERCENTAGE", "FIXED_AMOUNT", "FREE_SHIPPING"
+  discountValue         Float
+  discountCode          String   @unique
+  
+  // Usage restrictions
+  minimumOrderAmount    Float?
+  maximumDiscountAmount Float?   // For percentage discounts
+  usageLimit            Int?     // Total usage limit
+  usageLimitPerUser     Int?     // Per user usage limit
+  currentUsageCount     Int      @default(0)
+  
+  // Validity
+  isActive              Boolean  @default(true)
+  validFrom             DateTime @default(now())
+  validUntil            DateTime?
+  
+  // Applicability
+  applicableToAll       Boolean  @default(true)
+  applicableCategories  String[] // Categories this code applies to
+  applicableProducts    String[] @db.ObjectId // Specific products
+  excludedProducts      String[] @db.ObjectId // Excluded products
+  
+  // Seller relation
+  sellerId              String   @db.ObjectId
+  seller                sellers  @relation(fields: [sellerId], references: [id])
+  
+  // Shop relation
+  shopId                String   @db.ObjectId
+  shop                  shops    @relation(fields: [shopId], references: [id])
+  
+  // Usage tracking
+  usageHistory          discount_usage[]
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@index([sellerId])
+  @@index([shopId])
+  @@index([validFrom, validUntil])
+}
+
+// Track discount code usage
+model discount_usage {
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  
+  discountCodeId   String         @db.ObjectId
+  discountCode     discount_codes @relation(fields: [discountCodeId], references: [id])
+  
+  userId           String         @db.ObjectId
+  user             users          @relation(fields: [userId], references: [id])
+  
+  orderId          String?        @db.ObjectId
+  order            orders?        @relation(fields: [orderId], references: [id])
+  
+  discountAmount   Float          // Amount discounted
+  
+  usedAt           DateTime       @default(now())
+  
+  @@index([discountCodeId])
+  @@index([userId])
 }

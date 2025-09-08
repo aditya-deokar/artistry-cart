@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useStore, type CartItem as CartItemType } from '@/store';
 import { AnimatePresence } from 'framer-motion';
 
@@ -9,10 +9,13 @@ import { EmptyCart } from '@/components/cart/EmptyCart';
 import { CartItem } from '@/components/cart/CartItem';
 import { OrderSummary } from '@/components/cart/OrderSummary';
 
+
 const CartPage = () => {
+   
     // Select state and actions from the Zustand store
     const cart = useStore((state) => state.cart);
     const { removeFromCart, updateQuantity } = useStore((state) => state.actions);
+   
 
     // Calculate subtotal, memoized for performance.
     // This calculation runs only when the cart's contents change.
@@ -50,7 +53,7 @@ const CartPage = () => {
 
                             {/* Order Summary */}
                             <div className="lg:col-span-1">
-                                <OrderSummary  subtotal={subtotal} />
+                                <OrderSummary cart={cart}  subtotal={subtotal} />
                             </div>
                         </div>
                     </>
