@@ -3,11 +3,9 @@ import "./jobs/product-cron.job"
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorMiddleware } from '../../../packages/error-handler/error-middelware';
-import router from './routes/product.route';
-
-
-
-
+import productRouter from './routes/product.route';
+import eventRouter from './routes/events.route';      
+import discountRouter from './routes/discounts.route'; 
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 6002;
@@ -29,8 +27,11 @@ app.get('/', (req, res) => {
   res.send({ message: 'Hello API Products Service' });
 });
 
+// Routes
+app.use("/api", productRouter);
+app.use("/api/events", eventRouter);     
+app.use("/api/discounts", discountRouter); 
 
-app.use("/api", router);
 app.use(errorMiddleware);
 
 const server = app.listen(port, () => {

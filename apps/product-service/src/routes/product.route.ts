@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { CreateDiscountCodes, createProduct, deleteDiscountCode, deleteProductImage, deleteShopProducts, getAllProducts, getCategories, getDiscountCodes, getProductBySlug, getShopProducts, restoreShopProducts, uploadProductImage, validateCoupon } from "../controllers/product.controller";
+import {  createProduct, deleteProductImage, deleteShopProducts, getAllProducts, getCategories, getProductBySlug, getShopProducts, restoreShopProducts, uploadProductImage, validateCoupon } from "../controllers/product.controller";
 import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
 import { createShopReview, getAllShops, getProductsForShop, getReviewsForShop, getShopBySlug } from "../controllers/shop.controller";
 import { fullSearch, liveSearch } from "../controllers/search.controller";
@@ -11,9 +11,6 @@ const router: Router = express.Router();
 
 router.get("/get-categories", getCategories);
 
-router.post("/create-discount-code", isAuthenticated, CreateDiscountCodes);
-router.get("/get-discount-codes", isAuthenticated, getDiscountCodes);
-router.delete("/delete-discount-code/:id", isAuthenticated, deleteDiscountCode)
 
 router.post("/upload-product-image",isAuthenticated, uploadProductImage);
 router.delete("/delete-product-image",isAuthenticated, deleteProductImage);
@@ -54,5 +51,6 @@ router.get('/search/full', fullSearch);
 
 
 router.get('/offers/get-page-data', getOffersPageData);
+
 
 export default router;

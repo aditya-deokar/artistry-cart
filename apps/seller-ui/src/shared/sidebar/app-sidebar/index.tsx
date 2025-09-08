@@ -91,7 +91,7 @@ export const data = {
     },
     {
       title: "Create Event",
-      url: "/dashboard/create-event",
+      url: "/dashboard/events",
       icon: CalendarPlus,
     },
     {
@@ -112,6 +112,11 @@ export const data = {
     {
       title: "Discount Codes",
       url: "/dashboard/discount-codes",
+      icon: TicketPercent,
+    },
+    {
+      title: "Discounts",
+      url: "/dashboard/discounts",
       icon: TicketPercent,
     },
     {
