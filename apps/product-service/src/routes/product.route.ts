@@ -1,56 +1,67 @@
 import express, { Router } from "express";
-import {  createProduct, deleteProductImage, deleteShopProducts, getAllProducts, getCategories, getProductBySlug, getShopProducts, restoreShopProducts, uploadProductImage, validateCoupon } from "../controllers/product.controller";
-import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
-import { createShopReview, getAllShops, getProductsForShop, getReviewsForShop, getShopBySlug } from "../controllers/shop.controller";
-import { fullSearch, liveSearch } from "../controllers/search.controller";
-import { getOffersPageData } from "../controllers/offers.controller";
+import { 
+  // Product controllers
+  createProduct, 
+  updateProduct,
+  deleteProduct,
+  restoreProduct,
+  getSellerProducts,
+  getAllProducts,
+  getAllProductsAdmin,
+  getProductBySlug,
+  getProductsByIds,
+  updateProductStatusAdmin,
+  
+  // Utility controllers
+  getCategories,
+  uploadProductImage,
+  deleteProductImage,
+  validateCoupon
+} from "../controllers/product.controller";
 
+import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
+import isAdmin from "../../../../packages/middleware/isAdmin";
 
 
 const router: Router = express.Router();
 
-router.get("/get-categories", getCategories);
+// =============================================
+// PUBLIC ROUTES
+// =============================================
 
+// Categories
+router.get("/categories", getCategories);
 
-router.post("/upload-product-image",isAuthenticated, uploadProductImage);
-router.delete("/delete-product-image",isAuthenticated, deleteProductImage);
+// Products
+router.get("/products", getAllProducts);
+router.get("/product/:slug", getProductBySlug);
+router.get("/products/by-ids", getProductsByIds);
 
-router.post("/create-product",isAuthenticated, createProduct);
-router.get("/get-shop-products",isAuthenticated, getShopProducts);
-
-router.delete("/delete-product/:productId",isAuthenticated, deleteShopProducts);
-router.put("/restore-product/:productId",isAuthenticated, restoreShopProducts);
-
-router.get("/get-all-products", getAllProducts);
-router.get("/get-product/:slug", getProductBySlug);
-
-
+// Coupon validation
 router.post("/coupon/validate", validateCoupon);
 
+// =============================================
+// SELLER ROUTES (AUTHENTICATED)
+// =============================================
 
+// Image management
+router.post("/images/upload", isAuthenticated, uploadProductImage);
+router.delete("/images/delete", isAuthenticated, deleteProductImage);
 
-// shop
-router.get('/get-all-shops', getAllShops);
-router.get('/get-shop/:slug', getShopBySlug);
-router.get('/get-shop-products/:shopId', getProductsForShop);
-router.get('/get-shop-reviews/:shopId', getReviewsForShop);
+// Product CRUD
+router.post("/products", isAuthenticated, createProduct);
+router.get("/seller/products", isAuthenticated, getSellerProducts);
+router.put("/products/:productId", isAuthenticated, updateProduct);
+router.delete("/products/:productId", isAuthenticated, deleteProduct);
+router.put("/products/:productId/restore", isAuthenticated, restoreProduct);
 
-router.post('/create-review', isAuthenticated, createShopReview);
+// =============================================
+// ADMIN ROUTES
+// =============================================
 
-
-
-// search
-// Endpoint for the instant search dropdown
-// GET /api/search/live?q=terracotta
-router.get('/search/live', liveSearch);
-
-// Endpoint for the dedicated search results page
-// GET /api/search/full?q=terracotta&page=1&category=crafts
-router.get('/search/full', fullSearch);
-
-
-
-router.get('/offers/get-page-data', getOffersPageData);
+// Admin product management
+router.get("/admin/products", isAuthenticated, isAdmin, getAllProductsAdmin);
+router.put("/admin/products/:productId/status", isAuthenticated, isAdmin, updateProductStatusAdmin);
 
 
 export default router;

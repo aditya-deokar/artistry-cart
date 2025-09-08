@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "../../../../packages/libs/prisma";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
+import { ValidationError } from "../../../../packages/error-handler";
 
 // Validation schemas
 const createDiscountSchema = z.object({
@@ -8,17 +10,33 @@ const createDiscountSchema = z.object({
   description: z.string().max(500).optional(),
   discountType: z.enum(["PERCENTAGE", "FIXED_AMOUNT", "FREE_SHIPPING"]),
   discountValue: z.number().min(0),
-  discountCode: z.string().min(3).max(20).regex(/^[A-Z0-9]+$/),
+  discountCode: z.string().min(3).max(20).regex(/^[A-Z0-9]+$/, "Code must be uppercase letters and numbers only"),
   minimumOrderAmount: z.number().min(0).optional(),
   maximumDiscountAmount: z.number().min(0).optional(),
-  usageLimit: z.number().min(1).optional(),
-  usageLimitPerUser: z.number().min(1).optional(),
+  usageLimit: z.number().int().min(1).optional(),
+  usageLimitPerUser: z.number().int().min(1).optional(),
   validFrom: z.string().datetime().optional(),
   validUntil: z.string().datetime().optional(),
   applicableToAll: z.boolean().default(true),
   applicableCategories: z.array(z.string()).optional(),
   applicableProducts: z.array(z.string()).optional(),
-  excludedProducts: z.array(z.string()).optional()
+  excludedProducts: z.array(z.string()).optional(),
+}).refine(data => {
+  if (data.discountType === 'PERCENTAGE' && data.discountValue > 100) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Percentage discount cannot exceed 100%",
+  path: ["discountValue"],
+}).refine(data => {
+  if (data.discountType === 'FREE_SHIPPING' && data.discountValue !== 0) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Free shipping discount value should be 0",
+  path: ["discountValue"],
 });
 
 const updateDiscountSchema = createDiscountSchema.partial();
@@ -55,11 +73,16 @@ export const createDiscountCode = async (
     }
 
     // Validate dates
-    if (validatedData.validFrom && validatedData.validUntil) {
-      const validFrom = new Date(validatedData.validFrom);
-      const validUntil = new Date(validatedData.validUntil);
-      
-      if (validFrom >= validUntil) {
+    let validFrom = new Date();
+    let validUntil = undefined;
+
+    if (validatedData.validFrom) {
+      validFrom = new Date(validatedData.validFrom);
+    }
+
+    if (validatedData.validUntil) {
+      validUntil = new Date(validatedData.validUntil);
+      if (validUntil <= validFrom) {
         return res.status(400).json({
           success: false,
           message: "Valid until date must be after valid from date"
@@ -67,27 +90,20 @@ export const createDiscountCode = async (
       }
     }
 
-    // Validate percentage discount
-    if (validatedData.discountType === "PERCENTAGE" && validatedData.discountValue > 100) {
-      return res.status(400).json({
-        success: false,
-        message: "Percentage discount cannot exceed 100%"
-      });
-    }
-
     // Validate applicable products belong to seller
     if (validatedData.applicableProducts && validatedData.applicableProducts.length > 0) {
-      const products = await prisma.products.findMany({
+      const sellerProducts = await prisma.products.findMany({
         where: {
           id: { in: validatedData.applicableProducts },
           shopId: shopId
-        }
+        },
+        select: { id: true }
       });
 
-      if (products.length !== validatedData.applicableProducts.length) {
+      if (sellerProducts.length !== validatedData.applicableProducts.length) {
         return res.status(400).json({
           success: false,
-          message: "Some applicable products don't belong to your shop"
+          message: "Some products don't belong to your shop"
         });
       }
     }
@@ -95,10 +111,18 @@ export const createDiscountCode = async (
     const discountCode = await prisma.discount_codes.create({
       data: {
         ...validatedData,
-        validFrom: validatedData.validFrom ? new Date(validatedData.validFrom) : new Date(),
-        validUntil: validatedData.validUntil ? new Date(validatedData.validUntil) : undefined,
+        validFrom,
+        validUntil,
         sellerId,
-        shopId
+        shopId,
+      },
+      include: {
+        shop: {
+          select: {
+            name: true,
+            slug: true
+          }
+        }
       }
     });
 
@@ -120,7 +144,7 @@ export const createDiscountCode = async (
   }
 };
 
-// Get All Discount Codes for Seller
+// Get Seller Discount Codes
 export const getSellerDiscountCodes = async (
   req: any,
   res: Response,
@@ -151,13 +175,14 @@ export const getSellerDiscountCodes = async (
     const now = new Date();
 
     // Build where clause
-    const where: any = {
+    const where: Prisma.discount_codesWhereInput = {
       sellerId,
       shopId
     };
 
     if (status === "active") {
       where.isActive = true;
+      where.validFrom = { lte: now };
       where.OR = [
         { validUntil: null },
         { validUntil: { gte: now } }
@@ -166,17 +191,22 @@ export const getSellerDiscountCodes = async (
       where.validUntil = { lt: now };
     } else if (status === "inactive") {
       where.isActive = false;
+    } else if (status === "used_up") {
+      where.AND = [
+        { usageLimit: { not: null } },
+        { currentUsageCount: { gte: prisma.discount_codes.fields.usageLimit } }
+      ];
     }
 
     if (discount_type) {
-      where.discountType = discount_type;
+      where.discountType = discount_type as string;
     }
 
     if (search) {
       where.OR = [
-        { publicName: { contains: search, mode: 'insensitive' } },
-        { discountCode: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } }
+        { publicName: { contains: search as string, mode: 'insensitive' } },
+        { discountCode: { contains: search as string, mode: 'insensitive' } },
+        { description: { contains: search as string, mode: 'insensitive' } }
       ];
     }
 
@@ -184,6 +214,12 @@ export const getSellerDiscountCodes = async (
       prisma.discount_codes.findMany({
         where,
         include: {
+          shop: {
+            select: {
+              name: true,
+              slug: true
+            }
+          },
           usageHistory: {
             select: {
               id: true,
@@ -196,14 +232,8 @@ export const getSellerDiscountCodes = async (
                 }
               }
             },
-            orderBy: { usedAt: "desc" },
-            take: 5 // Show recent 5 usages
-          },
-          shop: {
-            select: {
-              name: true,
-              slug: true
-            }
+            orderBy: { usedAt: 'desc' },
+            take: 5
           }
         },
         orderBy: { createdAt: "desc" },
@@ -264,11 +294,11 @@ export const updateDiscountCode = async (
     if (!existingDiscount) {
       return res.status(404).json({
         success: false,
-        message: "Discount code not found or unauthorized"  
+        message: "Discount code not found or unauthorized"
       });
     }
 
-    // Check if new discount code already exists (if being updated)
+    // Check if code is being changed and if it already exists
     if (validatedData.discountCode && validatedData.discountCode !== existingDiscount.discountCode) {
       const codeExists = await prisma.discount_codes.findUnique({
         where: { discountCode: validatedData.discountCode }
@@ -282,34 +312,45 @@ export const updateDiscountCode = async (
       }
     }
 
+    // Validate dates if provided
     let updateData: any = { ...validatedData };
-    
-    // Handle date updates
-    if (validatedData.validFrom) {
-      updateData.validFrom = new Date(validatedData.validFrom);
+    if (validatedData.validFrom || validatedData.validUntil) {
+      const validFrom = validatedData.validFrom 
+        ? new Date(validatedData.validFrom) 
+        : existingDiscount.validFrom;
+      const validUntil = validatedData.validUntil 
+        ? new Date(validatedData.validUntil) 
+        : existingDiscount.validUntil;
+
+      if (validUntil && validUntil <= validFrom) {
+        return res.status(400).json({
+          success: false,
+          message: "Valid until date must be after valid from date"
+        });
+      }
+
+      updateData.validFrom = validFrom;
+      updateData.validUntil = validUntil;
     }
-    if (validatedData.validUntil) {
-      updateData.validUntil = new Date(validatedData.validUntil);
+
+    // Prevent reducing usage limit below current usage
+    if (validatedData.usageLimit !== undefined && 
+        validatedData.usageLimit < existingDiscount.currentUsageCount) {
+      return res.status(400).json({
+        success: false,
+        message: "Usage limit cannot be less than current usage count"
+      });
     }
 
     const updatedDiscount = await prisma.discount_codes.update({
       where: { id: discountId },
       data: updateData,
       include: {
-        usageHistory: {
+        shop: {
           select: {
-            id: true,
-            discountAmount: true,
-            usedAt: true,
-            user: {
-              select: {
-                name: true,
-                email: true
-              }
-            }
-          },
-          orderBy: { usedAt: "desc" },
-          take: 5
+            name: true,
+            slug: true
+          }
         }
       }
     });
@@ -356,9 +397,6 @@ export const deleteDiscountCode = async (
         id: discountId,
         sellerId,
         shopId
-      },
-      include: {
-        usageHistory: true
       }
     });
 
@@ -370,10 +408,10 @@ export const deleteDiscountCode = async (
     }
 
     // Check if discount has been used
-    if (existingDiscount.usageHistory.length > 0) {
+    if (existingDiscount.currentUsageCount > 0) {
       return res.status(400).json({
         success: false,
-        message: "Cannot delete discount code that has been used. You can deactivate it instead."
+        message: "Cannot delete discount code that has been used"
       });
     }
 
@@ -391,48 +429,67 @@ export const deleteDiscountCode = async (
   }
 };
 
-// Validate and Apply Discount Code (for checkout)
+// Validate Discount Code (Public)
 export const validateDiscountCode = async (
-  req: any,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { discountCode, cartItems, shopId } = req.body;
-    const userId = req.user?.id; // Assuming user auth middleware
 
-    if (!discountCode || !cartItems || !shopId) {
+    if (!discountCode || typeof discountCode !== "string") {
       return res.status(400).json({
         success: false,
-        message: "Discount code, cart items, and shop ID are required"
+        message: "Discount code is required"
       });
     }
 
-    const now = new Date();
+    if (!cartItems || !Array.isArray(cartItems)) {
+      return res.status(400).json({
+        success: false,
+        message: "Cart items are required"
+      });
+    }
 
-    // Find the discount code
-    const discount = await prisma.discount_codes.findFirst({
+    const discount = await prisma.discount_codes.findUnique({
       where: {
         discountCode: discountCode.toUpperCase(),
-        shopId,
-        isActive: true,
-        validFrom: { lte: now },
-        OR: [
-          { validUntil: null },
-          { validUntil: { gte: now } }
-        ]
       },
       include: {
-        usageHistory: userId ? {
-          where: { userId }
-        } : false
+        shop: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          }
+        }
       }
     });
 
     if (!discount) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid discount code"
+      });
+    }
+
+    // Check if discount is active and within valid period
+    const now = new Date();
+    if (!discount.isActive || 
+        now < discount.validFrom || 
+        (discount.validUntil && now > discount.validUntil)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid or expired discount code"
+        message: "This discount code has expired or is not active"
+      });
+    }
+
+    // Check shop restriction
+    if (shopId && discount.shopId !== shopId) {
+      return res.status(400).json({
+        success: false,
+        message: "This discount code is not valid for this shop"
       });
     }
 
@@ -440,17 +497,8 @@ export const validateDiscountCode = async (
     if (discount.usageLimit && discount.currentUsageCount >= discount.usageLimit) {
       return res.status(400).json({
         success: false,
-        message: "Discount code usage limit exceeded"
+        message: "This discount code has reached its usage limit"
       });
-    }
-
-    if (userId && discount.usageLimitPerUser && discount.usageHistory) {
-      if (discount.usageHistory.length >= discount.usageLimitPerUser) {
-        return res.status(400).json({
-          success: false,
-          message: "You have reached the usage limit for this discount code"
-        });
-      }
     }
 
     // Calculate cart total and check minimum order amount
@@ -467,31 +515,185 @@ export const validateDiscountCode = async (
 
     // Calculate discount amount
     let discountAmount = 0;
-    
-    if (discount.discountType === "PERCENTAGE") {
+    if (discount.discountType === 'PERCENTAGE') {
       discountAmount = (cartTotal * discount.discountValue) / 100;
-      
-      // Apply maximum discount limit
-      if (discount.maximumDiscountAmount && discountAmount > discount.maximumDiscountAmount) {
-        discountAmount = discount.maximumDiscountAmount;
+      if (discount.maximumDiscountAmount) {
+        discountAmount = Math.min(discountAmount, discount.maximumDiscountAmount);
       }
-    } else if (discount.discountType === "FIXED_AMOUNT") {
+    } else if (discount.discountType === 'FIXED_AMOUNT') {
       discountAmount = Math.min(discount.discountValue, cartTotal);
+    } else if (discount.discountType === 'FREE_SHIPPING') {
+      // Handle free shipping logic
+      discountAmount = 0; // Shipping cost would be handled separately
     }
 
-    const finalAmount = cartTotal - discountAmount;
+    const finalAmount = Math.max(cartTotal - discountAmount, 0);
 
     res.status(200).json({
       success: true,
-      message: "Discount code applied successfully",
       data: {
-        discountCode: discount.discountCode,
-        discountType: discount.discountType,
-        discountValue: discount.discountValue,
+        discount,
         discountAmount,
         cartTotal,
         finalAmount,
         savings: discountAmount
+      }
+    });
+
+  } catch (error) {
+    console.error("Discount validation error:", error);
+    next(error);
+  }
+};
+
+// Apply Discount Code (when order is placed)
+export const applyDiscountCode = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { discountCode, orderId, discountAmount } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required"
+      });
+    }
+
+    const discount = await prisma.discount_codes.findUnique({
+      where: { discountCode: discountCode.toUpperCase() }
+    });
+
+    if (!discount) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid discount code"
+      });
+    }
+
+    // Check per-user usage limit
+    if (discount.usageLimitPerUser) {
+      const userUsageCount = await prisma.discount_usage.count({
+        where: {
+          discountCodeId: discount.id,
+          userId
+        }
+      });
+
+      if (userUsageCount >= discount.usageLimitPerUser) {
+        return res.status(400).json({
+          success: false,
+          message: "You have reached the usage limit for this discount code"
+        });
+      }
+    }
+
+    // Record usage and increment counter
+    await prisma.$transaction(async (tx) => {
+      await tx.discount_usage.create({
+        data: {
+          discountCodeId: discount.id,
+          userId,
+          orderId,
+          discountAmount
+        }
+      });
+
+      await tx.discount_codes.update({
+        where: { id: discount.id },
+        data: {
+          currentUsageCount: { increment: 1 }
+        }
+      });
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Discount applied successfully"
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get Discount Usage Statistics
+export const getDiscountUsageStats = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { discountId } = req.params;
+    const sellerId = req.user?.id;
+    const shopId = req.user?.shop?.id;
+
+    if (!sellerId || !shopId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized"
+      });
+    }
+
+    // Verify discount belongs to seller
+    const discount = await prisma.discount_codes.findFirst({
+      where: {
+        id: discountId,
+        sellerId,
+        shopId
+      }
+    });
+
+    if (!discount) {
+      return res.status(404).json({
+        success: false,
+        message: "Discount code not found"
+      });
+    }
+
+    const [usageHistory, usageStats] = await Promise.all([
+      prisma.discount_usage.findMany({
+        where: { discountCodeId: discountId },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true
+            }
+          },
+          order: {
+            select: {
+              id: true,
+              totalAmount: true,
+              status: true
+            }
+          }
+        },
+        orderBy: { usedAt: 'desc' },
+        take: 50
+      }),
+      prisma.discount_usage.aggregate({
+        where: { discountCodeId: discountId },
+        _sum: { discountAmount: true },
+        _count: { id: true }
+      })
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        discount,
+        usageHistory,
+        stats: {
+          totalUsages: usageStats._count.id,
+          totalSavings: usageStats._sum.discountAmount || 0,
+          remainingUsages: discount.usageLimit 
+            ? Math.max(0, discount.usageLimit - discount.currentUsageCount)
+            : null
+        }
       }
     });
 

@@ -189,7 +189,7 @@ model products {
   subCategory           String
   colors                String[]
   sizes                 String[]
-  discountCodes         String        @db.ObjectId
+  discountCodes         String?        @db.ObjectId
   stock                 Int
   
   // Enhanced pricing fields
