@@ -25,7 +25,7 @@ export const isAdmin = (req: any, res: Response, next: NextFunction) => {
     }
 
     // User is admin, proceed to next middleware
-    next();
+    return next();
   } catch (error) {
     next(new AuthError("Admin authorization failed"));
   }

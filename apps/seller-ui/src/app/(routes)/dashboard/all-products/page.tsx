@@ -13,16 +13,16 @@ import { useMemo, useState } from "react"
 import { toast } from "sonner"
 
 const FetchProduct = async () => {
-    const res = await axiosInstance.get("/product/api/get-shop-products");
+    const res = await axiosInstance.get("/product/api/seller/products");
     return res?.data?.products;
 }
 
 const deleteProduct = async (productId: string) => {
-    const res = await axiosInstance.delete(`/product/api/delete-product/${productId}`);
+    const res = await axiosInstance.delete(`/product/api/products/${productId}`);
 }
 
 const restoreProduct = async (productId: string) => {
-    const res = await axiosInstance.put(`/product/api/restore-product/${productId}`)
+    const res = await axiosInstance.put(`/product/api/products/${productId}/restore`)
 }
 
 const AllProductsPage = () => {

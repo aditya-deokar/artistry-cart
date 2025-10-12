@@ -63,7 +63,7 @@ const ProductPage = () => {
                 params.set('search', apiFilters.search);
             }
 
-            const res = await axiosInstance.get(`/product/api/get-all-products?${params.toString()}`);
+            const res = await axiosInstance.get(`/product/api/products?${params.toString()}`);
             return res.data; // The API now returns an object { products, pagination }
         },
         staleTime: 1000 * 60 * 2, // 2 minutes
@@ -103,6 +103,8 @@ const ProductPage = () => {
     if (isError) {
         return <div className="text-center py-40">Failed to load artworks. Please try again later.</div>;
     }
+
+    console.log(data)
 
     return (
         <div >
