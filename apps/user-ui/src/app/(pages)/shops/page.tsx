@@ -13,7 +13,7 @@ import { ShopCardData } from '@/components/shops/all-shops/ShopCard';
 
 // Define the API response structure for type safety
 interface AllShopsApiResponse {
-  shops: ShopCardData[]; 
+  shops: (ShopCardData & { id: string })[]; // Ensure id is included in the shop data
   pagination: {
     total: number;
     currentPage: number;
@@ -25,8 +25,21 @@ export default function AllShopsPage() {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState('all');
 
-  // This would ideally come from a dedicated API call
-  const availableCategories = ["prints", "sculptures", "paintings", "crafts"];
+  // Fetch available categories from the API
+  const { data: categoryData } = useQuery<string[]>({
+    queryKey: ['shopCategories'],
+    queryFn: async () => {
+      try {
+        const res = await axiosInstance.get('/product/api/shops/categories');
+        return res.data.data.categories || ["prints", "sculptures", "paintings", "crafts"];
+      } catch (error) {
+        console.error("Failed to fetch shop categories:", error);
+        return ["prints", "sculptures", "paintings", "crafts"]; // Fallback categories
+      }
+    },
+  });
+  
+  const availableCategories = categoryData || ["prints", "sculptures", "paintings", "crafts"];
 
   // Fetch all shops based on the current page and category state
   const { data, isLoading, isError } = useQuery<AllShopsApiResponse>({
@@ -35,10 +48,15 @@ export default function AllShopsPage() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: '12',
-        category: category,
       });
-      const res = await axiosInstance.get(`/product/api/get-all-shops?${params.toString()}`);
-      return res.data;
+      
+      // Only add category parameter if it's not 'all'
+      if (category !== 'all') {
+        params.append('category', category);
+      }
+      
+      const res = await axiosInstance.get(`/product/api/shops?${params.toString()}`);
+      return res.data.data; // Access data from the nested data property in the new API response
     },
   });
 

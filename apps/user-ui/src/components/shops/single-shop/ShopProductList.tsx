@@ -19,8 +19,8 @@ export const ShopProductList: React.FC<{ shopId: string; totalProducts: number }
   const { data, isLoading, isError } = useQuery<ApiResponse>({
     queryKey: ['shopProducts', shopId, page],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/product/api/get-shop-products/${shopId}?page=${page}`);
-      return res.data;
+      const res = await axiosInstance.get(`/product/api/shops/${shopId}/products?page=${page}`);
+      return res.data.data; // Access data from the nested data property in the new API response
     },
     staleTime: 1000 * 60 * 5,
   });

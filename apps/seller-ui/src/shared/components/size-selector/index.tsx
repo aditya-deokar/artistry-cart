@@ -8,12 +8,15 @@ import { cn } from '@/lib/utils'
 type SizeSelectorProps = {
   control: Control<any>
   name: string
-  sizes: string[]
+  sizes?: string[]
   label?: string
   className?: string
 }
 
-const SizeSelector = ({ control, name, sizes, label = 'Select Sizes', className }: SizeSelectorProps) => {
+// Default common sizes if none provided
+const defaultSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
+
+const SizeSelector = ({ control, name, sizes = defaultSizes, label = 'Select Sizes', className }: SizeSelectorProps) => {
   return (
     <div className={cn("space-y-2", className)}>
       <Label className="text-base font-medium">{label}</Label>
@@ -34,7 +37,7 @@ const SizeSelector = ({ control, name, sizes, label = 'Select Sizes', className 
 
           return (
             <div className="flex flex-wrap gap-4">
-              {sizes.map((size) => (
+              {Array.isArray(sizes) && sizes.map((size) => (
                 <div key={size} className="flex items-center space-x-2">
                   <Checkbox
                     id={size}

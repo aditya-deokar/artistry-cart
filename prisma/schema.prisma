@@ -20,7 +20,7 @@ model users {
   email    String  @unique
   password String?
   avatar   Json? // Use Json type for consistency: { url, file_id }
-  role     String  @default("USER") // "USER" or "SELLER" or "ADMIN"
+  role     UserRole  @default(USER)
 
   // Relations
   orders         orders[]
@@ -57,11 +57,11 @@ model addresses {
 model orders {
   id                String  @id @default(auto()) @map("_id") @db.ObjectId
   totalAmount       Float
-  status            String // e.g., "PENDING", "SHIPPED", "DELIVERED", "CANCELLED"
+  status            OrderStatus @default(PENDING)
   shippingAddressId String? // Store a snapshot of the address at time of order
   couponCode        String?
   discountAmount    Float?
-  deliveryStatus    String @default("Ordered")
+  deliveryStatus    DeliveryStatus @default(Ordered)
 
   // Relation to User
   userId String @db.ObjectId
@@ -205,11 +205,6 @@ model products {
   status                productStatus @default(Active)
   totalSales            Int?
 
-  // Event relation (simplified)
-  isEvent       Boolean?
-  starting_date DateTime?
-  ending_date   DateTime?
-
   deletedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -224,6 +219,7 @@ model products {
   orderItems           OrderItem[]
   priceHistory         ProductPricing[]
   eventProductDiscounts EventProductDiscount[]
+  analytics            productAnalytics?
 
   @@index([current_price])
   @@index([is_on_discount])
@@ -364,7 +360,8 @@ model banners {
 
 model productAnalytics {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  productId    String   @unique
+  productId    String   @unique @db.ObjectId
+  product      products @relation(fields: [productId], references: [id])
   shopId       String
   views        Int      @default(0)
   cartAdds     Int      @default(0)
@@ -495,4 +492,27 @@ model discount_usage {
   
   @@index([discountCodeId])
   @@index([userId])
+}
+
+enum UserRole {
+  USER
+  SELLER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum DeliveryStatus {
+  Ordered
+  Processing
+  Shipped
+  OutForDelivery
+  Delivered
+  Cancelled
+  Returned
 }

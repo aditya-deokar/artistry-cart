@@ -54,7 +54,24 @@ export const CartItem = ({ item, onRemove, onUpdateQuantity }: CartItemProps) =>
       </div>
 
       <div className="flex flex-col items-end justify-between h-24 text-sm">
-        <span className="font-medium text-lg">{formatPrice(item?.sale_price * item.quantity)}</span>
+        {/* Show price information with discounts if available */}
+        <div className="flex flex-col items-end">
+          {item.pricing?.finalPrice !== item.regular_price || (item.sale_price && item.sale_price !== item.regular_price) ? (
+            <>
+              <span className="font-medium text-lg">
+                {formatPrice((item.pricing?.finalPrice || item.sale_price || item.regular_price) * item.quantity)}
+              </span>
+              <span className="text-xs text-muted-foreground line-through">
+                {formatPrice(item.regular_price * item.quantity)}
+              </span>
+            </>
+          ) : (
+            <span className="font-medium text-lg">
+              {formatPrice(item.regular_price * item.quantity)}
+            </span>
+          )}
+        </div>
+        
         <QuantitySelector 
             quantity={item.quantity}
             maxStock={item.stock}

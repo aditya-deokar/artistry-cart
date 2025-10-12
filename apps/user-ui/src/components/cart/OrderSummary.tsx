@@ -88,17 +88,36 @@ export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
   };
 
   // 4. --- Calculate final price ---
-  let discountAmount = 0;
+  
+  // Calculate event discounts already applied (difference between regular_price and pricing.finalPrice)
+  const eventDiscountsAlreadyApplied = cart.reduce((total, item) => {
+    if (item.pricing) {
+      // Calculate the discount already applied via event pricing
+      const regularTotal = item.regular_price * item.quantity;
+      const discountedTotal = item.pricing.finalPrice * item.quantity;
+      return total + (regularTotal - discountedTotal);
+    }
+    // If pricing object isn't available, check if sale_price differs from regular_price
+    else if (item.sale_price && item.sale_price < item.regular_price) {
+      return total + ((item.regular_price - item.sale_price) * item.quantity);
+    }
+    return total;
+  }, 0);
+
+  // Calculate additional coupon discount
+  let couponDiscountAmount = 0;
   if (appliedCoupon) {
     if (appliedCoupon.discountType.toLowerCase() === 'percentage') {
-      discountAmount = (subtotal * appliedCoupon.discountValue) / 100;
+      couponDiscountAmount = (subtotal * appliedCoupon.discountValue) / 100;
     } else { // Assuming 'flat' or 'fixed_amount'
-      discountAmount = Math.min(appliedCoupon.discountValue, subtotal);
+      couponDiscountAmount = Math.min(appliedCoupon.discountValue, subtotal);
     }
   }
+
+  // Calculate total discount (both event and coupon)
   const shippingCost = subtotal > 0 ? 50 : 0; 
   const taxes = subtotal * 0.05; // Example: 5% tax
-  const total = subtotal - discountAmount + shippingCost + taxes;
+  const total = subtotal - couponDiscountAmount + shippingCost + taxes;
 
   return (
     <div className="rounded-lg border border-border bg-card p-6 lg:p-8 space-y-4 sticky top-24">
@@ -145,16 +164,26 @@ export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
           <span className="font-medium">{formatPrice(subtotal)}</span>
         </div>
 
+        {eventDiscountsAlreadyApplied > 0 && (
+          <div className="flex justify-between items-center text-green-500">
+            <div className="flex items-center gap-2">
+              <Tag className="h-4 w-4" />
+              <span className="font-semibold">Event Discounts</span>
+            </div>
+            <span className="font-medium">-{formatPrice(eventDiscountsAlreadyApplied)}</span>
+          </div>
+        )}
+
         {appliedCoupon && (
           <div className="flex justify-between items-center text-green-500">
             <div className="flex items-center gap-2">
               <Tag className="h-4 w-4" />
-              <span className="font-semibold">Discount ({appliedCoupon.publicName})</span>
+              <span className="font-semibold">Coupon ({appliedCoupon.publicName})</span>
               <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-red-500" onClick={removeCoupon}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <span className="font-medium">-{formatPrice(discountAmount)}</span>
+            <span className="font-medium">-{formatPrice(couponDiscountAmount)}</span>
           </div>
         )}
 

@@ -31,23 +31,28 @@ type ProductPageProps = {
 
 async function fetchProductDetails(slug: string): Promise<ArtProduct | null> {
   try {
-    const response = await axiosInstance.get(`/product/api/get-product/${slug}`);
-    return response.data.product;
+    // Updated API endpoint based on the new route structure
+    const response = await axiosInstance.get(`/product/api/product/${slug}`);
+    // Updated data structure based on the new API response format
+    return response.data.data.product;
   } catch (error) {
     console.error("Failed to fetch product:", error);
     return null;
   }
 }
 
+// Uncomment and update metadata function to work with new API response structure
+// import type { Metadata } from 'next';
+// 
 // export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
 //   const product = await fetchProductDetails(params?.slug);
-
+//
 //   if (!product) {
 //     return { title: 'Product Not Found' };
 //   }
-
+//
 //   const primaryImage = product.images?.find(img => img !== null);
-
+//
 //   return {
 //     title: `${product.title} by ${product.Shop.name} | Artistry Cart`,
 //     description: product.description,
@@ -75,9 +80,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <Bounded className="py-12 md:py-20 mt-4">
-      {/* Conditionally render the countdown timer if it's an event */}
-      {product.isEvent && product.ending_date && (
-        <EventCountdown endingDate={product.ending_date} />
+      {/* Conditionally render the countdown timer if it's part of an event */}
+      {product.event && product.event.ending_date && (
+        <EventCountdown endingDate={product.event.ending_date} />
       )}
 
       <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-16 mt-8">
@@ -111,11 +116,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
           <div className="flex items-baseline gap-4">
                <span className="text-4xl font-light text-amber-400">
-                    {formatPrice(product.sale_price ?? product.regular_price)}
+                    {/* Use calculated pricing if available, otherwise fall back to the original logic */}
+                    {formatPrice(product.pricing?.finalPrice ?? product.sale_price ?? product.regular_price)}
                </span>
-               {product.sale_price && (
+               {(product.pricing?.discountInfo || product.sale_price) && (
                    <span className="text-2xl text-primary/50 line-through">
-                       {formatPrice(product.regular_price)}
+                       {formatPrice(product.pricing?.originalPrice ?? product.regular_price)}
+                   </span>
+               )}
+               {product.pricing?.savings && product.pricing.savings > 0 && (
+                   <span className="text-sm font-medium text-green-600 bg-green-100 px-2 py-1 rounded">
+                       Save {formatPrice(product.pricing?.savings)}
                    </span>
                )}
           </div>

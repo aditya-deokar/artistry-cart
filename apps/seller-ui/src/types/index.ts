@@ -1,31 +1,4 @@
-export interface Event {
-  id: string;
-  title: string;
-  description: string;
-  banner_image?: {
-    url: string;
-    file_id: string;
-  };
-  event_type: "FLASH_SALE" | "SEASONAL" | "CLEARANCE" | "NEW_ARRIVAL";
-  discount_percent?: number;
-  starting_date: string;
-  ending_date: string;
-  is_active: boolean;
-  sellerId: string;
-  shopId: string;
-  views: number;
-  clicks: number;
-  createdAt: string;
-  updatedAt: string;
-  products: Product[];
-  shop: {
-    id: string;
-    name: string;
-    slug: string;
-    avatar?: any;
-    ratings: number;
-  };
-}
+export type { Event, EventProductDiscount, EventFormData, EventFilters } from './event';
 
 export interface DiscountCode {
   id: string;

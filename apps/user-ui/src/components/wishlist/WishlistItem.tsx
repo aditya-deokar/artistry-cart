@@ -41,7 +41,7 @@ export const WishlistItem = ({ product, onRemove, onMoveToCart }: WishlistItemPr
       className="grid grid-cols-12 items-center gap-4 sm:gap-6 p-4 border border-border bg-card"
     >
       {/* --- Column 1: Image (Spans 3 columns) --- */}
-      <Link href={`/products/${product.slug}`} className="col-span-3 md:col-span-2">
+      <Link href={`/product/${product.slug}`} className="col-span-3 md:col-span-2">
         <div className="aspect-square relative rounded-md overflow-hidden bg-muted group">
           {primaryImage ? (
             <Image 
@@ -60,10 +60,10 @@ export const WishlistItem = ({ product, onRemove, onMoveToCart }: WishlistItemPr
       <div className="col-span-9 md:col-span-5 flex flex-col h-full">
         <div>
           <h3 className="font-display text-lg font-semibold tracking-wide text-foreground hover:text-primary transition-colors">
-            <Link href={`/products/${product.slug}`}>{product.title}</Link>
+            <Link href={`/product/${product.slug}`}>{product.title}</Link>
           </h3>
           <p className="text-sm text-muted-foreground mt-1">
-            by <Link href={`/artist/${product.Shop.id}`} className="hover:text-primary transition-colors">{product.Shop.name}</Link>
+            by <Link href={`/shop/${product.Shop.id}`} className="hover:text-primary transition-colors">{product.Shop.name}</Link>
           </p>
         </div>
 

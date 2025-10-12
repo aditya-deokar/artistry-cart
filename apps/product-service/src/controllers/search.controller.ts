@@ -210,9 +210,12 @@ export const fullSearch = async (req: Request, res: Response, next: NextFunction
 
     // Event filter
     if (inEvent) {
-      whereClause.isEvent = true;
-      whereClause.starting_date = { lte: new Date() };
-      whereClause.ending_date = { gte: new Date() };
+      const now = new Date();
+      whereClause.event = {
+        is_active: true,
+        starting_date: { lte: now },
+        ending_date: { gte: now }
+      };
     }
 
     // Shop filter

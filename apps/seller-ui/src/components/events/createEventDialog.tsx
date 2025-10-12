@@ -36,6 +36,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -66,6 +67,7 @@ const eventSchema = z.object({
     url: z.string(),
     file_id: z.string(),
   }).optional(),
+  is_active: z.boolean(),
 }).refine(data => data.ending_date > data.starting_date, {
   message: "End date must be after start date",
   path: ["ending_date"],
@@ -106,6 +108,7 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
       starting_date: undefined,
       ending_date: undefined,
       banner_image: undefined,
+      is_active: true, // Default to active
     },
   });
 
@@ -141,7 +144,7 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
   };
 
 
-  const { data , isLoading } = useSellerProducts();
+  // const { data , isLoading } = useSellerProducts();
 
   const handleImageUpload = async (file: File) => {
     setUploadingImage(true);
@@ -194,6 +197,7 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
         starting_date: data.starting_date.toISOString(),
         ending_date: data.ending_date.toISOString(),
         product_ids: selectedProductIds, // Include selected products
+        is_active: true, // Set default active status
       });
 
       toast.success('Event created successfully!');
@@ -635,6 +639,30 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
                 </div>
 
                 {/* Info Alert */}
+                {/* Active status field */}
+                <FormField
+                  control={form.control}
+                  name="is_active"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between space-y-0 rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          Active Status
+                        </FormLabel>
+                        <FormDescription>
+                          Make this event visible to customers immediately when it starts
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
                 <Alert>
                   <Info className="h-4 w-4" />
                   <AlertDescription>

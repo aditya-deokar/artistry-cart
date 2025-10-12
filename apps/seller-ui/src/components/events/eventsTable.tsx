@@ -142,12 +142,49 @@ export default function EventsTable({
       accessorKey: 'products',
       header: 'Products',
       cell: ({ row }) => {
-        const products = row.getValue('products') as Event['products'];
+        const event = row.original;
+        const productCount = event._count?.products || event.products?.length || 0;
+        
         return (
           <Badge variant="outline" className="text-blue-600 border-blue-200">
-            {products?.length || 0} products
+            {productCount} products
           </Badge>
         );
+      },
+    },
+    {
+      accessorKey: 'pricing',
+      header: 'Pricing',
+      cell: ({ row }) => {
+        const event = row.original;
+        
+        if (event.discount_type === 'PERCENTAGE' && event.discount_percent) {
+          return (
+            <div className="text-sm space-y-1">
+              <div className="text-green-600 font-medium">{event.discount_percent}% off</div>
+              {event.max_discount && (
+                <div className="text-xs text-gray-500">Max ₹{event.max_discount}</div>
+              )}
+            </div>
+          );
+        } else if (event.discount_type === 'FIXED_AMOUNT' && event.discount_value) {
+          return (
+            <div className="text-sm font-medium text-green-600">
+              ₹{event.discount_value} off
+            </div>
+          );
+        } else if (event.productDiscounts && event.productDiscounts.length > 0) {
+          return (
+            <div className="text-sm space-y-1">
+              <div className="text-gray-600">Product specific</div>
+              <div className="text-xs text-gray-500">
+                {event.productDiscounts.length} pricing rules
+              </div>
+            </div>
+          );
+        } else {
+          return <span className="text-gray-400">No discounts</span>;
+        }
       },
     },
     {
@@ -157,8 +194,11 @@ export default function EventsTable({
         const event = row.original;
         return (
           <div className="text-sm space-y-1">
-            <div className="text-gray-900">{event.views.toLocaleString()} views</div>
-            <div className="text-gray-500">{event.clicks.toLocaleString()} clicks</div>
+            <div className="text-gray-900">{event.views?.toLocaleString() || 0} views</div>
+            <div className="text-gray-500">{event.clicks?.toLocaleString() || 0} clicks</div>
+            {event.totalRevenue > 0 && (
+              <div className="text-green-600">₹{event.totalRevenue?.toLocaleString()}</div>
+            )}
           </div>
         );
       },

@@ -269,22 +269,23 @@ export const getAllProducts = async (
       ? parseFloat(req.query.maxPrice as string)
       : undefined;
     const search = req.query.search as string;
-    const eventOnly = req.query.eventOnly === 'true';
+  const eventOnly = req.query.eventOnly === "true";
 
     // Build dynamic where clause
     const whereClause: Prisma.productsWhereInput = {
       isDeleted: false,
-      status: "Active",
+      status: productStatus.Active,
       stock: { gt: 0 }, // Only show products in stock
     };
 
     // Event filter
     if (eventOnly) {
-      whereClause.AND = [
-        { isEvent: true },
-        { starting_date: { lte: new Date() } },
-        { ending_date: { gte: new Date() } },
-      ];
+      const now = new Date();
+      whereClause.event = {
+        is_active: true,
+        starting_date: { lte: now },
+        ending_date: { gte: now },
+      };
     }
 
     // Category filter
@@ -293,10 +294,10 @@ export const getAllProducts = async (
     }
 
     // Price filter (using current_price for accurate filtering)
-    if (minPrice !== undefined && maxPrice !== undefined) {
+    if (minPrice !== undefined || maxPrice !== undefined) {
       whereClause.current_price = {
-        gte: minPrice,
-        lte: maxPrice,
+        ...(minPrice !== undefined ? { gte: minPrice } : {}),
+        ...(maxPrice !== undefined ? { lte: maxPrice } : {}),
       };
     }
 
@@ -356,6 +357,7 @@ export const getAllProducts = async (
               discount_percent: true,
               starting_date: true,
               ending_date: true,
+              is_active: true,
             }
           }
         },
@@ -577,7 +579,6 @@ export const createProduct = async (
         data: {
           ...validatedData,
           current_price: validatedData.sale_price || validatedData.regular_price,
-          is_on_discount: !!validatedData.sale_price,
           // FIX: Use shop relation connect instead of direct shopId assignment
           Shop: {
             connect: { 
@@ -589,24 +590,8 @@ export const createProduct = async (
         },
       });
 
-      // Create initial pricing record
-      await tx.productPricing.create({
-        data: {
-          productId: newProduct.id,
-          basePrice: validatedData.regular_price,
-          discountedPrice: validatedData.sale_price,
-          discountAmount: validatedData.sale_price 
-            ? validatedData.regular_price - validatedData.sale_price 
-            : undefined,
-          discountPercent: validatedData.sale_price 
-            ? ((validatedData.regular_price - validatedData.sale_price) / validatedData.regular_price) * 100
-            : undefined,
-          discountSource: validatedData.sale_price ? 'PRODUCT_SALE' : undefined,
-          validFrom: new Date(),
-          createdBy: req.user.id,
-          reason: 'Product creation',
-        }
-      });
+      // Create initial pricing record and update cached price
+      await PricingService.updateCachedPricing(newProduct.id);
 
       return newProduct;
     });
@@ -763,31 +748,12 @@ export const updateProduct = async (
         where: { id: productId },
         data: {
           ...updateData,
-          current_price: updateData.sale_price || updateData.regular_price || existingProduct.current_price,
-          is_on_discount: !!(updateData.sale_price || existingProduct.sale_price),
         }
       });
 
-      // If pricing changed, create new pricing record
+      // If pricing changed, create new pricing record and update cache
       if (updateData.regular_price || updateData.sale_price) {
-        const newRegularPrice = updateData.regular_price || existingProduct.regular_price;
-        const newSalePrice = updateData.sale_price || existingProduct.sale_price;
-
-        await tx.productPricing.create({
-          data: {
-            productId,
-            basePrice: newRegularPrice,
-            discountedPrice: newSalePrice,
-            discountAmount: newSalePrice ? newRegularPrice - newSalePrice : undefined,
-            discountPercent: newSalePrice 
-              ? ((newRegularPrice - newSalePrice) / newRegularPrice) * 100
-              : undefined,
-            discountSource: newSalePrice ? 'PRODUCT_SALE' : undefined,
-            validFrom: new Date(),
-            createdBy: req.user.id,
-            reason: 'Product update',
-          }
-        });
+        await PricingService.updateCachedPricing(productId);
       }
 
       return updated;

@@ -2,68 +2,69 @@
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import axiosInstance from "@/utils/axiosinstance"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from "@tanstack/react-table"
-import { AxiosError } from "axios"
+
 import { Search, Pencil, Trash, Eye, Plus, BarChart, Star, ChevronRight, ArchiveRestore } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useMemo, useState } from "react"
-import { toast } from "sonner"
 
-const FetchProduct = async () => {
-    const res = await axiosInstance.get("/product/api/get-shop-products");
-    return res?.data?.products;
-}
 
-const deleteProduct = async (productId: string) => {
-    const res = await axiosInstance.delete(`/product/api/delete-product/${productId}`);
-}
-
-const restoreProduct = async (productId: string) => {
-    const res = await axiosInstance.put(`/product/api/restore-product/${productId}`)
-}
+import { useDeleteProduct, useRestoreProduct, useSellerProducts, useProductCategories } from "@/hooks/useProducts"
+import { 
+    Select, 
+    SelectContent, 
+    SelectItem, 
+    SelectTrigger, 
+    SelectValue 
+} from "@/components/ui/select"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { 
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const AllProductsPage = () => {
     const [globalFilter, setGlobalFilter] = useState("");
-    const [analyticsData, setAnalyticsData] = useState(null);
-    const [showAnalytics, setShowAnalytics] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState<string | null>(null);
+    const [currentTab, setCurrentTab] = useState<'all' | 'active' | 'draft' | 'out_of_stock' | 'deleted'>('all');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedCategory, setSelectedCategory] = useState<string>("all_categories");
+    const [sortBy, setSortBy] = useState<string>("newest");
 
-    const queryClient = useQueryClient();
+    // Get product categories
+    const { data: categories = [], isLoading: isCategoriesLoading } = useProductCategories();
 
-    const { data: products = [], isLoading: isProductLoading } = useQuery({
-        queryKey: ['shop-products'],
-        queryFn: FetchProduct,
-        staleTime: 1000 * 60 * 5,
+    // Get products with filtering
+    const { data, isLoading: isProductLoading } = useSellerProducts({
+        search: globalFilter,
+        category: selectedCategory === "all_categories" ? undefined : selectedCategory,
+        status: currentTab,
+        sortBy: sortBy as any,
+        page: currentPage,
+        limit: 10
     });
 
+    // Products data extraction with fallbacks for type safety
+    const products = data?.products || [];
+    const pagination = data?.pagination || {
+        currentPage: 1,
+        totalPages: 1,
+        totalCount: 0,
+        hasNext: false,
+        hasPrev: false
+    };
+
     // Delete Product Mutation - Updated with dialog close
-    const deleteMutation = useMutation({
-        mutationFn: deleteProduct,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["shop-products"] });
-            toast.success("Product deleted successfully!");
-            setDeleteDialogOpen(null); // Close dialog on success
-        },
-        onError: (error) => {
-            toast.error((error as AxiosError<{ message: string }>)?.response?.data?.message || "Delete failed");
-        }
-    })
+    const deleteMutation = useDeleteProduct();
 
     // Restore Product Mutation - Updated with dialog close
-    const restoreProductMutation = useMutation({
-        mutationFn: restoreProduct,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["shop-products"] })
-            toast.success("Product restored successfully!");
-            setDeleteDialogOpen(null); // Close dialog on success
-        },
-        onError: (error) => {
-            toast.error((error as AxiosError<{ message: string }>)?.response?.data?.message || "Restore failed");
-        }
-    })
+    const restoreProductMutation = useRestoreProduct();
 
     const columns = useMemo(() => [
         {
@@ -73,8 +74,8 @@ const AllProductsPage = () => {
                 <Image
                     width={200}
                     height={200}
-                    alt={row.original.images[0].url}
-                    src={row.original.images[0].url}
+                    alt={row.original.images[0]?.url || "Product image"}
+                    src={row.original.images[0]?.url || "/placeholder.png"}
                     className="w-12 h-12 rounded-md object-cover"
                 />
             )
@@ -82,7 +83,6 @@ const AllProductsPage = () => {
         {
             accessorKey: "name",
             header: "Product Name",
-            // product name cell- visual indicator for deleted products
             cell: ({ row }: any) => {
                 const truncatedTitle = row.original.title.length > 25 ? `${row.original.title.substring(0, 15)}...` : row.original.title;
 
@@ -92,11 +92,18 @@ const AllProductsPage = () => {
                             href={`${process.env.NEXT_PUBLIC_USER_UI_LINK}/product/${row.original.slug}`}
                             className={`hover:underline ${row.original.isDeleted ? 'text-red-400 line-through' : 'text-blue-400'}`}
                             title={row.original.title}
+                            target="_blank"
                         >
                             {truncatedTitle}
                         </Link>
                         {row.original.isDeleted && (
                             <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Deleted</span>
+                        )}
+                        {row.original.status === 'Draft' && (
+                            <span className="text-xs bg-amber-100 text-amber-600 px-2 py-1 rounded">Draft</span>
+                        )}
+                        {row.original.stock <= 0 && !row.original.isDeleted && (
+                            <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">Out of Stock</span>
                         )}
                     </div>
                 )
@@ -106,53 +113,63 @@ const AllProductsPage = () => {
             accessorKey: "price",
             header: "Price",
             cell: ({ row }: any) => (
-                <span>{row.original.sale_price}</span>
+                <div className="flex flex-col">
+                    <span className="font-medium">₹{row.original.sale_price || row.original.regular_price}</span>
+                    {row.original.sale_price && row.original.sale_price < row.original.regular_price && (
+                        <span className="text-xs text-gray-500 line-through">₹{row.original.regular_price}</span>
+                    )}
+                </div>
             )
         },
         {
             accessorKey: "stock",
-            header: "Stocks",
+            header: "Stock",
             cell: ({ row }: any) => (
                 <span
-                    className={row.original.stock < 10 ? 'text-red-500' : 'text-primary'}
+                    className={`${row.original.stock <= 10 ? 'text-red-500' : row.original.stock <= 20 ? 'text-amber-500' : 'text-green-500'} font-medium`}
                 >{row.original.stock} left</span>
             )
         },
         {
             accessorKey: "category",
             header: "Category",
+            cell: ({ row }: any) => (
+                <Badge variant="outline" className="capitalize">
+                    {row.original.category}
+                </Badge>
+            )
         },
         {
             accessorKey: "rating",
             header: "Rating",
             cell: ({ row }: any) => (
-                <div className="flex items-center gap-1 text-primary/80 ">
+                <div className="flex items-center gap-1 text-amber-400">
                     <Star fill="#fde047" size={18} />
-                    <span>{row.original.rating || 5}</span>
+                    <span>{row.original.rating || 0}</span>
                 </div>
             )
         },
         {
             header: "Actions",
             cell: ({ row }: any) => (
-                <div className="flex gap-3">
-                    <Link href={`product/${row.original.id}`}
+                <div className="flex gap-2">
+                    <Link href={`/dashboard/product/${row.original.id}`}
                         className="text-blue-400 transition-all"
                     >
-                        <Button variant={"outline"} className="hover:text-blue-600">
-                            <Eye size={18} />
+                        <Button variant="outline" size="sm" className="hover:text-blue-600">
+                            <Eye size={16} />
                         </Button>
                     </Link>
-                    <Link href={`product/edit/${row.original.id}`}
+                    <Link href={`/dashboard/product/edit/${row.original.id}`}
                         className="text-yellow-400 transition-all"
                     >
                         <Button
-                            className="hover:text-yellow-600" variant={"outline"}>
-                            <Pencil size={18} />
+                            className="hover:text-yellow-600" variant="outline" size="sm">
+                            <Pencil size={16} />
                         </Button>
                     </Link>
-                    <Button variant={"outline"}>
-                        <BarChart size={18} />
+                    <Button variant="outline" size="sm">
+                        <BarChart size={16} />
                     </Button>
 
                     {/* Conditional Delete/Restore Button */}
@@ -170,10 +187,11 @@ const AllProductsPage = () => {
                                 <Button
                                     type="button"
                                     variant="outline"
+                                    size="sm"
                                     className="text-red-500 hover:text-red-700"
                                     onClick={() => setDeleteDialogOpen(row.original.id)}
                                 >
-                                    <Trash size={18} />
+                                    <Trash size={16} />
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[425px]">
@@ -183,19 +201,19 @@ const AllProductsPage = () => {
                                 <div className="grid gap-4">
                                     <div className="grid gap-3">
                                         <p>Are you sure you want to delete <b>{row.original?.title}</b>?</p>
-                                        <p className="text-sm text-muted-foreground">You can restore this product within 24hr</p>
+                                        <p className="text-sm text-muted-foreground">You can restore this product later if needed.</p>
                                     </div>
 
                                     <div className="flex gap-2">
                                         <Button
-                                            variant={"outline"}
+                                            variant="outline"
                                             type="button"
                                             onClick={() => setDeleteDialogOpen(null)}
                                         >
                                             Cancel
                                         </Button>
                                         <Button
-                                            variant={"destructive"}
+                                            variant="destructive"
                                             type="button"
                                             disabled={deleteMutation.isPending}
                                             onClick={(e) => {
@@ -204,7 +222,7 @@ const AllProductsPage = () => {
                                                 deleteMutation.mutate(row?.original?.id);
                                             }}
                                         >
-                                            <Trash size={18} className="mr-2" />
+                                            <Trash size={16} className="mr-2" />
                                             {deleteMutation.isPending ? "Deleting..." : "Delete"}
                                         </Button>
                                     </div>
@@ -213,7 +231,7 @@ const AllProductsPage = () => {
                                 <DialogFooter>
                                     {deleteMutation.error && (
                                         <p className='text-red-500 text-xs mt-1'>
-                                            {(deleteMutation.error as AxiosError<{ message: string }>)?.response?.data?.message ||
+                                            {(deleteMutation.error as any)?.response?.data?.message ||
                                                 "Delete failed"}
                                         </p>
                                     )}
@@ -234,10 +252,11 @@ const AllProductsPage = () => {
                                 <Button
                                     type="button"
                                     variant="outline"
+                                    size="sm"
                                     className="text-green-600 hover:text-green-800"
                                     onClick={() => setDeleteDialogOpen(row.original.id)}
                                 >
-                                    <ArchiveRestore size={18} />
+                                    <ArchiveRestore size={16} />
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[425px]">
@@ -249,21 +268,19 @@ const AllProductsPage = () => {
                                         <p>Are you sure you want to restore <b>{row.original?.title}</b>?</p>
                                         <p className="text-sm text-muted-foreground">This product will be available for sale again.</p>
                                     </div>
-
-
                                 </div>
 
                                 <DialogFooter>
                                     <div className="flex gap-2 justify-end">
                                         <Button
-                                            variant={"outline"}
+                                            variant="outline"
                                             type="button"
                                             onClick={() => setDeleteDialogOpen(null)}
                                         >
                                             Cancel
                                         </Button>
                                         <Button
-                                            variant={"default"}
+                                            variant="default"
                                             type="button"
                                             disabled={restoreProductMutation.isPending}
                                             onClick={(e) => {
@@ -272,13 +289,13 @@ const AllProductsPage = () => {
                                                 restoreProductMutation.mutate(row?.original?.id);
                                             }}
                                         >
-                                            <ArchiveRestore size={18} className="mr-2" />
+                                            <ArchiveRestore size={16} className="mr-2" />
                                             {restoreProductMutation.isPending ? "Restoring..." : "Restore"}
                                         </Button>
                                     </div>
                                     {restoreProductMutation.error && (
                                         <p className='text-red-500 text-xs mt-1'>
-                                            {(restoreProductMutation.error as AxiosError<{ message: string }>)?.response?.data?.message ||
+                                            {(restoreProductMutation.error as any)?.response?.data?.message ||
                                                 "Restore failed"}
                                         </p>
                                     )}
@@ -289,7 +306,7 @@ const AllProductsPage = () => {
                 </div>
             )
         }
-    ], [deleteDialogOpen, deleteMutation, restoreProductMutation]); // Add dependencies
+    ], [deleteDialogOpen, deleteMutation.isPending, deleteMutation.error, restoreProductMutation.isPending, restoreProductMutation.error]);
 
     const table = useReactTable({
         data: products,
@@ -301,14 +318,72 @@ const AllProductsPage = () => {
         onGlobalFilterChange: setGlobalFilter,
     })
 
+    // Handle pagination
+    const handlePrevPage = () => {
+        if (pagination.hasPrev) {
+            setCurrentPage(prev => prev - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (pagination.hasNext) {
+            setCurrentPage(prev => prev + 1);
+        }
+    };
+
+    // Analytics summary cards
+    const analyticsCards = (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">Total Products</CardTitle>
+                    <CardDescription>All products in your store</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <span className="text-3xl font-bold block">{pagination.totalCount || 0}</span>
+                </CardContent>
+            </Card>
+            
+            <Card>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">Out of Stock</CardTitle>
+                    <CardDescription>Products needing replenishment</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {isProductLoading ? (
+                        <Skeleton className="h-8 w-16" />
+                    ) : (
+                        <span className="text-3xl font-bold block text-amber-500">
+                            {products.filter(p => p.stock <= 0 && !p.isDeleted).length}
+                        </span>
+                    )}
+                </CardContent>
+            </Card>
+            
+            <Card>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">Deleted Products</CardTitle>
+                    <CardDescription>Recently removed products</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {isProductLoading ? (
+                        <Skeleton className="h-8 w-16" />
+                    ) : (
+                        <span className="text-3xl font-bold block text-red-500">
+                            {products.filter(p => p.isDeleted).length}
+                        </span>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
+    );
+
     return (
-        <div className="w-full min-h-screen p-8 ">
-            {/* header */}
+        <div className="w-full min-h-screen p-4 md:p-8">
+            {/* Header */}
             <div className="flex justify-between items-center mb-1">
-                <h2 className="text-2xl text-primary font-semibold">All Product</h2>
-                <Link href={'/dashboard/create-product'}
-                    className="px-4 py-2 rounded-lg"
-                >
+                <h2 className="text-2xl text-primary font-semibold">All Products</h2>
+                <Link href={'/dashboard/create-product'}>
                     <Button className="flex gap-1">
                         <Plus size={18} /> Add Product
                     </Button>
@@ -316,62 +391,164 @@ const AllProductsPage = () => {
             </div>
 
             {/* Breadcrumbs */}
-            <div className='flex items-center '>
+            <div className='flex items-center mb-6'>
                 <Link href={'/dashboard'} className='cursor-pointer text-secondary'>Dashboard</Link>
                 <ChevronRight size={20} className='opacity-[0.8]' />
-                <span>All Product</span>
+                <span>All Products</span>
             </div>
 
-            {/* Search Bar */}
-            <div className="mb-4 flex items-center pt-2 flex-1 ">
-                <Input
-                    type="text"
-                    placeholder="Search products.."
-                    className="w-full bg-transparent"
-                    value={globalFilter}
-                    onChange={(e) => setGlobalFilter(e.target.value)}
-                />
-                <Search size={18} className="ml-2 text-accent" />
+            {/* Analytics Summary */}
+            {analyticsCards}
+
+            {/* Tabs and Filters */}
+            <div className="mb-6">
+                <Tabs 
+                    defaultValue="all"
+                    value={currentTab}
+                    onValueChange={(value) => {
+                        setCurrentTab(value as any);
+                        setCurrentPage(1);
+                    }}
+                >
+                    <TabsList className="mb-4">
+                        <TabsTrigger value="all">All</TabsTrigger>
+                        <TabsTrigger value="active">Active</TabsTrigger>
+                        <TabsTrigger value="draft">Draft</TabsTrigger>
+                        <TabsTrigger value="out_of_stock">Out of Stock</TabsTrigger>
+                        <TabsTrigger value="deleted">Deleted</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+            </div>
+
+            {/* Search and Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                {/* Search */}
+                <div className="flex items-center">
+                    <Input
+                        type="text"
+                        placeholder="Search products..."
+                        className="w-full bg-transparent"
+                        value={globalFilter}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                    />
+                    <Search size={18} className="ml-2 text-accent" />
+                </div>
+
+                {/* Category Filter */}
+                <div>
+                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all_categories">All Categories</SelectItem>
+                            {categories.map((category) => (
+                                <SelectItem key={category} value={category}>
+                                    {category}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Sort Filter */}
+                <div>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Sort by" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="newest">Newest</SelectItem>
+                            <SelectItem value="price_asc">Price: Low to High</SelectItem>
+                            <SelectItem value="price_desc">Price: High to Low</SelectItem>
+                            <SelectItem value="popularity">Popularity</SelectItem>
+                            <SelectItem value="rating">Rating</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
             {/* Table */}
             <div className="overflow-x-auto bg-secondary rounded-lg pt-4">
                 {isProductLoading ? (
-                    <p className="text-center">Loading Products..</p>
+                    <div className="p-8 flex justify-center">
+                        <div className="space-y-4 w-full max-w-3xl">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <Skeleton key={i} className="h-16 w-full" />
+                            ))}
+                        </div>
+                    </div>
+                ) : products.length === 0 ? (
+                    <div className="text-center p-8">
+                        <p className="text-lg mb-4">No products found</p>
+                        <Link href="/dashboard/create-product">
+                            <Button>Add your first product</Button>
+                        </Link>
+                    </div>
                 ) : (
-                    <table className="w-full">
-                        <thead>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <tr key={headerGroup.id}
-                                    className="border-b"
+                    <>
+                        <table className="w-full">
+                            <thead>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <tr key={headerGroup.id}
+                                        className="border-b"
+                                    >
+                                        {headerGroup.headers.map((header) => (
+                                            <th key={header.id}
+                                                className="p-3 text-left"
+                                            >
+                                                {header.isPlaceholder ? null : flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </thead>
+                            <tbody>
+                                {table.getRowModel().rows.map((row) => (
+                                    <tr key={row.id}
+                                        className="border-b hover:bg-secondary/80"
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <td key={cell.id} className="p-3">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
+                        {/* Pagination */}
+                        <div className="flex items-center justify-between p-4 border-t">
+                            <p className="text-sm text-muted-foreground">
+                                Showing {products.length} of {pagination.totalCount} products
+                            </p>
+                            <div className="flex items-center space-x-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handlePrevPage}
+                                    disabled={!pagination.hasPrev}
                                 >
-                                    {headerGroup.headers.map((header) => (
-                                        <th key={header.id}
-                                            className="p-3 text-left"
-                                        >
-                                            {header.isPlaceholder ? null : flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                            )}
-                                        </th>
-                                    ))}
-                                </tr>
-                            ))}
-                        </thead>
-                        <tbody>
-                            {table.getRowModel().rows.map((row) => (
-                                <tr key={row.id}
-                                    className="border-b "
+                                    Previous
+                                </Button>
+                                <span className="text-sm">
+                                    Page {pagination.currentPage} of {pagination.totalPages}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleNextPage}
+                                    disabled={!pagination.hasNext}
                                 >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <td key={cell.id} className="p-3">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
+                    </>
                 )}
             </div>
         </div>

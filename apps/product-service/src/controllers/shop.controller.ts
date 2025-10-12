@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import prisma from "../../../../packages/libs/prisma";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { ValidationError } from "../../../../packages/error-handler";
 
 // Interfaces
 interface ShopFilters {

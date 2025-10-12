@@ -443,7 +443,7 @@ export default function EditEventDialog({ event, isOpen, onClose }: EditEventDia
               <div className="text-sm text-gray-500 pt-4 border-t">
                 <div>Created: {format(new Date(event.createdAt), 'PPP')}</div>
                 <div>Last updated: {format(new Date(event.updatedAt), 'PPP')}</div>
-                <div>Shop: {event.shop.name}</div>
+                <div>Shop: {event?.shop?.name}</div>
               </div>
             </div>
 

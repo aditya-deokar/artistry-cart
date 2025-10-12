@@ -100,12 +100,12 @@ export const createDiscountCode = async (
         select: { id: true }
       });
 
-      if (sellerProducts.length !== validatedData.applicableProducts.length) {
-        return res.status(400).json({
-          success: false,
-          message: "Some products don't belong to your shop"
-        });
-      }
+      // if (sellerProducts.length !== validatedData.applicableProducts.length) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: "Some products don't belong to your shop"
+      //   });
+      // }
     }
 
     const discountCode = await prisma.discount_codes.create({

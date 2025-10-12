@@ -16,17 +16,15 @@ export const ShopReviews: React.FC<{ shopId: string; totalReviews: number }> = (
   const { data, isLoading } = useQuery({
     queryKey: ['shopReviews', shopId, page],
     queryFn: async () => {
-      // const res = await axiosInstance.get(`/product/api/get-shop-reviews/${shopId}?page=${page}`);
-      // return res.data;
-      console.log("Fetching reviews for shop:", shopId, "page:", page);
-      return { reviews: [] }; // Placeholder
+      const res = await axiosInstance.get(`/product/api/shops/${shopId}/reviews?page=${page}`);
+      return res.data.data; // Access data from the nested data property in the new API response
     },
   });
 
   // Mutation to create a new review
   const { mutate, isPending } = useMutation({
       mutationFn: (newReview: { shopId: string, rating: number, review: string }) => {
-          return axiosInstance.post('/shops/api/create-review', newReview);
+          return axiosInstance.post(`/product/api/shops/${shopId}/reviews`, newReview);
       },
       onSuccess: () => {
           // When a review is successfully submitted, invalidate the queries

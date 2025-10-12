@@ -27,10 +27,10 @@ export const getOffersPageData = async (
           take: 5,
         }),
 
-        // 2. Get active, sitewide coupon codes from admin
+        // 2. Get active, sitewide coupon codes
         prisma.discount_codes.findMany({
           where: {
-            sellerId: process.env.ADMIN_SELLER_ID || 'admin',
+            // Only get coupons that are active and valid
             isActive: true,
             validFrom: { lte: now },
             OR: [
@@ -236,6 +236,118 @@ export const getOffersPageData = async (
           totalCoupons: siteCoupons.length,
         }
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * User-facing offers page
+ * Simplified endpoint that focuses on the most relevant offer data for users
+ * Returns active events with their products, banners, and available coupons
+ */
+export const getUserOffers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const now = new Date();
+
+    // Get active events with their associated products
+    const activeEvents = await prisma.events.findMany({
+      where: {
+        is_active: true,
+        ending_date: { gte: now },
+        starting_date: { lte: now },
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        banner_image: true,
+        event_type: true,
+        discount_percent: true,
+        discount_type: true,
+        starting_date: true,
+        ending_date: true,
+        products: {
+          where: {
+            isDeleted: false,
+            status: 'Active',
+            stock: { gt: 0 }
+          },
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            description: true,
+            regular_price: true,
+            sale_price: true,
+            current_price: true,
+            images: true,
+            stock: true,
+            ratings: true,
+            Shop: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                avatar: true,
+              }
+            }
+          },
+          take: 12
+        }
+      }
+    });
+
+    // Get promotional banners
+    const banners = await prisma.banners.findMany({
+      where: {
+        isActive: true,
+        endDate: { gte: now },
+        startDate: { lte: now },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    });
+
+    // Get available coupons
+    const coupons = await prisma.discount_codes.findMany({
+      where: {
+        isActive: true,
+        validFrom: { lte: now },
+        OR: [
+          { validUntil: null },
+          { validUntil: { gte: now } }
+        ],
+        // Only show coupons meant for public display
+        applicableToAll: true,
+      },
+      select: {
+        id: true,
+        publicName: true,
+        description: true,
+        discountType: true,
+        discountValue: true,
+        discountCode: true,
+        minimumOrderAmount: true,
+        maximumDiscountAmount: true,
+        validUntil: true,
+      },
+      orderBy: { discountValue: "desc" },
+      take: 6,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        events: activeEvents,
+        banners,
+        coupons,
+      }
     });
   } catch (error) {
     next(error);
