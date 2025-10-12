@@ -335,12 +335,7 @@ export const createEvent = async (
       if (validatedData.product_ids && validatedData.product_ids.length > 0) {
         await tx.products.updateMany({
           where: { id: { in: validatedData.product_ids } },
-          data: { 
-            eventId: newEvent.id,
-            isEvent: true,
-            starting_date: startDate,
-            ending_date: endDate
-          }
+          data: { eventId: newEvent.id }
         });
       }
 
@@ -412,41 +407,50 @@ export const getAllEvents = async (
   next: NextFunction
 ) => {
   try {
-    const { 
-      page = "1", 
-      limit = "12", 
-      event_type,
-      shop_id,
+    const {
+      page = "1",
+      limit = "12",
+      event_type: eventTypeQuery,
+      shop_id: shopIdQuery,
+      shopId: shopIdCamel,
       category,
       search,
-      status = "active"
-    } = req.query;
+      status = "all"
+    } = req.query as Record<string, unknown>;
+
+    // Support REST params for routes like /type/:eventType and /shop/:shopId
+    const eventTypeParam = typeof req.params?.eventType === "string" ? req.params.eventType : undefined;
+    const shopIdParam = typeof req.params?.shopId === "string" ? req.params.shopId : undefined;
+
+    const eventType = (eventTypeQuery as string | undefined) ?? eventTypeParam;
+    const shopId = (shopIdQuery as string | undefined) ?? (shopIdCamel as string | undefined) ?? shopIdParam;
 
     const pageNum = parseInt(page as string);
     const limitNum = parseInt(limit as string);
     const skip = (pageNum - 1) * limitNum;
     const now = new Date();
+    const normalizedStatus = typeof status === "string" ? status.toLowerCase() : "all";
 
     // Build where clause
     const where: Prisma.eventsWhereInput = {};
 
-    if (status === "active") {
+    if (normalizedStatus === "active") {
       where.is_active = true;
       where.starting_date = { lte: now };
       where.ending_date = { gte: now };
-    } else if (status === "upcoming") {
+    } else if (normalizedStatus === "upcoming") {
       where.is_active = true;
       where.starting_date = { gt: now };
-    } else if (status === "expired") {
+    } else if (normalizedStatus === "expired") {
       where.ending_date = { lt: now };
     }
 
-    if (event_type) {
-      where.event_type = event_type as string;
+    if (eventType) {
+      where.event_type = eventType.toString().toUpperCase();
     }
 
-    if (shop_id) {
-      where.shopId = shop_id as string;
+    if (shopId) {
+      where.shopId = shopId;
     }
 
     if (search) {
@@ -668,7 +672,7 @@ export const getSellerEvents = async (
     });
 
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -748,7 +752,7 @@ export const getEventById = async (
     });
 
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -809,7 +813,7 @@ export const updateEvent = async (
       updateData.ending_date = endDate;
     }
 
-    const updatedEvent = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       const updated = await tx.events.update({
         where: { id: eventId },
         data: updateData,
@@ -892,7 +896,7 @@ export const updateEvent = async (
         errors: error
       });
     }
-    next(error);
+    return next(error);
   }
 };
 
@@ -949,27 +953,12 @@ export const deleteEvent = async (
 
       // Remove event association from products and reset pricing
       if (existingEvent.products.length > 0) {
-        const productIds = existingEvent.products.map(p => p.id);
-
-        // Reset products to non-event pricing
-        await tx.products.updateMany({
-          where: { id: { in: productIds } },
-          data: {
-            eventId: null,
-            isEvent: false,
-            starting_date: null,
-            ending_date: null,
-            current_price: { /* You'll need to recalculate this */ },
-            is_on_discount: false
-          }
-        });
-
-        // Recalculate current pricing for each product
         for (const product of existingEvent.products) {
           const currentPrice = product.sale_price || product.regular_price;
           await tx.products.update({
             where: { id: product.id },
             data: {
+              eventId: null,
               current_price: currentPrice,
               is_on_discount: !!product.sale_price
             }
@@ -994,7 +983,7 @@ export const deleteEvent = async (
     });
 
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -1081,7 +1070,7 @@ export const getSellerProductsForEvent = async (
     });
 
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -1147,12 +1136,7 @@ export const updateEventProducts = async (
       // Remove event association from all current products
       await tx.products.updateMany({
         where: { eventId: eventId },
-        data: {
-          eventId: null,
-          isEvent: false,
-          starting_date: null,
-          ending_date: null
-        }
+        data: { eventId: null }
       });
 
       // Reset pricing for removed products
@@ -1173,12 +1157,7 @@ export const updateEventProducts = async (
           where: {
             id: { in: product_ids }
           },
-          data: {
-            eventId: eventId,
-            isEvent: true,
-            starting_date: event.starting_date,
-            ending_date: event.ending_date
-          }
+          data: { eventId: eventId }
         });
       }
 
@@ -1232,7 +1211,7 @@ export const updateEventProducts = async (
     });
 
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -1355,12 +1334,7 @@ export const createEventWithProduct = async (
         where: {
           id: { in: validatedData.product_ids }
         },
-        data: {
-          eventId: newEvent.id,
-          isEvent: true,
-          starting_date: startDate,
-          ending_date: endDate
-        }
+        data: { eventId: newEvent.id }
       });
 
       return newEvent;
@@ -1452,6 +1426,6 @@ export const createEventWithProduct = async (
     }
     
     console.error("Create event with products error:", error);
-    next(error);
+    return next(error);
   }
 };

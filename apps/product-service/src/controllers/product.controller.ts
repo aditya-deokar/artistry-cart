@@ -269,22 +269,23 @@ export const getAllProducts = async (
       ? parseFloat(req.query.maxPrice as string)
       : undefined;
     const search = req.query.search as string;
-    const eventOnly = req.query.eventOnly === 'true';
+  const eventOnly = req.query.eventOnly === "true";
 
     // Build dynamic where clause
     const whereClause: Prisma.productsWhereInput = {
       isDeleted: false,
-      status: "Active",
+      status: productStatus.Active,
       stock: { gt: 0 }, // Only show products in stock
     };
 
     // Event filter
     if (eventOnly) {
-      whereClause.AND = [
-        { isEvent: true },
-        { starting_date: { lte: new Date() } },
-        { ending_date: { gte: new Date() } },
-      ];
+      const now = new Date();
+      whereClause.event = {
+        is_active: true,
+        starting_date: { lte: now },
+        ending_date: { gte: now },
+      };
     }
 
     // Category filter
@@ -293,10 +294,10 @@ export const getAllProducts = async (
     }
 
     // Price filter (using current_price for accurate filtering)
-    if (minPrice !== undefined && maxPrice !== undefined) {
+    if (minPrice !== undefined || maxPrice !== undefined) {
       whereClause.current_price = {
-        gte: minPrice,
-        lte: maxPrice,
+        ...(minPrice !== undefined ? { gte: minPrice } : {}),
+        ...(maxPrice !== undefined ? { lte: maxPrice } : {}),
       };
     }
 
@@ -356,6 +357,7 @@ export const getAllProducts = async (
               discount_percent: true,
               starting_date: true,
               ending_date: true,
+              is_active: true,
             }
           }
         },
