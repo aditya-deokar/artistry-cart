@@ -1,126 +1,190 @@
-import prisma from "../../../../packages/libs/prisma"
+import { Prisma } from "@prisma/client";
 
-export const updateUserAnalytics= async(event:any) => {
+import prisma from "../../../../packages/libs/prisma";
+
+export type UserAction =
+    | "add_to_wishlist"
+    | "add_to_cart"
+    | "product_view"
+    | "remove_from_wishlist"
+    | "remove_from_cart"
+    | "purchase"
+    | "shop_visit";
+
+export interface AnalyticsEvent {
+    action?: UserAction;
+    userId: string;
+    productId?: string;
+    shopId?: string;
+    country?: string;
+    city?: string;
+    device?: string;
+    timestamp?: string;
+}
+
+type StoredAction = {
+    action: Exclude<UserAction, "shop_visit">;
+    timestamp: string;
+    productId?: string;
+    shopId?: string;
+};
+
+export const updateUserAnalytics = async (event: AnalyticsEvent) => {
     try {
-        const existingData= await prisma.userAnalytics.findUnique({
-            where:{
-                userId : event.userId,
+        if (!event.userId) return;
+
+        const existingData = await prisma.userAnalytics.findUnique({
+            where: {
+                userId: event.userId,
             },
-            select: { actions: true }
+            select: { actions: true },
         });
 
-        let updatedActions:any = existingData?.actions || [];
+        const actions = (existingData?.actions as StoredAction[] | undefined) ?? [];
+        const now = new Date().toISOString();
 
-        const actionExists = updatedActions.some(
-            (entry:any)=> entry.productId === event.productId && entry.action === event.action
-        );
-
-        // Always store `product_view` for recommendations
-        if(event.action === "product_view"){
-            updatedActions.push({
-                productId:event?.productId,
-                shopId: event?.shopId,
-                action: "product_view",
-                timestamp: new Date(),
-            })
-        }else if(["add_to_cart", "add_to_wishlist"].includes(event.action) && !actionExists){
-            updatedActions.push({
-                productId:event?.productId,
-                shopId: event?.shopId,
-                action: event?.action,
-                timestamp: new Date(),
-            });
-        }
-        // Remove `add_to_cart` when `remove_from_cart` is triggred 
-        else if(event.action === "remove_from_cart"){
-            updatedActions= updatedActions.filter(
-                (entry:any)=> !( entry.productId === event.productId && entry.action === "add_to_cart")
-
+        const findAction = (action: StoredAction["action"]) =>
+            actions.find(
+                (entry) => entry.productId === event.productId && entry.action === action,
             );
-        }
-        // Remove `add_to_wishlist` when `remove_from_wishlist is triggered
-        else if(event.action === "remove_from_wishlist"){
-            updatedActions= updatedActions.filter(
-                (entry:any)=> !( entry.productId === event.productId && entry.action === "add_to_wishlist")
 
+            const pushAction = (action: StoredAction["action"]) => {
+                const payload: StoredAction = {
+                    action,
+                    timestamp: now,
+                };
+
+                if (event.productId) {
+                    payload.productId = event.productId;
+                }
+
+                if (event.shopId) {
+                    payload.shopId = event.shopId;
+                }
+
+                actions.push(payload);
+            };
+
+            if (event.action === "product_view") {
+                pushAction("product_view");
+            } else if (event.action === "add_to_cart" && !findAction("add_to_cart")) {
+                pushAction("add_to_cart");
+            } else if (event.action === "add_to_wishlist" && !findAction("add_to_wishlist")) {
+                pushAction("add_to_wishlist");
+        } else if (event.action === "remove_from_cart") {
+            const index = actions.findIndex(
+                (entry) => entry.productId === event.productId && entry.action === "add_to_cart",
             );
+            if (index >= 0) actions.splice(index, 1);
+        } else if (event.action === "remove_from_wishlist") {
+            const index = actions.findIndex(
+                (entry) => entry.productId === event.productId && entry.action === "add_to_wishlist",
+            );
+            if (index >= 0) actions.splice(index, 1);
         }
 
-        // keep only the last 100 actions (prevent storage overloaded)
-        if(updatedActions.length> 100){
-            updatedActions.shift();
+        if (actions.length > 100) {
+            actions.splice(0, actions.length - 100);
         }
 
-        const extraFields:Record<string,any>= {};
+        const extraFields: Record<string, string> = {};
 
-        if(event.country){
+        if (event.country) {
             extraFields.country = event.country;
         }
 
-        if(event.city){
+        if (event.city) {
             extraFields.city = event.city;
         }
 
-        if(event.device){
+        if (event.device) {
             extraFields.device = event.device;
         }
 
-        // update or create user analytics
-        await prisma.userAnalytics.upsert({
+                    const serializedActions = actions.map<Prisma.InputJsonValue>((entry) => ({
+                        action: entry.action,
+                        timestamp: entry.timestamp,
+                        ...(entry.productId ? { productId: entry.productId } : {}),
+                        ...(entry.shopId ? { shopId: entry.shopId } : {}),
+                    }));
+
+            await prisma.userAnalytics.upsert({
             where: { userId: event.userId },
-            update:{
-                lastVisited :new Date(),
-                actions: updatedActions,
-                ...extraFields
-            },
-            create :{
-                userId: event?.userId,
+            update: {
                 lastVisited: new Date(),
-                actions: updatedActions,
-                ...extraFields
-            }
+                    actions: serializedActions,
+                ...extraFields,
+            },
+            create: {
+                userId: event.userId,
+                lastVisited: new Date(),
+                    actions: serializedActions,
+                ...extraFields,
+            },
         });
 
-        // update product analytics
-        await updateProductAnalytics(event)
-
+        await updateProductAnalytics(event);
     } catch (error) {
         console.log("Error in storing user analytics", error);
     }
-}
+};
 
-export const updateProductAnalytics = async(event:any)=> {
+export const updateProductAnalytics = async (event: AnalyticsEvent) => {
     try {
-        if(!event.productId) return;
+        if (!event.productId) return;
 
-        const updateFields:any ={};
+        const now = new Date();
 
-        if(event.action === "product_view") updateFields.views = { increament: 1};
-        if(event.action === "add_to_cart") updateFields.cartAdds = { increament: 1};
-        if(event.action === "add_to_wishlist") updateFields.wishListAdds = { increament: 1};
-        if(event.action === "purchase") updateFields.purchases = { increament: 1};
+        let shopId = event.shopId;
 
-        if(event.action === "remove_from_cart") updateFields.cartAdds = { decreament: 1};
-        if(event.action === "remove_from_wishlist") updateFields.wishlistAdds = { decreament: 1};
+        if (!shopId) {
+            const product = await prisma.products.findUnique({
+                where: { id: event.productId },
+                select: { shopId: true },
+            });
 
-        // update or create Product Analytics asynchronosly
+            shopId = product?.shopId;
+        }
+
+        if (!shopId) return;
+
         await prisma.productAnalytics.upsert({
-            where:{
-                lastViewAt: new Date(),
-                ...updateFields,
+            where: {
+                productId: event.productId,
             },
-            create:{
-                productId : event.productId,
-                shopId: event.shopId || null,
+            update: {
+                shopId,
+                lastViewedAt: now,
+                ...(event.action === "product_view"
+                    ? { views: { increment: 1 } }
+                    : {}),
+                ...(event.action === "add_to_cart"
+                    ? { cartAdds: { increment: 1 } }
+                    : {}),
+                ...(event.action === "add_to_wishlist"
+                    ? { wishlistAdds: { increment: 1 } }
+                    : {}),
+                ...(event.action === "purchase"
+                    ? { purchases: { increment: 1 } }
+                    : {}),
+                ...(event.action === "remove_from_cart"
+                    ? { cartAdds: { decrement: 1 } }
+                    : {}),
+                ...(event.action === "remove_from_wishlist"
+                    ? { wishlistAdds: { decrement: 1 } }
+                    : {}),
+            },
+            create: {
+                productId: event.productId,
+                        shopId,
                 views: event.action === "product_view" ? 1 : 0,
                 cartAdds: event.action === "add_to_cart" ? 1 : 0,
                 wishlistAdds: event.action === "add_to_wishlist" ? 1 : 0,
-                purchases: event.action === "purchases" ? 1 : 0,
-                lastViewAt :new Date(), 
+                purchases: event.action === "purchase" ? 1 : 0,
+                lastViewedAt: now,
             },
-        })
-
+        });
     } catch (error) {
         console.error("Error in Product Analytics", error);
     }
-}
+};
