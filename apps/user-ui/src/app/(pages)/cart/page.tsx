@@ -19,8 +19,15 @@ const CartPage = () => {
 
     // Calculate subtotal, memoized for performance.
     // This calculation runs only when the cart's contents change.
+    // Uses the pricing.finalPrice if available (which includes event discounts), otherwise falls back to sale_price
     const subtotal = useMemo(() => {
-        return cart.reduce((acc, item) => acc + item?.sale_price! * item.quantity, 0);
+        return cart.reduce((acc, item) => {
+            // Use the most accurate price available (pricing.finalPrice includes event discounts)
+            // Handle null sale_price values by falling back to regular_price
+            const pricePerUnit = item.pricing?.finalPrice || 
+                                (item.sale_price !== null ? item.sale_price : item.regular_price);
+            return acc + pricePerUnit * item.quantity;
+        }, 0);
     }, [cart]);
 
     return (

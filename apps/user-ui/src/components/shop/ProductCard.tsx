@@ -15,9 +15,10 @@ import useLocationTracking from '@/hooks/useLocationTracking';
 import useDeviceTracking from '@/hooks/useDeviceTracking';
 import WishlistButton from '../products/WishlistButton';
 
+// Define framer-motion card variants with correct typing
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
 
 const useCountdown = (endDate?: string | null) => {
@@ -34,18 +35,19 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
 
   const primaryImage = product.images.find(img => img !== null);
   const isLimited = product.stock <= 5 && product.stock > 0;
-  const timeleft = useCountdown(product.ending_date);
+  
+  // Use event's ending_date if available, otherwise check for product's ending_date
+  const eventEndDate = product.event?.ending_date || null;
+  const timeleft = useCountdown(eventEndDate);
 
-  // Select state slices
-  const wishlistItems = useStore((state) => state.wishlist);
+  // Select state slices from store
   const cartItems = useStore((state) => state.cart);
 
   // Select actions from the nested 'actions' object
   const { addToCart } = useStore((state) => state.actions);
 
-  
-  const isWishlisted = wishlistItems.some((item:any)=> item.id == product.id );
-  const isInCart = cartItems.some((item:any)=> item.id == product.id );
+  // Check if product is in cart to control button behavior
+  const isInCart = cartItems.some((item) => item.id === product.id);
 
   return (
    
@@ -56,9 +58,9 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
         "relative w-full aspect-[4/5] overflow-hidden rounded-lg",
         "bg-muted" // Use `bg-muted` for a neutral placeholder color in both themes
       )}>
-        {/* --- BADGES (No changes needed, these are brand/status colors) --- */}
+        {/* --- BADGES (Updated to use event object) --- */}
         <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-            {product.isEvent && <div className="bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">OFFER</div>}
+            {product.event && <div className="bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">OFFER</div>}
             {isLimited && <div className="bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">Limited</div>}
         </div>
         
@@ -81,7 +83,12 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
             <WishlistButton product={product} productId={product.id}/>
             <Button
             onClick={()=> !isInCart && addToCart({...product, quantity:1 }, user, location, deviceInfo)}
-            variant="outline" size="icon" className="bg-background rounded-full shadow-md hover:bg-background">
+            variant="outline" 
+            size="icon" 
+            className="bg-background rounded-full shadow-md hover:bg-background"
+            disabled={product.stock <= 0 || isInCart}
+            title={isInCart ? "Already in cart" : "Add to cart"}
+            >
                 <ShoppingCart size={18} />
             </Button>
         </div>
@@ -95,9 +102,15 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
             <span className="absolute bottom-[-2px] left-0 h-[2px] w-0 bg-amber-600 transition-all duration-300 group-hover:w-full"></span>
           </Link>
         </h3>
-        <p className="text-sm text-muted-foreground mt-1 hover:text-amber-800 transition-colors">
-            by <Link href={`/artist/${product?.Shop?.id}`}>{product?.Shop?.name}</Link>
-        </p>
+        {/* <p className="text-sm text-muted-foreground mt-1 hover:text-amber-800 transition-colors">
+            by {product.Shop ? (
+              <Link href={`/shops/${product.Shop.slug || product.Shop.id}`}>
+                {product.Shop.name}
+              </Link>
+            ) : (
+              <span>Unknown Seller</span>
+            )}
+        </p> */}
         
         <div className="flex-grow" />
 
@@ -109,7 +122,7 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
                     <span>{product.totalSales > 1 ? `${product.totalSales} sold` : 'Best Seller'}</span>
                 </div>
             )}
-            {product.isEvent && timeleft && (
+            {product.event && timeleft && (
                 <div className="flex items-center gap-1.5">
                     <Clock size={14}/>
                     <span>{timeleft}</span>
@@ -117,12 +130,21 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
             )}
         </div>
 
-        {/* --- PRICE (Updated old price color) --- */}
+        {/* --- PRICE (Updated to use new pricing structure) --- */}
         <div className="flex items-baseline gap-2 mt-2">
-            <p className="font-semibold text-base text-amber-600">{formatPrice(product.sale_price)}</p>
-            {product?.sale_price! < product.regular_price && 
-                <p className="text-sm text-muted-foreground line-through">{formatPrice(product.regular_price)}</p>
-            }
+            {/* Use pricing.finalPrice if available (includes event discounts), 
+                otherwise fall back to sale_price or regular_price */}
+            <p className="font-semibold text-base text-amber-600">
+                {formatPrice(product.pricing?.finalPrice || product.sale_price || product.regular_price)}
+            </p>
+            
+            {/* Show original price as strikethrough if there's a discount */}
+            {((product.pricing?.finalPrice && product.pricing.finalPrice < product.regular_price) || 
+              (product.sale_price && product.sale_price < product.regular_price)) && (
+                <p className="text-sm text-muted-foreground line-through">
+                    {formatPrice(product.regular_price)}
+                </p>
+            )}
         </div>
       </div>
     </motion.div>

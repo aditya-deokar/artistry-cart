@@ -21,6 +21,7 @@ import {
 
 import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
 import isAdmin from "../../../../packages/middleware/isAdmin";
+import { getUserOffers } from "../controllers/offers.controller";
 
 
 const router: Router = express.Router();

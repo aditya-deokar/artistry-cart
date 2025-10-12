@@ -26,6 +26,14 @@ export interface Event {
   updatedAt: string;
   products?: Product[];
   productDiscounts?: EventProductDiscount[];
+  shop?: {
+    name: string;
+    slug: string;
+  };
+  _count?: {
+    products: number;
+    productDiscounts: number;
+  };
 }
 
 export interface EventProductDiscount {

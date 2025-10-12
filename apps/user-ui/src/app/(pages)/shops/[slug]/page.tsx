@@ -70,8 +70,8 @@ export default function SingleShopPage() {
     const { data: shop, isLoading, isError } = useQuery<ShopData>({
         queryKey: ['shop', slug],
         queryFn: async () => {
-            const res = await axiosInstance.get(`/product/api/get-shop/${slug}`);
-            return res.data.shop;
+            const res = await axiosInstance.get(`/product/api/shops/${slug}`);
+            return res.data.data.shop; // Access shop from the nested data property in the new API response
         },
         enabled: !!slug,
     });
@@ -82,6 +82,8 @@ export default function SingleShopPage() {
     if (isError || !shop) {
         return notFound();
     }
+
+    console.log(shop)
     
     return (
         <>

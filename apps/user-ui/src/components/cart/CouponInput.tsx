@@ -13,12 +13,12 @@ import axiosInstance from '@/utils/axiosinstance';
 
 const validateCouponCode = async (couponCode: string): Promise<DiscountCode> => {
   try {
-    const response = await axiosInstance.post('/product/api/coupon/validate', { couponCode });
-    return response.data;
+    const response = await axiosInstance.post('/product/api/coupons/validate', { couponCode });
+    return response.data.data; // Access data from the nested data property in the new API response
   } catch (error) {
     
     if (axios.isAxiosError(error) && error.response) {
-      
+      // Handle API error response
       throw new Error(error.response.data.message || 'Invalid coupon code.');
     }
   

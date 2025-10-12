@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import {
   getOffersPageData,
+  getUserOffers,
   getDealsByCategory,
   getLimitedTimeOffers,
   getSeasonalOffers,
@@ -17,8 +18,12 @@ const offersRouter: Router = express.Router();
 // PUBLIC OFFER ROUTES
 // =============================================
 
-// Main offers page
-offersRouter.get("/", getOffersPageData);
+// Main offers page (original implementation)
+// offersRouter.get("/", getOffersPageData);
+offersRouter.get("/", getUserOffers);
+
+// User-facing offers page (new simplified endpoint)
+offersRouter.get("/user", getUserOffers);
 
 // Categorized offers
 offersRouter.get("/category/:category", getDealsByCategory);

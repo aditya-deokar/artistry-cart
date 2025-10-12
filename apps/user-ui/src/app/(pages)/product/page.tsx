@@ -27,12 +27,13 @@ const useDebounce = (value: any, delay: number) => {
 };
 
 const ProductPage = () => {
+    // Updated to match the FilterState interface from FilterSidebar
     const [filters, setFilters] = useState({
         page: 1,
         category: 'all',
-        priceRange: [0, 50000],
-        sortBy: 'newest',
-        search: '',
+        priceRange: [0, 50000] as [number, number], // Type assertion to match the expected type
+        sortBy: 'newest' as 'newest' | 'price-asc' | 'price-desc' | 'relevance', // Type assertion for enum values
+        search: '', // We'll keep search for our API but handle it separately for the FilterSidebar
     });
     
     // Use the debounced search term and price for the API query
@@ -63,27 +64,31 @@ const ProductPage = () => {
                 params.set('search', apiFilters.search);
             }
 
+            // Updated endpoint based on the new API structure
             const res = await axiosInstance.get(`/product/api/products?${params.toString()}`);
-            return res.data; // The API now returns an object { products, pagination }
+            return res.data.data; // The API returns { success: true, data: { products, pagination } }
         },
         staleTime: 1000 * 60 * 2, // 2 minutes
     });
 
-    const { data:CategoryData, isLoading:CategoryLoading, isError:CategoryError } = useQuery({
+    // Simplified category query to avoid unused variables
+    const { data: CategoryData } = useQuery({
         queryKey: ["categories"],
         queryFn: async () => {
             try {
-                const res = await axiosInstance.get("product/api/get-categories");
-                return res.data;
+                // Updated endpoint for categories
+                const res = await axiosInstance.get("/product/api/products/categories");
+                return res.data.data; // Access the data property
             } catch (error) {
-                console.log(error);
+                console.error("Failed to fetch categories:", error);
+                return { categories: [] }; // Return default data on error
             }
         },
         staleTime: 1000 * 60 * 5,
         retry: 2,
-
     });
 
+    // Handle the updated API response structure
     const categories = CategoryData?.categories || [];
 
 
@@ -112,7 +117,22 @@ const ProductPage = () => {
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     <aside className="lg:col-span-1">
-                        <FilterSidebar categories={categories} filters={filters} setFilters={setFilters} />
+                        <FilterSidebar 
+                            categories={categories} 
+                            filters={{
+                                category: filters.category,
+                                priceRange: filters.priceRange,
+                                sortBy: filters.sortBy
+                            }} 
+                            setFilters={(newFilters) => {
+                                // Handle the FilterSidebar's filter updates while preserving the search property
+                                setFilters(prev => ({
+                                    ...prev,
+                                    ...newFilters,
+                                    search: prev.search, // Preserve search from our state
+                                }));
+                            }} 
+                        />
                     </aside>
                     <section className="lg:col-span-3">
                         {isLoading && <div className="absolute inset-0 bg-white/50 z-20"></div>} {/* Subtle loading overlay */}

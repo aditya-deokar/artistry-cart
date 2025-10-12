@@ -577,7 +577,6 @@ export const createProduct = async (
         data: {
           ...validatedData,
           current_price: validatedData.sale_price || validatedData.regular_price,
-          is_on_discount: !!validatedData.sale_price,
           // FIX: Use shop relation connect instead of direct shopId assignment
           Shop: {
             connect: { 
@@ -589,24 +588,8 @@ export const createProduct = async (
         },
       });
 
-      // Create initial pricing record
-      await tx.productPricing.create({
-        data: {
-          productId: newProduct.id,
-          basePrice: validatedData.regular_price,
-          discountedPrice: validatedData.sale_price,
-          discountAmount: validatedData.sale_price 
-            ? validatedData.regular_price - validatedData.sale_price 
-            : undefined,
-          discountPercent: validatedData.sale_price 
-            ? ((validatedData.regular_price - validatedData.sale_price) / validatedData.regular_price) * 100
-            : undefined,
-          discountSource: validatedData.sale_price ? 'PRODUCT_SALE' : undefined,
-          validFrom: new Date(),
-          createdBy: req.user.id,
-          reason: 'Product creation',
-        }
-      });
+      // Create initial pricing record and update cached price
+      await PricingService.updateCachedPricing(newProduct.id);
 
       return newProduct;
     });
@@ -763,31 +746,12 @@ export const updateProduct = async (
         where: { id: productId },
         data: {
           ...updateData,
-          current_price: updateData.sale_price || updateData.regular_price || existingProduct.current_price,
-          is_on_discount: !!(updateData.sale_price || existingProduct.sale_price),
         }
       });
 
-      // If pricing changed, create new pricing record
+      // If pricing changed, create new pricing record and update cache
       if (updateData.regular_price || updateData.sale_price) {
-        const newRegularPrice = updateData.regular_price || existingProduct.regular_price;
-        const newSalePrice = updateData.sale_price || existingProduct.sale_price;
-
-        await tx.productPricing.create({
-          data: {
-            productId,
-            basePrice: newRegularPrice,
-            discountedPrice: newSalePrice,
-            discountAmount: newSalePrice ? newRegularPrice - newSalePrice : undefined,
-            discountPercent: newSalePrice 
-              ? ((newRegularPrice - newSalePrice) / newRegularPrice) * 100
-              : undefined,
-            discountSource: newSalePrice ? 'PRODUCT_SALE' : undefined,
-            validFrom: new Date(),
-            createdBy: req.user.id,
-            reason: 'Product update',
-          }
-        });
+        await PricingService.updateCachedPricing(productId);
       }
 
       return updated;

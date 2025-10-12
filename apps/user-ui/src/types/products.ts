@@ -32,6 +32,17 @@ export type ArtProduct = {
   stock: number;
   sale_price: number | null; // Can be null
   regular_price: number;
+  current_price?: number; // Cached current effective price
+  is_on_discount?: boolean; // Whether the product is on discount
+  
+  // Dynamic pricing calculation from API
+  pricing?: {
+    productId: string;
+    originalPrice: number;
+    finalPrice: number;
+    discountInfo?: any; // Details about the discount
+    savings: number;
+  };
   
   // New & Optional Fields from your JSON
   warranty?: string | null;
@@ -43,10 +54,17 @@ export type ArtProduct = {
   colors?: string[];
   sizes?: string[];
 
-  // Event-specific fields
-  isEvent?: boolean;
-  starting_date?: string | null;
-  ending_date?: string | null;
+  // Event relation (updated structure)
+  eventId?: string | null;
+  event?: {
+    id: string;
+    title: string;
+    event_type: string;
+    discount_percent?: number;
+    starting_date: string;
+    ending_date: string;
+    is_active: boolean;
+  };
 
   // Nested JSON and relations
   images: ImageInfo[];
