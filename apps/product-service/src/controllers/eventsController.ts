@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import prisma from "../../../../packages/libs/prisma";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { PricingService } from "../lib/pricing.service";
 
 
 // Enhanced validation schemas
@@ -90,71 +91,49 @@ class EventPricingService {
 
     if (!event) return;
 
-    // Update product pricing records
-    const pricingPromises = event.products.map(async (product) => {
-      const productDiscount = event.productDiscounts.find(pd => pd.productId === product.id);
-      let discountedPrice = product.current_price;
-      let discountAmount = 0;
-      let discountPercent = 0;
-
-      if (productDiscount && productDiscount.isActive) {
-        if (productDiscount.specialPrice) {
-          discountedPrice = productDiscount.specialPrice;
-          discountAmount = product.regular_price - discountedPrice;
-          discountPercent = (discountAmount / product.regular_price) * 100;
-        } else if (productDiscount.discountType === 'PERCENTAGE') {
-          discountAmount = (product.regular_price * productDiscount.discountValue) / 100;
-          if (productDiscount.maxDiscount) {
-            discountAmount = Math.min(discountAmount, productDiscount.maxDiscount);
-          }
-          discountedPrice = product.regular_price - discountAmount;
-          discountPercent = productDiscount.discountValue;
-        } else if (productDiscount.discountType === 'FIXED_AMOUNT') {
-          discountAmount = Math.min(productDiscount.discountValue, product.regular_price);
-          discountedPrice = product.regular_price - discountAmount;
-          discountPercent = (discountAmount / product.regular_price) * 100;
-        }
-      } else if (event.discount_percent && event.discount_percent > 0) {
-        discountAmount = (product.regular_price * event.discount_percent) / 100;
-        if (event.max_discount) {
-          discountAmount = Math.min(discountAmount, event.max_discount);
-        }
-        discountedPrice = product.regular_price - discountAmount;
-        discountPercent = event.discount_percent;
+    await prisma.productPricing.updateMany({
+      where: {
+        sourceId: eventId,
+        discountSource: "EVENT",
+        isActive: true
+      },
+      data: {
+        isActive: false,
+        validUntil: new Date()
       }
-
-      // Create pricing record
-      await prisma.productPricing.create({
-        data: {
-          productId: product.id,
-          basePrice: product.regular_price,
-          discountedPrice: Math.max(discountedPrice, 0),
-          discountAmount,
-          discountPercent: Math.round(discountPercent * 100) / 100,
-          discountSource: 'EVENT',
-          sourceId: eventId,
-          sourceName: event.title,
-          validFrom: startDate,
-          validUntil: endDate,
-          reason: `Event pricing: ${event.title}`,
-        }
-      });
-
-      // Update cached pricing
-      await prisma.products.update({
-        where: { id: product.id },
-        data: {
-          current_price: Math.max(discountedPrice, 0),
-          is_on_discount: discountAmount > 0
-        }
-      });
     });
 
-    await Promise.all(pricingPromises);
+    await Promise.all(
+      event.products.map(async (product) => {
+        const productDiscount = event.productDiscounts.find(
+          (pd) => pd.productId === product.id && pd.isActive,
+        );
+
+        const { create, productUpdate } = PricingService.buildPricingRecord({
+          product,
+          event,
+          productDiscount,
+          validFrom: startDate,
+          validUntil: endDate,
+        });
+
+        await prisma.productPricing.create({ data: create });
+        await prisma.products.update({
+          where: { id: product.id },
+          data: productUpdate,
+        });
+      }),
+    );
   }
 
 
-  static async updateEventProductPricing(eventId: string, productIds: string[], startDate: Date, endDate: Date, eventData: any) {
+  static async updateEventProductPricing(eventId: string, productIds: string[], startDate: Date, endDate: Date) {
+    if (!productIds?.length) {
+      return;
+    }
+
+    const uniqueProductIds = [...new Set(productIds)];
+
     const event = await prisma.events.findUnique({
       where: { id: eventId },
       include: {
@@ -164,74 +143,50 @@ class EventPricingService {
 
     if (!event) return;
 
-    // Update pricing for each product
-    const pricingPromises = productIds.map(async (productId) => {
-      const product = await prisma.products.findUnique({
-        where: { id: productId }
-      });
-
-      if (!product) return;
-
-      // Find product-specific discount or use event-level discount
-      const productDiscount = event.productDiscounts.find(pd => pd.productId === productId && pd.isActive);
-      let discountedPrice = product.regular_price;
-      let discountAmount = 0;
-      let discountPercent = 0;
-
-      if (productDiscount) {
-        if (productDiscount.specialPrice) {
-          discountedPrice = productDiscount.specialPrice;
-          discountAmount = product.regular_price - discountedPrice;
-          discountPercent = (discountAmount / product.regular_price) * 100;
-        } else if (productDiscount.discountType === 'PERCENTAGE') {
-          discountAmount = (product.regular_price * productDiscount.discountValue) / 100;
-          if (productDiscount.maxDiscount) {
-            discountAmount = Math.min(discountAmount, productDiscount.maxDiscount);
-          }
-          discountedPrice = product.regular_price - discountAmount;
-          discountPercent = productDiscount.discountValue;
-        } else if (productDiscount.discountType === 'FIXED_AMOUNT') {
-          discountAmount = Math.min(productDiscount.discountValue, product.regular_price);
-          discountedPrice = product.regular_price - discountAmount;
-          discountPercent = (discountAmount / product.regular_price) * 100;
-        }
-      } else if (event.discount_percent && event.discount_percent > 0) {
-        discountAmount = (product.regular_price * event.discount_percent) / 100;
-        if (event.max_discount) {
-          discountAmount = Math.min(discountAmount, event.max_discount);
-        }
-        discountedPrice = product.regular_price - discountAmount;
-        discountPercent = event.discount_percent;
+    const products = await prisma.products.findMany({
+      where: {
+        id: { in: uniqueProductIds },
+        eventId
       }
-
-      // Create pricing record
-      await prisma.productPricing.create({
-        data: {
-          productId,
-          basePrice: product.regular_price,
-          discountedPrice: Math.max(discountedPrice, 0),
-          discountAmount,
-          discountPercent: Math.round(discountPercent * 100) / 100,
-          discountSource: 'EVENT',
-          sourceId: eventId,
-          sourceName: event.title,
-          validFrom: startDate,
-          validUntil: endDate,
-          reason: `Event pricing: ${event.title}`,
-        }
-      });
-
-      // Update cached pricing
-      await prisma.products.update({
-        where: { id: productId },
-        data: {
-          current_price: Math.max(discountedPrice, 0),
-          is_on_discount: discountAmount > 0
-        }
-      });
     });
 
-    await Promise.all(pricingPromises);
+    if (!products.length) {
+      return;
+    }
+
+    await prisma.productPricing.updateMany({
+      where: {
+        sourceId: eventId,
+        discountSource: "EVENT",
+        productId: { in: products.map((product) => product.id) },
+        isActive: true
+      },
+      data: {
+        isActive: false,
+        validUntil: new Date()
+      }
+    });
+
+    // Update pricing only for products currently linked to the event
+    await Promise.all(products.map(async (product) => {
+      const productDiscount = event.productDiscounts.find(
+        (pd) => pd.productId === product.id && pd.isActive,
+      );
+
+      const { create, productUpdate } = PricingService.buildPricingRecord({
+        product,
+        event,
+        productDiscount,
+        validFrom: startDate,
+        validUntil: endDate,
+      });
+
+      await prisma.productPricing.create({ data: create });
+      await prisma.products.update({
+        where: { id: product.id },
+        data: productUpdate,
+      });
+    }));
   }
 
 
@@ -382,7 +337,7 @@ export const createEvent = async (
       }
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Event created successfully",
       data: eventWithProducts
@@ -396,7 +351,7 @@ export const createEvent = async (
         errors: error
       });
     }
-    next(error);
+    return next(error);
   }
 };
 
@@ -1342,11 +1297,10 @@ export const createEventWithProduct = async (
 
     // Update pricing for all products (outside transaction for performance)
     await EventPricingService.updateEventProductPricing(
-      event.id, 
-      validatedData.product_ids, 
-      startDate, 
-      endDate, 
-      validatedData
+      event.id,
+      validatedData.product_ids,
+      startDate,
+      endDate,
     );
 
     // Fetch complete event data with all relations
