@@ -7,6 +7,7 @@ import {
 import { imagekit } from "../../../../packages/libs/imageKit";
 import { Prisma, productStatus } from "@prisma/client";
 import { z } from "zod";
+import { PricingService } from "../lib/pricing.service";
 
 // Enhanced validation schemas
 const createProductSchema = z.object({
@@ -36,130 +37,6 @@ const createProductSchema = z.object({
 const updateProductSchema = createProductSchema.partial().extend({
   id: z.string()
 });
-
-// =============================================
-// PRICING SERVICE FUNCTIONS
-// =============================================
-
-class PricingService {
-  static async calculateProductPrice(productId: string, eventId?: string) {
-    const product = await prisma.products.findUnique({
-      where: { id: productId },
-      include: {
-        event: eventId ? {
-          include: {
-            productDiscounts: {
-              where: { productId, isActive: true }
-            }
-          }
-        } : false,
-        priceHistory: {
-          where: {
-            isActive: true,
-            validFrom: { lte: new Date() },
-            OR: [
-              { validUntil: { gte: new Date() } },
-              { validUntil: null }
-            ]
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 1
-        }
-      }
-    });
-
-    if (!product) throw new Error('Product not found');
-
-    // Start with base price
-    let finalPrice = product.sale_price || product.regular_price;
-    let discountInfo = null;
-
-    // Check for active event pricing
-    if (product.event && this.isEventActive(product.event)) {
-      const eventDiscount = this.calculateEventDiscount(product, product.event);
-      if (eventDiscount.discountedPrice < finalPrice) {
-        finalPrice = eventDiscount.discountedPrice;
-        discountInfo = eventDiscount;
-      }
-    }
-
-    return {
-      productId,
-      originalPrice: product.sale_price || product.regular_price,
-      finalPrice: Math.max(finalPrice, 0),
-      discountInfo,
-      savings: discountInfo ? (discountInfo.originalPrice - finalPrice) : 0
-    };
-  }
-
-  private static calculateEventDiscount(product: any, event: any) {
-    const basePrice = product.sale_price || product.regular_price;
-    let discountedPrice = basePrice;
-    let discountAmount = 0;
-    let discountPercent = 0;
-
-    // Check for product-specific discount first
-    const productDiscount = event.productDiscounts?.[0];
-    if (productDiscount && productDiscount.isActive) {
-      if (productDiscount.specialPrice) {
-        discountedPrice = productDiscount.specialPrice;
-        discountAmount = basePrice - discountedPrice;
-        discountPercent = (discountAmount / basePrice) * 100;
-      } else if (productDiscount.discountType === 'PERCENTAGE') {
-        discountAmount = (basePrice * productDiscount.discountValue) / 100;
-        if (productDiscount.maxDiscount) {
-          discountAmount = Math.min(discountAmount, productDiscount.maxDiscount);
-        }
-        discountedPrice = basePrice - discountAmount;
-        discountPercent = productDiscount.discountValue;
-      } else if (productDiscount.discountType === 'FIXED_AMOUNT') {
-        discountAmount = Math.min(productDiscount.discountValue, basePrice);
-        discountedPrice = basePrice - discountAmount;
-        discountPercent = (discountAmount / basePrice) * 100;
-      }
-    }
-    // Fall back to event-level discount
-    else if (event.discount_percent && event.discount_percent > 0) {
-      discountAmount = (basePrice * event.discount_percent) / 100;
-      if (event.max_discount) {
-        discountAmount = Math.min(discountAmount, event.max_discount);
-      }
-      discountedPrice = basePrice - discountAmount;
-      discountPercent = event.discount_percent;
-    }
-
-    return {
-      originalPrice: basePrice,
-      discountedPrice: Math.max(discountedPrice, 0),
-      discountAmount,
-      discountPercent: Math.round(discountPercent * 100) / 100,
-      source: 'EVENT',
-      sourceId: event.id,
-      sourceName: event.title
-    };
-  }
-
-  private static isEventActive(event: any): boolean {
-    const now = new Date();
-    return event.is_active && 
-           new Date(event.starting_date) <= now && 
-           new Date(event.ending_date) > now;
-  }
-
-  static async updateCachedPricing(productId: string) {
-    const pricing = await this.calculateProductPrice(productId);
-    
-    await prisma.products.update({
-      where: { id: productId },
-      data: {
-        current_price: pricing.finalPrice,
-        is_on_discount: pricing.savings > 0
-      }
-    });
-
-    return pricing;
-  }
-}
 
 // =============================================
 // COMMON/UTILITY FUNCTIONS
@@ -462,7 +339,7 @@ export const getProductBySlug = async (
     // Calculate current pricing
     const pricing = await PricingService.calculateProductPrice(product.id);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         product: {
@@ -473,7 +350,7 @@ export const getProductBySlug = async (
     });
   } catch (error) {
     console.error("Error fetching product by slug:", error);
-    next(error);
+    return next(error);
   }
 };
 
@@ -525,7 +402,7 @@ export const getProductsByIds = async (
       orderBy: { createdAt: 'desc' }
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: products,
       message: `Found ${products.length} products`
@@ -533,7 +410,7 @@ export const getProductsByIds = async (
 
   } catch (error) {
     console.error('Error fetching products by IDs:', error);
-    next(error);
+    return next(error);
   }
 };
 
@@ -953,8 +830,8 @@ export const updateProductStatusAdmin = async (
       return next(new AuthError("Admin access required"));
     }
 
-    const { productId } = req.params;
-    const { status, reason } = req.body;
+  const { productId } = req.params;
+  const { status } = req.body;
 
     if (!['Active', 'Pending', 'Draft'].includes(status)) {
       return res.status(400).json({
@@ -976,13 +853,13 @@ export const updateProductStatusAdmin = async (
     //   reason
     // });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: `Product status updated to ${status}`,
       data: product
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -1046,13 +923,13 @@ export const validateCoupon = async (
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: discount
     });
   } catch (error) {
     console.error("Coupon validation error:", error);
-    next(error);
+    return next(error);
   }
 };
 
