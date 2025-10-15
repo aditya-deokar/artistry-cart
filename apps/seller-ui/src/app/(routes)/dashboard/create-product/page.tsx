@@ -46,8 +46,8 @@ const CreateProduct = () => {
         queryKey: ["categories"],
         queryFn: async () => {
             try {
-                const res = await axiosInstance.get("product/api/get-categories");
-                return res.data;
+                const res = await axiosInstance.get("/product/api/categories");
+                return res.data.data; // Updated to match API response structure
             } catch (error) {
                 console.log(error);
             }
@@ -61,8 +61,8 @@ const CreateProduct = () => {
     const { data: discountCodes = [], isLoading: discountLoading } = useQuery({
         queryKey: ['shop-discounts'],
         queryFn: async () => {
-            const res = await axiosInstance.get("/product/api/get-discount-codes");
-            return res?.data?.discount_codes || []
+            const res = await axiosInstance.get("/product/api/discounts/seller"); // Updated route
+            return res?.data?.data || [] // Updated to access data.data
         }
     });
 
@@ -81,19 +81,58 @@ const CreateProduct = () => {
 
 
     const onsubmit = async(data: any) => {
-        console.log(data);
+        console.log("Form data:", data);
+        
         try {
             setLoading(true);
-            await axiosInstance.post("/product/api/create-product", data);
-            router.push("/dashboard/all-products");
+            
+            // Transform form data to match backend schema
+            const productData = {
+                title: data.title,
+                description: data.description,
+                detailed_description: data.detailed_description,
+                warranty: data.warranty || undefined,
+                custom_specifications: data.custom_specifications || undefined,
+                slug: data.slug,
+                tags: typeof data.tags === 'string' 
+                    ? data.tags.split(',').map((tag: string) => tag.trim()).filter(Boolean)
+                    : data.tags || [],
+                cash_on_delivery: data.cash_on_delivery ?? true,
+                brand: data.brand || undefined,
+                video_url: data.video_url || undefined,
+                category: data.category,
+                subCategory: data.subCategory,
+                colors: Array.isArray(data.colors) ? data.colors : [],
+                sizes: Array.isArray(data.sizes) ? data.sizes : [],
+                discountCodes: data.discounts || undefined, // Map 'discounts' to 'discountCodes'
+                stock: parseInt(data.stock) || 0,
+                sale_price: data.sale_price ? parseFloat(data.sale_price) : undefined,
+                regular_price: parseFloat(data.regular_price),
+                customProperties: data.customProperties || {},
+                images: image.filter((img): img is UploadedImages => img !== null),
+                status: 'Active' as const, // Default to Active, can be changed to 'Draft' for save draft
+            };
 
-        } catch (error:any) {
-            toast.error(error?.data?.message)
-        }finally{
+            console.log("Transformed product data:", productData);
+            
+            const response = await axiosInstance.post("/product/api/products", productData);
+            
+            // The response now includes pricing information from PricingService
+            // Backend automatically calculates: current_price, is_on_discount, and creates ProductPricing history
+            const createdProduct = response.data.data;
+            console.log("Created product with pricing:", createdProduct);
+            
+            router.push("/dashboard/all-products");
+            toast.success("Product created successfully!");
+        } catch (error: any) {
+            console.error("Product creation error:", error);
+            const errorMessage = error?.response?.data?.message || 
+                               error?.response?.data?.error || 
+                               "Failed to create product";
+            toast.error(errorMessage);
+        } finally {
             setLoading(false);
         }
-
-        
     }
 
     const convertFileBase64 = (file: File) => {
@@ -114,13 +153,13 @@ const CreateProduct = () => {
 
             // console.log(fileName);
 
-            const response = await axiosInstance.post("/product/api/upload-product-image", { fileName });
+            const response = await axiosInstance.post("/product/api/images/upload", { fileName }); // Updated route
 
             const updatedImages = [...image];
 
             const uploadedImage: UploadedImages = {
-                file_id: response.data.file_id,
-                url: response.data.file_url,
+                file_id: response.data.data.file_id, // Updated to access data.data
+                url: response.data.data.file_url, // Updated to access data.data
             }
 
             updatedImages[index] = uploadedImage;
@@ -146,7 +185,7 @@ const CreateProduct = () => {
 
         try {
             // 1. Delete image from server
-            await axiosInstance.delete("/product/api/delete-product-image", {
+            await axiosInstance.delete("/product/api/images/delete", { // Updated route
                 data: { fileId: imageToDelete.file_id },
             });
 
@@ -170,8 +209,54 @@ const CreateProduct = () => {
 
     const countWords = (text: string) => text.trim().split(/\s+/).length;
 
-    const handleSaveDraft = () => {
+    const handleSaveDraft = async () => {
+        const formData = watch(); // Get all form values
+        
+        try {
+            setLoading(true);
+            
+            // Transform form data to match backend schema with Draft status
+            const productData = {
+                title: formData.title || "Untitled Product",
+                description: formData.description || "No description",
+                detailed_description: formData.detailed_description || "No detailed description",
+                warranty: formData.warranty || undefined,
+                custom_specifications: formData.custom_specifications || undefined,
+                slug: formData.slug || `draft-${Date.now()}`,
+                tags: typeof formData.tags === 'string' 
+                    ? formData.tags.split(',').map((tag: string) => tag.trim()).filter(Boolean)
+                    : formData.tags || [],
+                cash_on_delivery: formData.cash_on_delivery ?? true,
+                brand: formData.brand || undefined,
+                video_url: formData.video_url || undefined,
+                category: formData.category || "Uncategorized",
+                subCategory: formData.subCategory || "General",
+                colors: Array.isArray(formData.colors) ? formData.colors : [],
+                sizes: Array.isArray(formData.sizes) ? formData.sizes : [],
+                discountCodes: formData.discounts || undefined,
+                stock: parseInt(formData.stock) || 0,
+                sale_price: formData.sale_price ? parseFloat(formData.sale_price) : undefined,
+                regular_price: parseFloat(formData.regular_price) || 0,
+                customProperties: formData.customProperties || {},
+                images: image.filter((img): img is UploadedImages => img !== null),
+                status: 'Draft' as const, // Save as Draft
+            };
 
+            console.log("Saving draft:", productData);
+            
+            const response = await axiosInstance.post("/product/api/products", productData);
+            
+            toast.success("Product saved as draft!");
+            router.push("/dashboard/all-products");
+        } catch (error: any) {
+            console.error("Draft save error:", error);
+            const errorMessage = error?.response?.data?.message || 
+                               error?.response?.data?.error || 
+                               "Failed to save draft";
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
     }
 
 

@@ -501,14 +501,31 @@ export const getSellerProducts = async (
     const status = req.query.status as string;
     const search = req.query.search as string;
     const category = req.query.category as string;
+    const sortBy = req.query.sortBy as string;
 
     const whereClause: Prisma.productsWhereInput = {
       shopId,
-      isDeleted: false,
     };
 
+    // Handle status filter
     if (status && status !== 'all') {
-      whereClause.status = status as productStatus;
+      if (status === 'deleted') {
+        whereClause.isDeleted = true;
+      } else if (status === 'out_of_stock') {
+        whereClause.isDeleted = false;
+        whereClause.stock = 0;
+      } else if (status === 'active') {
+        whereClause.isDeleted = false;
+        whereClause.status = 'Active';
+      } else if (status === 'draft') {
+        whereClause.isDeleted = false;
+        whereClause.status = 'Draft';
+      } else {
+        whereClause.isDeleted = false;
+        whereClause.status = status as productStatus;
+      }
+    } else {
+      whereClause.isDeleted = false;
     }
 
     if (search) {
@@ -520,6 +537,29 @@ export const getSellerProducts = async (
 
     if (category && category !== 'all') {
       whereClause.category = category;
+    }
+
+    // Build orderBy clause based on sortBy parameter
+    let orderByClause: any = { createdAt: 'desc' };
+    if (sortBy) {
+      switch (sortBy) {
+        case 'price_asc':
+          orderByClause = { regular_price: 'asc' };
+          break;
+        case 'price_desc':
+          orderByClause = { regular_price: 'desc' };
+          break;
+        case 'popularity':
+          orderByClause = { totalSales: 'desc' };
+          break;
+        case 'rating':
+          orderByClause = { ratings: 'desc' };
+          break;
+        case 'newest':
+        default:
+          orderByClause = { createdAt: 'desc' };
+          break;
+      }
     }
 
     const [products, total] = await Promise.all([
@@ -544,7 +584,7 @@ export const getSellerProducts = async (
         },
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: orderByClause,
       }),
       prisma.products.count({ where: whereClause })
     ]);
@@ -554,9 +594,9 @@ export const getSellerProducts = async (
       data: {
         products,
         pagination: {
-          total,
           currentPage: page,
           totalPages: Math.ceil(total / limit),
+          totalCount: total,
           hasNext: page * limit < total,
           hasPrev: page > 1,
         }
@@ -930,6 +970,85 @@ export const validateCoupon = async (
   } catch (error) {
     console.error("Coupon validation error:", error);
     return next(error);
+  }
+};
+
+// =============================================
+// SELLER STATISTICS/ANALYTICS
+// =============================================
+
+export const getSellerProductsSummary = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const shopId = req.user?.shop?.id;
+    if (!shopId) {
+      return next(new AuthError("Unauthorized"));
+    }
+
+    // Get all statistics in parallel for better performance
+    const [
+      totalProducts,
+      activeProducts,
+      draftProducts,
+      outOfStockProducts,
+      deletedProducts,
+    ] = await Promise.all([
+      // Total products (excluding deleted)
+      prisma.products.count({
+        where: {
+          shopId,
+          isDeleted: false,
+        }
+      }),
+      // Active products
+      prisma.products.count({
+        where: {
+          shopId,
+          isDeleted: false,
+          status: 'Active',
+        }
+      }),
+      // Draft products
+      prisma.products.count({
+        where: {
+          shopId,
+          isDeleted: false,
+          status: 'Draft',
+        }
+      }),
+      // Out of stock products
+      prisma.products.count({
+        where: {
+          shopId,
+          isDeleted: false,
+          stock: 0,
+        }
+      }),
+      // Deleted products
+      prisma.products.count({
+        where: {
+          shopId,
+          isDeleted: true,
+        }
+      }),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalProducts,
+        activeProducts,
+        draftProducts,
+        outOfStockProducts,
+        deletedProducts,
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching seller products summary:", error);
+    next(error);
   }
 };
 

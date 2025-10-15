@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Package, ShoppingCart } from 'lucide-react';
+import { Search, Package } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useSellerProducts } from '@/hooks/useProducts';
+import { useSellerProductsForEvent } from '@/hooks/useEvents';
 
 
 interface Product {
@@ -22,10 +22,16 @@ interface Product {
   title: string;
   images: any[];
   regular_price: number;
+  current_price: number;
   sale_price?: number;
   stock: number;
   category: string;
-  eventId?: string;
+  eventId?: string | null;
+  event?: {
+    id: string;
+    title: string;
+    ending_date: Date;
+  };
 }
 
 interface ProductSelectionDialogProps {
@@ -48,7 +54,7 @@ export default function ProductSelectionDialog({
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading } = useSellerProducts({
+  const { data, isLoading } = useSellerProductsForEvent({
     search: debouncedSearch || undefined,
     page,
     limit: 20
@@ -185,10 +191,10 @@ export default function ProductSelectionDialog({
                           
                           <div className="flex items-center justify-between">
                             <div className="flex flex-col">
-                              {product.sale_price ? (
+                              {product.current_price < product.regular_price ? (
                                 <>
                                   <span className="text-sm font-semibold text-green-600">
-                                    ₹{product.sale_price.toLocaleString()}
+                                    ₹{product.current_price.toLocaleString()}
                                   </span>
                                   <span className="text-xs text-gray-500 line-through">
                                     ₹{product.regular_price.toLocaleString()}
@@ -206,9 +212,17 @@ export default function ProductSelectionDialog({
                             </Badge>
                           </div>
 
-                          <Badge variant="secondary" className="text-xs">
-                            {product.category}
-                          </Badge>
+                          <div className="flex items-center justify-between">
+                            <Badge variant="secondary" className="text-xs">
+                              {product.category}
+                            </Badge>
+                            
+                            {isDisabled && product.event && (
+                              <Badge variant="outline" className="text-xs text-orange-600">
+                                {product.event.title}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>

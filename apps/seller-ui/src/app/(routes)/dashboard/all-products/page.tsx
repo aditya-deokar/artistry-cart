@@ -4,13 +4,14 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from "@/components/ui/input"
 import { useReactTable, getCoreRowModel, getFilteredRowModel, flexRender } from "@tanstack/react-table"
 
-import { Search, Pencil, Trash, Eye, Plus, BarChart, Star, ChevronRight, ArchiveRestore } from "lucide-react"
+import { Search, Pencil, Trash, Eye, Plus, BarChart, Star, ChevronRight, ArchiveRestore, Loader2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useMemo, useState } from "react"
 
 
-import { useDeleteProduct, useRestoreProduct, useSellerProducts, useProductCategories } from "@/hooks/useProducts"
+import { useDeleteProduct, useRestoreProduct, useSellerProducts, useProductCategories, useSellerProductsSummary } from "@/hooks/useProducts"
+import { Product } from "@/types"
 import { 
     Select, 
     SelectContent, 
@@ -38,7 +39,7 @@ const AllProductsPage = () => {
     const [sortBy, setSortBy] = useState<string>("newest");
 
     // Get product categories
-    const { data: categories = [], isLoading: isCategoriesLoading } = useProductCategories();
+    const { data: categories = [] } = useProductCategories();
 
     // Get products with filtering
     const { data, isLoading: isProductLoading } = useSellerProducts({
@@ -49,6 +50,9 @@ const AllProductsPage = () => {
         page: currentPage,
         limit: 10
     });
+
+    // Get summary statistics (import at top)
+    const { data: summaryData } = useSellerProductsSummary();
 
     // Products data extraction with fallbacks for type safety
     const products = data?.products || [];
@@ -61,16 +65,16 @@ const AllProductsPage = () => {
     };
 
     // Delete Product Mutation - Updated with dialog close
-    const deleteMutation = useDeleteProduct();
+    const deleteMutation = useDeleteProduct(() => setDeleteDialogOpen(null));
 
     // Restore Product Mutation - Updated with dialog close
-    const restoreProductMutation = useRestoreProduct();
+    const restoreProductMutation = useRestoreProduct(() => setDeleteDialogOpen(null));
 
-    const columns = useMemo(() => [
+    const columns = useMemo<any[]>(() => [
         {
             accessorKey: "image",
             header: "Image",
-            cell: ({ row }: any) => (
+            cell: ({ row }: { row: { original: Product } }) => (
                 <Image
                     width={200}
                     height={200}
@@ -83,8 +87,8 @@ const AllProductsPage = () => {
         {
             accessorKey: "name",
             header: "Product Name",
-            cell: ({ row }: any) => {
-                const truncatedTitle = row.original.title.length > 25 ? `${row.original.title.substring(0, 15)}...` : row.original.title;
+            cell: ({ row }: { row: { original: Product } }) => {
+                const truncatedTitle = row.original.title.length > 30 ? `${row.original.title.substring(0, 30)}...` : row.original.title;
 
                 return (
                     <div className="flex items-center gap-2">
@@ -93,6 +97,7 @@ const AllProductsPage = () => {
                             className={`hover:underline ${row.original.isDeleted ? 'text-red-400 line-through' : 'text-blue-400'}`}
                             title={row.original.title}
                             target="_blank"
+                            rel="noopener noreferrer"
                         >
                             {truncatedTitle}
                         </Link>
@@ -112,7 +117,7 @@ const AllProductsPage = () => {
         {
             accessorKey: "price",
             header: "Price",
-            cell: ({ row }: any) => (
+            cell: ({ row }: { row: { original: Product } }) => (
                 <div className="flex flex-col">
                     <span className="font-medium">₹{row.original.sale_price || row.original.regular_price}</span>
                     {row.original.sale_price && row.original.sale_price < row.original.regular_price && (
@@ -124,7 +129,7 @@ const AllProductsPage = () => {
         {
             accessorKey: "stock",
             header: "Stock",
-            cell: ({ row }: any) => (
+            cell: ({ row }: { row: { original: Product } }) => (
                 <span
                     className={`${row.original.stock <= 10 ? 'text-red-500' : row.original.stock <= 20 ? 'text-amber-500' : 'text-green-500'} font-medium`}
                 >{row.original.stock} left</span>
@@ -133,7 +138,7 @@ const AllProductsPage = () => {
         {
             accessorKey: "category",
             header: "Category",
-            cell: ({ row }: any) => (
+            cell: ({ row }: { row: { original: Product } }) => (
                 <Badge variant="outline" className="capitalize">
                     {row.original.category}
                 </Badge>
@@ -142,7 +147,7 @@ const AllProductsPage = () => {
         {
             accessorKey: "rating",
             header: "Rating",
-            cell: ({ row }: any) => (
+            cell: ({ row }: { row: { original: Product } }) => (
                 <div className="flex items-center gap-1 text-amber-400">
                     <Star fill="#fde047" size={18} />
                     <span>{row.original.rating || 0}</span>
@@ -151,7 +156,7 @@ const AllProductsPage = () => {
         },
         {
             header: "Actions",
-            cell: ({ row }: any) => (
+            cell: ({ row }: { row: { original: Product } }) => (
                 <div className="flex gap-2">
                     <Link href={`/dashboard/product/${row.original.id}`}
                         className="text-blue-400 transition-all"
@@ -160,7 +165,7 @@ const AllProductsPage = () => {
                             <Eye size={16} />
                         </Button>
                     </Link>
-                    <Link href={`/dashboard/product/edit/${row.original.id}`}
+                    <Link href={`/dashboard/product/edit/${row.original.slug}`}
                         className="text-yellow-400 transition-all"
                     >
                         <Button
@@ -222,8 +227,17 @@ const AllProductsPage = () => {
                                                 deleteMutation.mutate(row?.original?.id);
                                             }}
                                         >
-                                            <Trash size={16} className="mr-2" />
-                                            {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                                            {deleteMutation.isPending ? (
+                                                <>
+                                                    <Loader2 size={16} className="mr-2 animate-spin" />
+                                                    Deleting...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Trash size={16} className="mr-2" />
+                                                    Delete
+                                                </>
+                                            )}
                                         </Button>
                                     </div>
                                 </div>
@@ -289,8 +303,17 @@ const AllProductsPage = () => {
                                                 restoreProductMutation.mutate(row?.original?.id);
                                             }}
                                         >
-                                            <ArchiveRestore size={16} className="mr-2" />
-                                            {restoreProductMutation.isPending ? "Restoring..." : "Restore"}
+                                            {restoreProductMutation.isPending ? (
+                                                <>
+                                                    <Loader2 size={16} className="mr-2 animate-spin" />
+                                                    Restoring...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <ArchiveRestore size={16} className="mr-2" />
+                                                    Restore
+                                                </>
+                                            )}
                                         </Button>
                                     </div>
                                     {restoreProductMutation.error && (
@@ -306,7 +329,7 @@ const AllProductsPage = () => {
                 </div>
             )
         }
-    ], [deleteDialogOpen, deleteMutation.isPending, deleteMutation.error, restoreProductMutation.isPending, restoreProductMutation.error]);
+    ], [deleteDialogOpen, deleteMutation.isPending, restoreProductMutation.isPending]);
 
     const table = useReactTable({
         data: products,
@@ -340,7 +363,9 @@ const AllProductsPage = () => {
                     <CardDescription>All products in your store</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <span className="text-3xl font-bold block">{pagination.totalCount || 0}</span>
+                    <span className="text-3xl font-bold block">
+                        {summaryData?.totalProducts ?? pagination.totalCount ?? 0}
+                    </span>
                 </CardContent>
             </Card>
             
@@ -350,11 +375,11 @@ const AllProductsPage = () => {
                     <CardDescription>Products needing replenishment</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {isProductLoading ? (
+                    {isProductLoading && !summaryData ? (
                         <Skeleton className="h-8 w-16" />
                     ) : (
                         <span className="text-3xl font-bold block text-amber-500">
-                            {products.filter(p => p.stock <= 0 && !p.isDeleted).length}
+                            {summaryData?.outOfStockProducts ?? products.filter(p => p.stock <= 0 && !p.isDeleted).length}
                         </span>
                     )}
                 </CardContent>
@@ -366,11 +391,11 @@ const AllProductsPage = () => {
                     <CardDescription>Recently removed products</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {isProductLoading ? (
+                    {isProductLoading && !summaryData ? (
                         <Skeleton className="h-8 w-16" />
                     ) : (
                         <span className="text-3xl font-bold block text-red-500">
-                            {products.filter(p => p.isDeleted).length}
+                            {summaryData?.deletedProducts ?? products.filter(p => p.isDeleted).length}
                         </span>
                     )}
                 </CardContent>

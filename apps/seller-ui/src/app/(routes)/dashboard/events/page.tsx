@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, Suspense, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { Plus, Search, Calendar, DollarSign, Percent, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,19 +14,15 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useSellerEvents } from '@/hooks/useEvents';
 import EventsTable from '@/components/events/eventsTable';
 import EventsTableSkeleton from '@/components/events/EventsTableSkeleton';
-import CreateEventDialog from '@/components/events/createEventDialog';
-import useSeller from '@/hooks/useSeller';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 
 function EventsContent() {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
   const [eventType, setEventType] = useState('ALL');
   const [dateRange, setDateRange] = useState<{from?: Date; to?: Date}>(); 
   const [page, setPage] = useState(1);
-
-  const { seller, isLoading: isSellerLoading } = useSeller();
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -42,8 +39,7 @@ function EventsContent() {
   const { data, isLoading, error } = useSellerEvents({
     page,
     limit: 10,
-    status,
-    shop_id: seller?.id || '', 
+    status: status !== 'all' ? status : undefined,
     event_type: eventType === 'ALL' ? undefined : eventType,
     search: debouncedSearch || undefined,
     ...apiDateParams
@@ -97,14 +93,6 @@ function EventsContent() {
     };
   }, [data?.events]);
 
-  if (isSellerLoading) {
-    return <div>Loading seller data...</div>;
-  }
-
-  if (!seller?.id) {
-    return <div className="text-red-500">Unable to fetch seller details.</div>;
-  }
-
   if (error) {
     throw error; 
   }
@@ -118,7 +106,7 @@ function EventsContent() {
             Create and manage promotional events for your products
           </p>
         </div>
-        <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={() => router.push('/dashboard/events/create')} className="bg-blue-600 hover:bg-blue-700">
           <Plus className="w-4 h-4 mr-2" />
           Create Event
         </Button>
@@ -221,7 +209,6 @@ function EventsContent() {
               <DatePickerWithRange
                 value={dateRange as DateRange}
                 onChange={(range) => setDateRange(range as any)}
-                placeholder="Filter by date"
               />
             </div>
           </div>
@@ -250,11 +237,6 @@ function EventsContent() {
           </Tabs>
         </CardContent>
       </Card>
-
-      <CreateEventDialog
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
-      />
     </div>
   );
 }

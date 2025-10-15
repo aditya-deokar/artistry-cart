@@ -78,8 +78,8 @@ export const useEvents = (params?: EventsParams) =>
     retry: 1,
   });
 
-// Seller events (require shop_id) with improved caching strategy
-export const useSellerEvents = (params: EventsParams & { shop_id: string }) =>
+// Seller events (authenticated) with improved caching strategy
+export const useSellerEvents = (params?: EventsParams) =>
   useQuery<EventsResponse, Error>({
     queryKey: ['events', 'seller', params],
     queryFn: () => fetchEvents('/product/api/events/seller/events', params),
@@ -125,7 +125,7 @@ export const useEventAnalytics = (eventId: string, dateRange?: { from: Date; to:
     staleTime: 5 * 60 * 1000,
   });
 
-// Create event with optimistic updates
+// Create event (basic - without products)
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
 
@@ -146,11 +146,33 @@ export const useCreateEvent = () => {
   });
 };
 
+// Create event with products (recommended)
+export const useCreateEventWithProducts = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<any, Error, CreateEventData>({
+    mutationFn: async (eventData) => {
+      const { data } = await axiosInstance.post('/product/api/events/with-products', eventData);
+      return data.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] }); // Invalidate products as their pricing may have changed
+      toast.success('Event created successfully with products and pricing');
+      return data;
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to create event');
+      throw error;
+    },
+  });
+};
+
 // Update event with optimistic updates
 export const useUpdateEvent = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Event, Error, { eventId: string; data: Partial<CreateEventData> }>({
+  return useMutation<Event, Error, { eventId: string; data: Partial<CreateEventData> }, { previousEvent?: Event }>({
     mutationFn: async ({ eventId, data }) => {
       const { data: response } = await axiosInstance.put(`/product/api/events/${eventId}`, data);
       return response.data;
@@ -175,6 +197,7 @@ export const useUpdateEvent = () => {
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['events', variables.eventId] });
+      queryClient.invalidateQueries({ queryKey: ['products'] }); // Invalidate products as their pricing may have changed
       toast.success('Event updated successfully');
       return data;
     },
@@ -193,7 +216,7 @@ export const useUpdateEvent = () => {
 export const useDeleteEvent = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, string>({
+  return useMutation<void, Error, string, { previousEvents?: EventsResponse }>({
     mutationFn: async (eventId) => {
       await axiosInstance.delete(`/product/api/events/${eventId}`);
     },
@@ -216,6 +239,7 @@ export const useDeleteEvent = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] }); // Invalidate products as their pricing reverts
       toast.success('Event deleted successfully');
     },
     onError: (error: any, eventId, context) => {
@@ -278,16 +302,16 @@ export const useUpdateEventProducts = () => {
   });
 };
 
-// Fetch seller products for event creation
-export const useSellerProductsForEvent = (shopId: string, enabled: boolean = false) => 
+// Fetch seller products for event creation (authenticated route - no shopId needed)
+export const useSellerProductsForEvent = (params?: { search?: string; category?: string; page?: number; limit?: number }, enabled: boolean = true) => 
   useQuery<any, Error>({
-    queryKey: ['events', 'seller-products', shopId],
+    queryKey: ['events', 'seller-products', params],
     queryFn: async () => {
       const { data } = await axiosInstance.get('/product/api/events/seller/products', { 
-        params: { shop_id: shopId } 
+        params 
       });
       return data.data;
     },
-    enabled: !!shopId && enabled,
+    enabled: enabled,
     staleTime: 5 * 60 * 1000,
   });

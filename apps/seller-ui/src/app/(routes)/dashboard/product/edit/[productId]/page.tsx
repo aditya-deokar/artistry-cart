@@ -5,15 +5,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CashOnDeliverySelector from '@/shared/components/cash-on-delivery';
 import ColorSector from '@/shared/components/color-selector';
-import CustomProperties from '@/shared/components/custom-properties';
 import CustomSpecifications from '@/shared/components/custom-specifications';
 import ImagePlaceholder from '@/shared/components/image-placeholders';
 import Input from '@/shared/components/inputs/input';
 import { TextEditor } from '@/shared/components/rich-editor';
 import SizeSelector from '@/shared/components/size-selector';
-import { useProductCategories, useProductDetails } from '@/hooks/useProducts';
+import { useProductDetails } from '@/hooks/useProducts';
 import axiosInstance from '@/utils/axiosinstance';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, Loader2, Save } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -68,27 +67,18 @@ const EditProduct = () => {
     // Fetch product data
     const { data: product, isLoading: isProductLoading } = useProductDetails(productId);
     
-    // Fetch categories
-    const { data: categories = [], isLoading: isCategoriesLoading } = useProductCategories();
+    // Fetch categories and subcategories from API
+    const { data: categoriesData, isLoading: isCategoriesLoading } = useQuery({
+        queryKey: ["categories"],
+        queryFn: async () => {
+            const res = await axiosInstance.get("/product/api/categories");
+            return res.data.data;
+        },
+        staleTime: 1000 * 60 * 5,
+    });
     
-    // State for subcategories (since the API returns only main categories)
-    const [subcategories, setSubcategories] = useState<string[]>([]);
-    
-    // For simplicity, let's define some common subcategories for demonstration
-    // In a real app, you would fetch these from your API
-    const getSubcategories = useMemo(() => {
-        return (category: string): string[] => {
-            const subcategoriesMap: Record<string, string[]> = {
-                'Painting': ['Oil', 'Acrylic', 'Watercolor', 'Digital'],
-                'Sculpture': ['Wood', 'Metal', 'Clay', 'Stone'],
-                'Jewelry': ['Necklace', 'Earrings', 'Rings', 'Bracelets'],
-                'Photography': ['Nature', 'Portrait', 'Urban', 'Abstract'],
-                'Digital Art': ['2D', '3D', 'Animation', 'Mixed Media'],
-            };
-            
-            return subcategoriesMap[category] || [];
-        };
-    }, []);
+    const categories = categoriesData?.categories || [];
+    const subCategoriesData = categoriesData?.subCategories || {};
 
     // Form setup
     const { register, control, watch, setValue, handleSubmit, reset, formState: { errors } } = useForm<ProductFormData>({
@@ -116,13 +106,11 @@ const EditProduct = () => {
 
     // Watch for key fields
     const selectedCategory = watch("category");
-
-    // Update subcategories when category changes
-    useEffect(() => {
-        if (selectedCategory) {
-            setSubcategories(getSubcategories(selectedCategory));
-        }
-    }, [selectedCategory, getSubcategories]);
+    
+    // Calculate subcategories based on selected category
+    const subcategories = useMemo(() => {
+        return selectedCategory ? subCategoriesData[selectedCategory] || [] : [];
+    }, [selectedCategory, subCategoriesData]);
 
     // Update form when product data is loaded
     useEffect(() => {
@@ -130,7 +118,10 @@ const EditProduct = () => {
             console.log('Product data loaded:', product);
             
             // Cast product to any to access all properties
-            const productData = product as ProductApiResponse;
+            // Check if product has a nested 'product' property
+            const productData = (product as any).product || product as ProductApiResponse;
+            
+            console.log('Actual product data:', productData);
             
             // Extract tags (if they exist)
             let tagsString = '';
@@ -148,9 +139,9 @@ const EditProduct = () => {
                 category: productData.category || '',
                 subCategory: productData.subCategory || '',
                 slug: productData.slug || '',
-                regular_price: productData.regular_price || 0,
-                sale_price: productData.sale_price || 0,
-                stock: productData.stock || 0,
+                regular_price: Number(productData.regular_price) || 0,
+                sale_price: Number(productData.sale_price) || 0,
+                stock: Number(productData.stock) || 0,
                 colors: Array.isArray(productData.colors) ? productData.colors : [],
                 sizes: Array.isArray(productData.sizes) ? productData.sizes : [],
                 cash_on_delivery: productData.cash_on_delivery !== false,
@@ -160,25 +151,20 @@ const EditProduct = () => {
                 custom_specifications: productData.custom_specifications || [],
             };
 
-            // Reset form with gathered data
+            console.log('Form data prepared:', formData);
+
+            // Reset form with gathered data - this sets all default values
             reset(formData);
             
-            // Set each field individually to ensure values are applied
-            Object.keys(formData).forEach(key => {
-                setValue(key as keyof ProductFormData, formData[key as keyof typeof formData]);
-            });
-            
-            // Update subcategories if a category is selected
-            if (productData.category) {
-                setSubcategories(getSubcategories(productData.category));
-            }
-            
             // Set images
+            console.log('Product images:', productData.images);
             if (productData.images && Array.isArray(productData.images) && productData.images.length > 0) {
                 const productImages = productData.images.map((img: any) => ({
                     file_id: img.file_id,
                     url: img.url
                 }));
+                
+                console.log('Mapped product images:', productImages);
                 
                 if (productImages.length < 8) {
                     productImages.push(null); // Add an empty placeholder if less than 8 images
@@ -186,11 +172,19 @@ const EditProduct = () => {
                 
                 setImage(productImages);
                 // Set images without nulls for the form data
-                const validImages = productImages.filter(img => img !== null) as UploadedImages[];
+                const validImages = productImages.filter((img: UploadedImages | null) => img !== null) as UploadedImages[];
                 setValue('images', validImages);
+                
+                console.log('Images set successfully. Total images:', productImages.length - 1);
+            } else {
+                console.log('No images found or images array is empty');
+                // Still set an empty placeholder
+                setImage([null]);
             }
+
+            console.log('Form values set successfully');
         }
-    }, [product, reset, setValue, getSubcategories]);
+    }, [product, reset, setValue]);
 
     // Handle form submission
     const updateProductMutation = useMutation({
@@ -218,10 +212,10 @@ const EditProduct = () => {
             ...data,
             tags: tagsArray,
             // Ensure we only submit non-null images
-            images: image.filter(img => img !== null) as UploadedImages[]
+            images: image.filter((img): img is UploadedImages => img !== null)
         };
         
-        updateProductMutation.mutate(submitData as ProductFormData);
+        updateProductMutation.mutate(submitData as any);
     };
 
     // Image handling functions
@@ -239,11 +233,11 @@ const EditProduct = () => {
 
         try {
             const fileName = await convertFileBase64(file);
-            const response = await axiosInstance.post("/product/api/upload-product-image", { fileName });
+            const response = await axiosInstance.post("/product/api/images/upload", { fileName });
 
             const uploadedImage: UploadedImages = {
-                file_id: response.data.file_id,
-                url: response.data.file_url,
+                file_id: response.data.data.file_id,
+                url: response.data.data.file_url,
             };
 
             const updatedImages = [...image];
@@ -257,9 +251,11 @@ const EditProduct = () => {
             // Filter out nulls for the form value
             setValue("images", updatedImages.filter(img => img !== null) as UploadedImages[]);
             setIsChanged(true);
-        } catch (error) {
-            console.log(error);
-            toast.error("Failed to upload image");
+            toast.success("Image uploaded successfully");
+        } catch (error: any) {
+            console.error('Image upload error:', error);
+            console.error('Error response:', error.response?.data);
+            toast.error(error.response?.data?.message || "Failed to upload image");
         }
     };
 
@@ -270,7 +266,7 @@ const EditProduct = () => {
         if (!imageToDelete || typeof imageToDelete !== "object") return;
 
         try {
-            await axiosInstance.delete("/product/api/delete-product-image", {
+            await axiosInstance.delete("/product/api/images/delete", {
                 data: { fileId: imageToDelete.file_id },
             });
 
@@ -284,8 +280,11 @@ const EditProduct = () => {
             // Filter out nulls for the form value
             setValue("images", updatedImages.filter(img => img !== null) as UploadedImages[]);
             setIsChanged(true);
-        } catch (error) {
-            toast.error("Failed to delete image. Please try again.");
+            toast.success("Image deleted successfully");
+        } catch (error: any) {
+            console.error('Image deletion error:', error);
+            console.error('Error response:', error.response?.data);
+            toast.error(error.response?.data?.message || "Failed to delete image. Please try again.");
         }
     };
 
@@ -315,9 +314,6 @@ const EditProduct = () => {
             </div>
         );
     }
-
-    // Safely access product data with type casting
-    const productData = product as ProductApiResponse;
 
     return (
         <form className='w-full mx-auto shadow-md p-8 rounded-lg'

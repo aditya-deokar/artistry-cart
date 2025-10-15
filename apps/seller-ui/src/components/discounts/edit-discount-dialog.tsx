@@ -41,19 +41,18 @@ import { Calendar } from '@/components/ui/calendar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { DiscountCode } from '@/types';
-import { toast } from 'sonner';
 import { useUpdateDiscount } from '@/hooks/useDiscounts';
 
 const editDiscountSchema = z.object({
   publicName: z.string().min(1, 'Name is required').max(100, 'Name too long'),
-  description: z.string().max(500, 'Description too long').optional(),
+  description: z.string().max(500, 'Description too long').optional().or(z.literal('')),
   discountType: z.enum(['PERCENTAGE', 'FIXED_AMOUNT', 'FREE_SHIPPING']),
   discountValue: z.number().min(0),
-  minimumOrderAmount: z.number().min(0).optional(),
-  maximumDiscountAmount: z.number().min(0).optional(),
-  usageLimit: z.number().min(1).optional(),
-  usageLimitPerUser: z.number().min(1).optional(),
-  validUntil: z.date().optional(),
+  minimumOrderAmount: z.number().min(0).optional().nullable(),
+  maximumDiscountAmount: z.number().min(0).optional().nullable(),
+  usageLimit: z.number().min(1).optional().nullable(),
+  usageLimitPerUser: z.number().min(1).optional().nullable(),
+  validUntil: z.date().optional().nullable(),
   isActive: z.boolean(),
 }).refine(data => {
   if (data.discountType === 'PERCENTAGE' && data.discountValue > 100) {
@@ -63,6 +62,15 @@ const editDiscountSchema = z.object({
 }, {
   message: "Percentage discount cannot exceed 100%",
   path: ["discountValue"],
+}).refine(data => {
+  // If validUntil is set, it must be in the future
+  if (data.validUntil && data.validUntil < new Date()) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Expiry date must be in the future",
+  path: ["validUntil"],
 });
 
 type EditDiscountFormData = z.infer<typeof editDiscountSchema>;
@@ -78,61 +86,90 @@ export default function EditDiscountDialog({ discount, isOpen, onClose }: EditDi
   
   const updateDiscount = useUpdateDiscount();
 
+  const handleClose = () => {
+    setIsCalendarOpen(false);
+    onClose();
+  };
+
   const form = useForm<EditDiscountFormData>({
     resolver: zodResolver(editDiscountSchema),
     defaultValues: {
-      publicName: discount.publicName,
+      publicName: discount.publicName || '',
       description: discount.description || '',
-      discountType: discount.discountType,
-      discountValue: discount.discountValue,
-      minimumOrderAmount: discount.minimumOrderAmount,
-      maximumDiscountAmount: discount.maximumDiscountAmount,
-      usageLimit: discount.usageLimit,
-      usageLimitPerUser: discount.usageLimitPerUser,
-      validUntil: discount.validUntil ? new Date(discount.validUntil) : undefined,
-      isActive: discount.isActive,
+      discountType: discount.discountType || 'PERCENTAGE',
+      discountValue: discount.discountValue || 0,
+      minimumOrderAmount: discount.minimumOrderAmount ?? null,
+      maximumDiscountAmount: discount.maximumDiscountAmount ?? null,
+      usageLimit: discount.usageLimit ?? null,
+      usageLimitPerUser: discount.usageLimitPerUser ?? null,
+      validUntil: discount.validUntil ? new Date(discount.validUntil) : null,
+      isActive: discount.isActive ?? true,
     },
   });
 
   useEffect(() => {
-    if (discount) {
+    if (discount && isOpen) {
       form.reset({
-        publicName: discount.publicName,
+        publicName: discount.publicName || '',
         description: discount.description || '',
-        discountType: discount.discountType,
-        discountValue: discount.discountValue,
-        minimumOrderAmount: discount.minimumOrderAmount,
-        maximumDiscountAmount: discount.maximumDiscountAmount,
-        usageLimit: discount.usageLimit,
-        usageLimitPerUser: discount.usageLimitPerUser,
-        validUntil: discount.validUntil ? new Date(discount.validUntil) : undefined,
-        isActive: discount.isActive,
+        discountType: discount.discountType || 'PERCENTAGE',
+        discountValue: discount.discountValue || 0,
+        minimumOrderAmount: discount.minimumOrderAmount ?? null,
+        maximumDiscountAmount: discount.maximumDiscountAmount ?? null,
+        usageLimit: discount.usageLimit ?? null,
+        usageLimitPerUser: discount.usageLimitPerUser ?? null,
+        validUntil: discount.validUntil ? new Date(discount.validUntil) : null,
+        isActive: discount.isActive ?? true,
       });
     }
-  }, [discount, form]);
+  }, [discount, isOpen, form]);
 
   const discountType = form.watch('discountType');
   const hasBeenUsed = discount.currentUsageCount > 0;
 
   const onSubmit = async (data: EditDiscountFormData) => {
     try {
+      // Prepare data for API, removing null values and converting date
+      const updateData: any = {
+        publicName: data.publicName,
+        description: data.description || undefined,
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+        isActive: data.isActive,
+      };
+
+      // Only include optional fields if they have values
+      if (data.minimumOrderAmount !== null && data.minimumOrderAmount !== undefined) {
+        updateData.minimumOrderAmount = data.minimumOrderAmount;
+      }
+      if (data.maximumDiscountAmount !== null && data.maximumDiscountAmount !== undefined) {
+        updateData.maximumDiscountAmount = data.maximumDiscountAmount;
+      }
+      if (data.usageLimit !== null && data.usageLimit !== undefined) {
+        updateData.usageLimit = data.usageLimit;
+      }
+      if (data.usageLimitPerUser !== null && data.usageLimitPerUser !== undefined) {
+        updateData.usageLimitPerUser = data.usageLimitPerUser;
+      }
+      if (data.validUntil) {
+        updateData.validUntil = data.validUntil.toISOString();
+      }
+
       await updateDiscount.mutateAsync({
         discountId: discount.id,
-        data: {
-          ...data,
-          validUntil: data.validUntil?.toISOString(),
-        }
+        data: updateData
       });
       
-      toast.success('Discount code updated successfully!');
-      onClose();
+      handleClose();
+      // Toast is already shown by the hook
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update discount code');
+      // Error toast is already shown by the hook
+      console.error('Failed to update discount:', error);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
@@ -307,10 +344,13 @@ export default function EditDiscountDialog({ discount, isOpen, onClose }: EditDi
                             type="number"
                             placeholder="500"
                             min="0"
-                            {...field}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                            value={field.value ?? ''}
+                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                           />
                         </FormControl>
+                        <FormDescription>
+                          Optional: Leave empty for no minimum
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -327,13 +367,13 @@ export default function EditDiscountDialog({ discount, isOpen, onClose }: EditDi
                             type="number"
                             placeholder="1000"
                             min="0"
-                            {...field}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                            value={field.value ?? ''}
+                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                             disabled={discountType !== 'PERCENTAGE'}
                           />
                         </FormControl>
                         <FormDescription>
-                          For percentage discounts only
+                          For percentage discounts only (optional)
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -351,13 +391,21 @@ export default function EditDiscountDialog({ discount, isOpen, onClose }: EditDi
                             type="number"
                             placeholder="100"
                             min={discount.currentUsageCount || 1}
-                            {...field}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                            value={field.value ?? ''}
+                            onChange={(e) => {
+                              const value = e.target.value ? Number(e.target.value) : null;
+                              // Ensure value is not less than current usage
+                              if (value !== null && hasBeenUsed && value < discount.currentUsageCount) {
+                                return;
+                              }
+                              field.onChange(value);
+                            }}
                           />
                         </FormControl>
                         <FormDescription>
                           Current usage: {discount.currentUsageCount}
                           {hasBeenUsed && ' (Cannot set below current usage)'}
+                          {!hasBeenUsed && ' (Leave empty for unlimited)'}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -375,10 +423,13 @@ export default function EditDiscountDialog({ discount, isOpen, onClose }: EditDi
                             type="number"
                             placeholder="1"
                             min="1"
-                            {...field}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                            value={field.value ?? ''}
+                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                           />
                         </FormControl>
+                        <FormDescription>
+                          Optional: Leave empty for unlimited per user
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -413,14 +464,35 @@ export default function EditDiscountDialog({ discount, isOpen, onClose }: EditDi
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
-                            selected={field.value}
+                            selected={field.value ?? undefined}
                             onSelect={(date) => {
-                              field.onChange(date);
+                              field.onChange(date ?? null);
                               setIsCalendarOpen(false);
                             }}
-                            disabled={(date) => date < new Date()}
+                            disabled={(date) => {
+                              // Disable dates before today (but allow today)
+                              const today = new Date();
+                              today.setHours(0, 0, 0, 0);
+                              return date < today;
+                            }}
                             initialFocus
                           />
+                          {field.value && (
+                            <div className="p-3 border-t">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  field.onChange(null);
+                                  setIsCalendarOpen(false);
+                                }}
+                                className="w-full"
+                              >
+                                Clear date
+                              </Button>
+                            </div>
+                          )}
                         </PopoverContent>
                       </Popover>
                       <FormDescription>
@@ -434,7 +506,7 @@ export default function EditDiscountDialog({ discount, isOpen, onClose }: EditDi
             </div>
 
             <div className="flex justify-end space-x-2 pt-6 border-t">
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button type="button" variant="outline" onClick={handleClose} disabled={updateDiscount.isPending}>
                 Cancel
               </Button>
               <Button 

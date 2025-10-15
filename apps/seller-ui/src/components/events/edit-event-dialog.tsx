@@ -105,7 +105,7 @@ export default function EditEventDialog({
   const updateEventProducts = useUpdateEventProducts();
   const { data: eventDetails } = useEvent(event.id);
   const { data: sellerProductsData, isLoading: isSellerProductsLoading } =
-    useSellerProductsForEvent(event.shopId, isOpen);
+    useSellerProductsForEvent({}, !!isOpen);
 
   const form = useForm<EditEventFormData>({
     resolver: zodResolver(editEventSchema),
