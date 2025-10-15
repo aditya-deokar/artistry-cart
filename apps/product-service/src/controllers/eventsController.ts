@@ -21,6 +21,7 @@ const createEventSchema = z.object({
   min_order_value: z.number().min(0).optional(),
   starting_date: z.string().datetime(),
   ending_date: z.string().datetime(),
+  is_active: z.boolean().optional().default(true),
   product_ids: z.array(z.string()).optional(),
   product_pricing: z.array(z.object({
     productId: z.string(),
@@ -56,6 +57,7 @@ const createEventWithProductsSchema = z.object({
   ending_date: z.string().datetime({
     message: 'Invalid end date format'
   }),
+  is_active: z.boolean().optional().default(true),
   product_ids: z.array(z.string()).min(1, 'At least one product is required'),
   product_pricing: z.array(z.object({
     productId: z.string(),
@@ -265,6 +267,7 @@ export const createEvent = async (
           min_order_value: validatedData.min_order_value,
           starting_date: startDate,
           ending_date: endDate,
+          is_active: validatedData.is_active ?? true,
           sellerId,
           shopId,
         },

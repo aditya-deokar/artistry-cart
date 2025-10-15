@@ -44,8 +44,9 @@ export const useProductDetails = (productId: string) => {
   return useQuery<Product, Error>({
     queryKey: ['product', productId],
     queryFn: async () => {
-      const { data } = await axiosInstance.get(`/product/api/products/${productId}`);
-      return data.data;
+      const { data } = await axiosInstance.get(`/product/api/product/${productId}`);
+      // API returns { product: {...} } not { data: {...} }
+      return data.product || data.data || data;
     },
     enabled: !!productId,
     staleTime: 5 * 60 * 1000, // 5 minutes

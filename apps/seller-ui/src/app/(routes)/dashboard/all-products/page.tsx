@@ -165,7 +165,7 @@ const AllProductsPage = () => {
                             <Eye size={16} />
                         </Button>
                     </Link>
-                    <Link href={`/dashboard/product/edit/${row.original.id}`}
+                    <Link href={`/dashboard/product/edit/${row.original.slug}`}
                         className="text-yellow-400 transition-all"
                     >
                         <Button

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -45,9 +45,8 @@ import { cn } from '@/lib/utils';
 
 import { toast } from 'sonner';
 import ProductSelectionDialog from './product-selection-dialog';
-import { useCreateEvent } from '@/hooks/useEvents';
+import { useCreateEventWithProducts } from '@/hooks/useEvents';
 import axiosInstance from '@/utils/axiosinstance';
-import { useSellerProducts } from '@/hooks/useProducts';
 
 // Event schema with product selection
 const eventSchema = z.object({
@@ -93,10 +92,8 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
 
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState(false); // Add loading state
-  
 
-  const createEvent = useCreateEvent();
+  const createEvent = useCreateEventWithProducts();
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
@@ -144,43 +141,64 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
   };
 
 
-  // const { data , isLoading } = useSellerProducts();
+  // Convert file to base64 (same as product image upload)
+  const convertFileBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
   const handleImageUpload = async (file: File) => {
+    if (!file) return;
+
     setUploadingImage(true);
     try {
-      const formData = new FormData();
-      formData.append('image', file);
+      // Convert file to base64
+      const image = await convertFileBase64(file);
 
-      // Replace with your actual upload endpoint
-      const response = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
+      // Upload using the same endpoint as product images
+      const response = await axiosInstance.post("/product/api/images/upload", { image });
 
-      if (!response.ok) throw new Error('Upload failed');
+      const uploadedImage = {
+        file_id: response.data.data.file_id,
+        url: response.data.data.file_url,
+      };
 
-      const data = await response.json();
-
-      form.setValue('banner_image', {
-        url: data.url,
-        file_id: data.file_id,
-      });
+      form.setValue('banner_image', uploadedImage);
 
       toast.success('Banner image uploaded successfully');
-    } catch (error) {
-      toast.error('Failed to upload image');
+    } catch (error: any) {
+      console.error('Image upload error:', error);
+      toast.error(error?.response?.data?.message || 'Failed to upload image');
     } finally {
       setUploadingImage(false);
     }
   };
 
-  const removeBannerImage = () => {
-    form.setValue('banner_image', undefined);
-  };
+  const removeBannerImage = async () => {
+    const currentImage = form.getValues('banner_image');
+    
+    if (!currentImage?.file_id) {
+      form.setValue('banner_image', undefined);
+      return;
+    }
 
-  const removeProduct = (productId: string) => {
-    setSelectedProductIds(prev => prev.filter(id => id !== productId));
+    try {
+      // Delete image from server (same as product images)
+      await axiosInstance.delete("/product/api/images/delete", {
+        data: { fileId: currentImage.file_id },
+      });
+
+      form.setValue('banner_image', undefined);
+      toast.success('Banner image removed successfully');
+    } catch (error: any) {
+      console.error('Image deletion error:', error);
+      toast.error('Failed to delete image. Please try again.');
+    }
   };
 
   const applySuggestedDiscount = () => {
@@ -192,23 +210,29 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
 
   const onSubmit = async (data: EventFormData) => {
     try {
+      // Validate that at least one product is selected
+      if (selectedProductIds.length === 0) {
+        toast.error('Please select at least one product for the event');
+        return;
+      }
+
       await createEvent.mutateAsync({
         ...data,
         starting_date: data.starting_date.toISOString(),
         ending_date: data.ending_date.toISOString(),
         product_ids: selectedProductIds, // Include selected products
-        is_active: true, // Set default active status
+        is_active: data.is_active,
       });
 
-      toast.success('Event created successfully!');
-
+      // Success message is handled by the hook
       // Reset form and state
       form.reset();
       setSelectedProductIds([]);
       setSelectedProducts([]);
       onClose();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to create event');
+      // Error message is handled by the hook
+      console.error('Failed to create event:', error);
     }
   };
 
@@ -442,6 +466,7 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
                             <PopoverTrigger asChild>
                               <FormControl>
                                 <Button
+                                  type="button"
                                   variant="outline"
                                   className={cn(
                                     'w-full pl-3 text-left font-normal',
@@ -449,7 +474,9 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
                                   )}
                                 >
                                   {field.value ? (
-                                    format(field.value, 'PPP')
+                                    <span className="text-foreground">
+                                      {format(field.value, 'PPP')}
+                                    </span>
                                   ) : (
                                     <span>Pick start date</span>
                                   )}
@@ -457,16 +484,22 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
+                            <PopoverContent 
+                              className="w-auto p-0" 
+                              align="start"
+                            >
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={(date) => {
-                                  field.onChange(date);
-                                  setIsStartCalendarOpen(false);
+                                  if (date) {
+                                    field.onChange(date);
+                                    setIsStartCalendarOpen(false);
+                                  }
                                 }}
                                 disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                                 initialFocus
+                                defaultMonth={field.value}
                               />
                             </PopoverContent>
                           </Popover>
@@ -488,6 +521,7 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
                             <PopoverTrigger asChild>
                               <FormControl>
                                 <Button
+                                  type="button"
                                   variant="outline"
                                   className={cn(
                                     'w-full pl-3 text-left font-normal',
@@ -495,7 +529,9 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
                                   )}
                                 >
                                   {field.value ? (
-                                    format(field.value, 'PPP')
+                                    <span className="text-foreground">
+                                      {format(field.value, 'PPP')}
+                                    </span>
                                   ) : (
                                     <span>Pick end date</span>
                                   )}
@@ -503,19 +539,25 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
+                            <PopoverContent 
+                              className="w-auto p-0" 
+                              align="start"
+                            >
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={(date) => {
-                                  field.onChange(date);
-                                  setIsEndCalendarOpen(false);
+                                  if (date) {
+                                    field.onChange(date);
+                                    setIsEndCalendarOpen(false);
+                                  }
                                 }}
                                 disabled={(date) => {
                                   const minDate = selectedStartDate || new Date();
                                   return date <= minDate;
                                 }}
                                 initialFocus
+                                defaultMonth={field.value || selectedStartDate}
                               />
                             </PopoverContent>
                           </Popover>
@@ -556,19 +598,7 @@ export default function CreateEventDialog({ isOpen, onClose }: CreateEventDialog
                     </Button>
                   </div>
 
-                  {loadingProducts ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {selectedProductIds.map((_, index) => (
-                        <Card key={index} className="animate-pulse">
-                          <CardContent className="p-3">
-                            <div className="bg-gray-200 h-20 rounded mb-2"></div>
-                            <div className="bg-gray-200 h-4 rounded w-3/4 mb-1"></div>
-                            <div className="bg-gray-200 h-3 rounded w-1/2"></div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : selectedProducts.length > 0 ? (
+                  {selectedProducts.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-60 overflow-y-auto">
                       {selectedProducts.map((product: any) => (
                         <Card key={product.id} className="relative">
