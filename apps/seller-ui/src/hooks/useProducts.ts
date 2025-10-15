@@ -93,7 +93,7 @@ export const useUpdateProductStock = () => {
 };
 
 // Delete product
-export const useDeleteProduct = () => {
+export const useDeleteProduct = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
   
   return useMutation<void, Error, string>({
@@ -103,6 +103,9 @@ export const useDeleteProduct = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['seller-products'] });
       toast.success('Product deleted successfully');
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to delete product');
@@ -111,7 +114,7 @@ export const useDeleteProduct = () => {
 };
 
 // Restore deleted product
-export const useRestoreProduct = () => {
+export const useRestoreProduct = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
   
   return useMutation<Product, Error, string>({
@@ -122,6 +125,9 @@ export const useRestoreProduct = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['seller-products'] });
       toast.success('Product restored successfully');
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to restore product');
@@ -151,5 +157,23 @@ export const useProductCategories = () => {
       return data.data.categories;
     },
     staleTime: 60 * 60 * 1000, // 1 hour
+  });
+};
+
+// Get seller products summary/statistics
+export const useSellerProductsSummary = () => {
+  return useQuery<{
+    totalProducts: number;
+    activeProducts: number;
+    draftProducts: number;
+    outOfStockProducts: number;
+    deletedProducts: number;
+  }, Error>({
+    queryKey: ['seller-products-summary'],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get('/product/api/seller/products/summary');
+      return data.data;
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };

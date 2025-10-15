@@ -47,9 +47,15 @@ export interface Product {
   images: any[];
   regular_price: number;
   sale_price?: number;
+  current_price?: number;
   category: string;
-  ratings: number;
+  ratings?: number;
+  rating?: number;
   stock: number;
+  status?: string;
+  isDeleted?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateEventData {

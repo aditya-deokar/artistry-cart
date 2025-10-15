@@ -67,7 +67,7 @@ export const useCreateDiscount = () => {
   
   return useMutation<DiscountCode, Error, CreateDiscountData>({
     mutationFn: async (discountData: CreateDiscountData): Promise<DiscountCode> => {
-      const { data } = await axiosInstance.post('/product/api/discounts/create', discountData);
+      const { data } = await axiosInstance.post('/product/api/discounts', discountData); // Updated route
       return data.data;
     },
     onSuccess: () => {
@@ -86,7 +86,7 @@ export const useUpdateDiscount = () => {
   
   return useMutation<DiscountCode, Error, { discountId: string; data: Partial<CreateDiscountData> }>({
     mutationFn: async ({ discountId, data }): Promise<DiscountCode> => {
-      const response = await axiosInstance.put(`/product/api/discounts/update/${discountId}`, data);
+      const response = await axiosInstance.put(`/product/api/discounts/${discountId}`, data); // Updated route
       return response.data.data;
     },
     onMutate: async ({ discountId, data }) => {
@@ -127,7 +127,7 @@ export const useDeleteDiscount = () => {
   
   return useMutation<void, Error, string>({
     mutationFn: async (discountId: string): Promise<void> => {
-      await axiosInstance.delete(`/product/api/discounts/delete/${discountId}`);
+      await axiosInstance.delete(`/product/api/discounts/${discountId}`); // Updated route
     },
     onMutate: async (discountId) => {
       // Cancel outgoing refetches to avoid optimistic update being overwritten
@@ -183,7 +183,8 @@ export const useToggleDiscountActive = () => {
   
   return useMutation<DiscountCode, Error, { discountId: string; isActive: boolean }>({
     mutationFn: async ({ discountId, isActive }) => {
-      const { data } = await axiosInstance.patch(`/product/api/discounts/${discountId}/toggle-active`, { 
+      // Use the update endpoint with isActive field
+      const { data } = await axiosInstance.put(`/product/api/discounts/${discountId}`, { 
         isActive 
       });
       return data.data;

@@ -16,7 +16,7 @@ import DiscountsTable from '@/components/discounts/DiscountsTable';
 function DiscountsContent() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('all');
+  const [status, setStatus] = useState<'active' | 'expired' | 'scheduled' | 'all'>('all');
   const [discountType, setDiscountType] = useState('ALL');
   const [page, setPage] = useState(1);
 
@@ -25,8 +25,8 @@ function DiscountsContent() {
   const { data, isLoading, error } = useSellerDiscounts({
     page,
     limit: 10,
-    status,
-    discount_type: discountType || undefined,
+    status: status !== 'all' ? status : undefined,
+    discount_type: discountType !== 'ALL' ? discountType : undefined,
     search: debouncedSearch || undefined,
   });
 
@@ -76,7 +76,7 @@ function DiscountsContent() {
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs value={status} onValueChange={setStatus} className="w-full">
+          <Tabs value={status} onValueChange={(value) => setStatus(value as 'active' | 'expired' | 'scheduled' | 'all')} className="w-full">
             <TabsList>
               <TabsTrigger value="all">All Codes</TabsTrigger>
               <TabsTrigger value="active">Active</TabsTrigger>
