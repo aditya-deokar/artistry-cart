@@ -6,7 +6,7 @@ import { Poppins, Raleway, Roboto} from "next/font/google"
 import Providers from './Providers';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 
-import ReactLenis from "lenis/react";
+// import ReactLenis from "lenis/react";
 import Header from '@/shared/widgets/header';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -49,7 +49,7 @@ export default function RootLayout({
     <ViewTransitions>
       <html lang="en" suppressHydrationWarning> 
         <body className={`${roboto.variable} ${poppins.variable} ${raleway.variable} ${gambarino.variable} antialiased`} suppressHydrationWarning>
-           <ReactLenis root options={{ lerp: 0.05, smoothWheel: true }} >
+           
 
             <ThemeProvider
               attribute="class"
@@ -64,7 +64,7 @@ export default function RootLayout({
 
             </Providers>
             </ThemeProvider>
-          </ReactLenis>
+         
         </body>
       </html>
     </ViewTransitions>
