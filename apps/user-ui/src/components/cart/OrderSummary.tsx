@@ -106,16 +106,29 @@ export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
 
   // Calculate additional coupon discount
   let couponDiscountAmount = 0;
-  if (appliedCoupon) {
-    if (appliedCoupon.discountType.toLowerCase() === 'percentage') {
+  if (appliedCoupon && appliedCoupon.discountType) {
+    if (appliedCoupon.discountType === 'PERCENTAGE') {
       couponDiscountAmount = (subtotal * appliedCoupon.discountValue) / 100;
-    } else { // Assuming 'flat' or 'fixed_amount'
+      // Apply maximum discount limit if specified
+      if (appliedCoupon.maximumDiscountAmount) {
+        couponDiscountAmount = Math.min(couponDiscountAmount, appliedCoupon.maximumDiscountAmount);
+      }
+    } else if (appliedCoupon.discountType === 'FIXED_AMOUNT') {
       couponDiscountAmount = Math.min(appliedCoupon.discountValue, subtotal);
+    } else if (appliedCoupon.discountType === 'FREE_SHIPPING') {
+      // Free shipping discount will be applied to shipping cost
+      couponDiscountAmount = 0; // Don't reduce subtotal
     }
   }
 
   // Calculate total discount (both event and coupon)
-  const shippingCost = subtotal > 0 ? 50 : 0; 
+  let shippingCost = subtotal > 0 ? 50 : 0;
+  
+  // Apply free shipping if coupon type is FREE_SHIPPING
+  if (appliedCoupon && appliedCoupon.discountType === 'FREE_SHIPPING') {
+    shippingCost = 0;
+  }
+  
   const taxes = subtotal * 0.05; // Example: 5% tax
   const total = subtotal - couponDiscountAmount + shippingCost + taxes;
 
@@ -189,7 +202,16 @@ export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
 
         <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Shipping</span>
-            <span className="font-medium">{formatPrice(shippingCost)}</span>
+            <span className={`font-medium ${shippingCost === 0 && appliedCoupon?.discountType === 'FREE_SHIPPING' ? 'text-green-500 line-through' : ''}`}>
+              {shippingCost === 0 && appliedCoupon?.discountType === 'FREE_SHIPPING' ? (
+                <span className="flex items-center gap-1">
+                  <span className="line-through text-muted-foreground">{formatPrice(50)}</span>
+                  <span className="text-green-500 font-semibold">FREE</span>
+                </span>
+              ) : (
+                formatPrice(shippingCost)
+              )}
+            </span>
         </div>
         <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Taxes</span>

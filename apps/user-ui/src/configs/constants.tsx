@@ -9,8 +9,8 @@ export const navItems:NavItemsTypes[] =[
         href: "/shops"
     },
     {
-        title: "Offers",
-        href: "/offers"
+        title: "Events",
+        href: "/events"
     },
     {
         title: "Become A Seller",
