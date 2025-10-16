@@ -21,9 +21,11 @@ export type Address = {
 export type DiscountCode = {
   id: string;
   publicName: string;
-  discountType: 'percentage' | 'flat';
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_SHIPPING';
   discountValue: number;
   discountCode: string;
+  minimumOrderAmount?: number;
+  maximumDiscountAmount?: number;
 };
 
 export interface StoreState {

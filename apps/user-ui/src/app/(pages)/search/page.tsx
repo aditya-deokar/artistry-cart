@@ -1,13 +1,11 @@
 import { SearchResultsView } from '@/components/search/SearchResultsView';
-import React, {  Suspense } from 'react';
-
-
-
+import React, { Suspense } from 'react';
+import SearchLoading from './loading';
 
 export default function SearchPage() {
     return (
-        <Suspense fallback={<div>Loading Page...</div>}>
+        <Suspense fallback={<SearchLoading />}>
             <SearchResultsView />
         </Suspense>
-    )
+    );
 }

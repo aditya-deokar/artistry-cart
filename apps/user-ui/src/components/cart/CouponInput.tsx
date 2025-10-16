@@ -1,9 +1,10 @@
 'use-client';
 
 import { useState } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -11,10 +12,29 @@ import { useStore, type DiscountCode } from '@/store';
 import axiosInstance from '@/utils/axiosinstance';
 
 
-const validateCouponCode = async (couponCode: string): Promise<DiscountCode> => {
+const validateCouponCode = async (couponCode: string, cartItems: any[]): Promise<DiscountCode> => {
   try {
-    const response = await axiosInstance.post('/product/api/coupons/validate', { couponCode });
-    return response.data.data; // Access data from the nested data property in the new API response
+    const response = await axiosInstance.post('/product/api/discounts/validate', { 
+      discountCode: couponCode,
+      cartItems: cartItems,
+    });
+    
+    // API returns: { success, data: { discount, discountAmount, cartTotal, finalAmount, savings } }
+    const apiData = response.data.data;
+    const discount = apiData.discount;
+    
+    // Map API response to store format
+    const mappedDiscount: DiscountCode = {
+      id: discount.id,
+      publicName: discount.publicName,
+      discountType: discount.discountType, // 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_SHIPPING'
+      discountValue: discount.discountValue,
+      discountCode: discount.discountCode,
+      minimumOrderAmount: discount.minimumOrderAmount,
+      maximumDiscountAmount: discount.maximumDiscountAmount,
+    };
+    
+    return mappedDiscount;
   } catch (error) {
     
     if (axios.isAxiosError(error) && error.response) {
@@ -28,22 +48,42 @@ const validateCouponCode = async (couponCode: string): Promise<DiscountCode> => 
 
 export const CouponInput = () => {
   const [code, setCode] = useState('');
+  const cart = useStore((state) => state.cart); // Get cart items from store
   const { applyCoupon } = useStore((state) => state.actions);
 
 
   const mutation = useMutation({
-    mutationFn: validateCouponCode,
+    mutationFn: ({ couponCode, cartItems }: { couponCode: string; cartItems: any[] }) => 
+      validateCouponCode(couponCode, cartItems),
     onSuccess: (validatedCoupon) => {
-     
-      applyCoupon(validatedCoupon); 
-      setCode(''); 
+      applyCoupon(validatedCoupon);
+      setCode('');
+      
+      // Show success message based on discount type
+      if (validatedCoupon.discountType === 'PERCENTAGE') {
+        toast.success(`Coupon applied! ${validatedCoupon.discountValue}% discount`);
+      } else if (validatedCoupon.discountType === 'FIXED_AMOUNT') {
+        toast.success(`Coupon applied! Flat discount`);
+      } else if (validatedCoupon.discountType === 'FREE_SHIPPING') {
+        toast.success('Coupon applied! Free shipping');
+      }
     },
-    
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
   });
 
   const handleApplyCoupon = () => {
     if (!code) return;
-    mutation.mutate(code);
+    
+    // Format cart items for API validation
+    const formattedCartItems = cart.map(item => ({
+      id: item.id,
+      price: item.sale_price || item.regular_price,
+      quantity: item.quantity
+    }));
+    
+    mutation.mutate({ couponCode: code, cartItems: formattedCartItems });
   };
 
   return (
