@@ -5,8 +5,10 @@ import {
   searchProducts,
   searchEvents,
   searchShops,
-  getSearchSuggestions
+  getSearchSuggestions,
+  sellerSearch
 } from "../controllers/search.controller";
+import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
 
 const searchRouter: Router = express.Router();
 
@@ -25,6 +27,9 @@ searchRouter.get("/", fullSearch);
 searchRouter.get("/products", searchProducts);
 searchRouter.get("/events", searchEvents);
 searchRouter.get("/shops", searchShops);
+
+// Seller dashboard search (protected)
+searchRouter.get("/seller", isAuthenticated, sellerSearch);
 
 
 export default searchRouter;

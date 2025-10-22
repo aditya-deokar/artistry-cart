@@ -672,3 +672,181 @@ export const getSearchSuggestions = async (req: Request, res: Response, next: Ne
     return next(error);
   }
 };
+
+/**
+ * Seller Dashboard Search - Search across seller's products, orders, events, and discounts
+ */
+export const sellerSearch = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const sellerId = (req as any).user?.shop?.id;
+
+    if (!sellerId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized. Seller authentication required.'
+      });
+    }
+
+    const query = (req.query.q as string) || '';
+    const category = (req.query.category as string) || 'all';
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    if (query.trim().length < 2) {
+      return res.status(200).json({
+        success: true,
+        data: { results: [] }
+      });
+    }
+
+    const searchResults: any[] = [];
+
+    // Search Products
+    if (category === 'all' || category === 'products') {
+      const products = await prisma.products.findMany({
+        where: {
+          shopId: sellerId,
+          OR: [
+            { title: { contains: query, mode: 'insensitive' } },
+            { description: { contains: query, mode: 'insensitive' } },
+            { category: { contains: query, mode: 'insensitive' } },
+            { tags: { has: query.toLowerCase() } }
+          ],
+          isDeleted: false
+        },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          images: true,
+          current_price: true,
+          status: true,
+          stock: true,
+          category: true,
+        },
+        take: limit,
+        orderBy: { createdAt: 'desc' }
+      });
+
+      searchResults.push(...products.map(product => ({
+        id: product.id,
+        title: product.title,
+        description: `${product.category} - ${product.stock} in stock`,
+        category: 'products' as const,
+        url: `/dashboard/all-products/${product.slug}`,
+        imageUrl: product.images?.[0]?.url || null,
+        metadata: {
+          status: product.status,
+          price: `$${product.current_price}`,
+          stock: product.stock
+        }
+      })));
+    }
+
+    // Search Orders (if needed in future)
+    // Note: Orders are typically in a separate service, so this would need to be adjusted
+    // based on your microservices architecture
+
+    // Search Events
+    if (category === 'all' || category === 'events') {
+      const events = await prisma.events.findMany({
+        where: {
+          shopId: sellerId,
+          OR: [
+            { title: { contains: query, mode: 'insensitive' } },
+            { description: { contains: query, mode: 'insensitive' } }
+          ]
+        },
+        select: {
+          id: true,
+          title: true,
+          event_type: true,
+          banner_image: true,
+          starting_date: true,
+          ending_date: true,
+          is_active: true,
+          _count: {
+            select: { products: true }
+          }
+        },
+        take: limit,
+        orderBy: { createdAt: 'desc' }
+      });
+
+      const now = new Date();
+      searchResults.push(...events.map(event => ({
+        id: event.id,
+        title: event.title,
+        description: `${event.event_type} - ${event._count.products} products`,
+        category: 'events' as const,
+        url: `/dashboard/events/${event.id}`,
+        imageUrl: typeof event.banner_image === 'object' && event.banner_image !== null 
+          ? (event.banner_image as any).url 
+          : event.banner_image || null,
+        metadata: {
+          status: event.is_active && event.ending_date > now ? 'Active' : 'Inactive',
+          type: event.event_type,
+          products: event._count.products
+        }
+      })));
+    }
+
+    // Search Discounts
+    if (category === 'all' || category === 'discounts') {
+      const discountCodes = await prisma.discount_codes.findMany({
+        where: {
+          shopId: sellerId,
+          OR: [
+            { discountCode: { contains: query, mode: 'insensitive' } },
+            { description: { contains: query, mode: 'insensitive' } },
+            { publicName: { contains: query, mode: 'insensitive' } }
+          ]
+        },
+        select: {
+          id: true,
+          discountCode: true,
+          publicName: true,
+          description: true,
+          discountType: true,
+          discountValue: true,
+          isActive: true,
+          validFrom: true,
+          validUntil: true,
+          currentUsageCount: true,
+          usageLimit: true
+        },
+        take: limit,
+        orderBy: { createdAt: 'desc' }
+      });
+
+      const now = new Date();
+      searchResults.push(...discountCodes.map((discount) => ({
+        id: discount.id,
+        title: discount.discountCode,
+        description: discount.description || `${discount.publicName}`,
+        category: 'discounts' as const,
+        url: `/dashboard/discounts/${discount.id}`,
+        imageUrl: null,
+        metadata: {
+          status: discount.isActive && (!discount.validUntil || discount.validUntil > now) ? 'Active' : 'Inactive',
+          type: discount.discountType,
+          value: discount.discountType === 'PERCENTAGE' 
+            ? `${discount.discountValue}%` 
+            : `$${discount.discountValue}`,
+          usage: `${discount.currentUsageCount}/${discount.usageLimit || '∞'}`
+        }
+      })));
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        results: searchResults.slice(0, limit),
+        total: searchResults.length,
+        query
+      }
+    });
+
+  } catch (error) {
+    return next(error);
+  }
+};
