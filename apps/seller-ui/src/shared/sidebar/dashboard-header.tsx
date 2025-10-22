@@ -15,8 +15,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { ModeToggle } from "@/components/mode-toggle";
+import { useSearch } from "@/contexts/SearchContext";
+import { useEffect } from "react";
 
 export function DashboardHeader() {
+  const { openSearch } = useSearch();
+
+  // Add keyboard shortcut (Ctrl+K or Cmd+K)
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        openSearch();
+      }
+    };
+
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, [openSearch]);
   return (
     <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-colors">
       <div className="flex items-center gap-2 px-4 w-full">
@@ -30,8 +46,13 @@ export function DashboardHeader() {
             <Input
               type="search"
               placeholder="Search products, orders, customers..."
-              className="pl-10 pr-4 w-full bg-muted/50 border-0 focus-visible:ring-1"
+              className="pl-10 pr-4 w-full bg-muted/50 border-0 focus-visible:ring-1 cursor-pointer"
+              onClick={openSearch}
+              readOnly
             />
+            <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+              <span className="text-xs">⌘</span>K
+            </kbd>
           </div>
         </div>
 
