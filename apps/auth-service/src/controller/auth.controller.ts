@@ -180,32 +180,64 @@ export const loginUser = async (
 };
 
 // Logout user
+// export const logoutUser = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     // Clear the tokens
+//     res.clearCookie("access_token", {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === "production",
+//       sameSite: "strict",
+//     });
+//     res.clearCookie("refresh_token", {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === "production",
+//       sameSite: "strict",
+//     });
+
+//     return res.status(200).json({
+//       message: "Logout successful!",
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return next(error);
+//   }
+// };
+
+// Logout user
 export const logoutUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    // Clear the tokens
-    res.clearCookie("access_token", {
+    // Cookie options for clearing
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
-    res.clearCookie("refresh_token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
+      sameSite: "strict" as const,
+      path: "/", // Important: must match the path used when setting the cookie
+    };
+
+    // Clear the access token
+    res.clearCookie("access_token", cookieOptions);
+    
+    // Clear the refresh token
+    res.clearCookie("refresh_token", cookieOptions);
 
     return res.status(200).json({
+      success: true,
       message: "Logout successful!",
     });
   } catch (error) {
-    console.error(error);
+    console.error("Logout error:", error);
     return next(error);
   }
 };
+
 
 
 // Refresh Token User

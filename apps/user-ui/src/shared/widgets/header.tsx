@@ -1,8 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { HeartIcon, ShoppingCart, User2, Menu, X } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
 // UI Components
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -15,6 +17,7 @@ import useUser from '@/hooks/useUser';
 import { navItems } from '@/configs/constants';
 import { cn } from '@/lib/utils';
 import { useStore } from '@/store';
+import { useAuthStore } from '@/store/authStore';
 import { TransitionLink } from '@/components/common/TransitionLink';
 import { GlobalSearch } from '@/components/search/GlobalSearch';
 
@@ -70,7 +73,6 @@ const MobileMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
     );
 };
 
-
 // --- Main Header Component ---
 const Header = ({ className, logoContainerClassName, navContainerClassName, iconsContainerClassName }: HeaderProps) => {
     const { user, isLoading } = useUser();
@@ -78,14 +80,49 @@ const Header = ({ className, logoContainerClassName, navContainerClassName, icon
     const cart = useStore((state: any) => state.cart);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathname = usePathname();
+    const router = useRouter();
+    const queryClient = useQueryClient();
+    const { setLoggedIn } = useAuthStore();
 
     // Close the mobile menu automatically on route changes
     useEffect(() => {
         setIsMenuOpen(false);
     }, [pathname]);
 
+    // Logout handler
+    const handleLogout = async () => {
+        try {
+            // Call logout API to clear server-side session/cookie
+            await axios.post(
+                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/logout-user`,
+                {},
+                { withCredentials: true }
+            );
+            
+            // Update auth state
+            setLoggedIn(false);
+            
+            // Clear all React Query cache
+            queryClient.clear();
+            
+            // Or clear only user query
+            // queryClient.setQueryData(['user'], null);
+            // queryClient.removeQueries({ queryKey: ['user'] });
+            
+            // Redirect to login page
+            router.push('/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            
+            // Even if API fails, clear client-side data
+            setLoggedIn(false);
+            queryClient.clear();
+            router.push('/login');
+        }
+    };
+
     return (
-        <header className={cn("w-full  sticky top-0 z-50 bg-background/80 backdrop-blur-2xl", className)}>
+        <header className={cn("w-full sticky top-0 z-50 bg-background/80 backdrop-blur-2xl", className)}>
             <div className="border-b border-border">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex h-20 items-center justify-between gap-4">
@@ -128,15 +165,26 @@ const Header = ({ className, logoContainerClassName, navContainerClassName, icon
                                         <>
                                             <DropdownMenuLabel>Hi, {user?.name?.split(" ")[0]}</DropdownMenuLabel>
                                             <DropdownMenuSeparator />
-                                            <TransitionLink href="/profile"><DropdownMenuItem className="cursor-pointer">Profile</DropdownMenuItem></TransitionLink>
-                                            <DropdownMenuItem className="cursor-pointer">Logout</DropdownMenuItem>
+                                            <TransitionLink href="/profile">
+                                                <DropdownMenuItem className="cursor-pointer">Profile</DropdownMenuItem>
+                                            </TransitionLink>
+                                            <DropdownMenuItem 
+                                                className="cursor-pointer text-red-600 focus:text-red-600" 
+                                                onClick={handleLogout}
+                                            >
+                                                Logout
+                                            </DropdownMenuItem>
                                         </>
                                     ) : (
                                         <>
-                                            <DropdownMenuLabel>Hello, Sign in</DropdownMenuLabel>
+                                            <DropdownMenuLabel>Sign in</DropdownMenuLabel>
                                             <DropdownMenuSeparator />
-                                            <TransitionLink href="/login"><DropdownMenuItem className="cursor-pointer">Login</DropdownMenuItem></TransitionLink>
-                                            <TransitionLink href="/register"><DropdownMenuItem className="cursor-pointer">Register</DropdownMenuItem></TransitionLink>
+                                            <TransitionLink href="/login">
+                                                <DropdownMenuItem className="cursor-pointer">Login</DropdownMenuItem>
+                                            </TransitionLink>
+                                            <TransitionLink href="/register">
+                                                <DropdownMenuItem className="cursor-pointer">Register</DropdownMenuItem>
+                                            </TransitionLink>
                                         </>
                                     )}
                                 </DropdownMenuContent>
@@ -145,19 +193,19 @@ const Header = ({ className, logoContainerClassName, navContainerClassName, icon
                             <Button asChild variant="ghost" size="icon" className='relative'>
                                 <TransitionLink href={"/wishlist"}>
                                     <HeartIcon />
-                                    {wishlist?.length > 0 && <Badge  className='absolute -top-1 -right-1 h-5 w-5 justify-center p-0 bg-secondary'>{wishlist.length}</Badge>}
+                                    {wishlist?.length > 0 && <Badge className='absolute -top-1 -right-1 h-5 w-5 justify-center p-0 bg-secondary'>{wishlist.length}</Badge>}
                                 </TransitionLink>
                             </Button>
 
                             <Button asChild variant="ghost" size="icon" className='relative'>
                                 <TransitionLink href={"/cart"}>
                                     <ShoppingCart />
-                                    {cart?.length > 0 && <Badge  className='absolute -top-1 -right-1 h-5 w-5 justify-center p-0 bg-secondary'>{cart.length}</Badge>}
+                                    {cart?.length > 0 && <Badge className='absolute -top-1 -right-1 h-5 w-5 justify-center p-0 bg-secondary'>{cart.length}</Badge>}
                                 </TransitionLink>
                             </Button>
 
                             {/* Mobile Menu Button */}
-                            <div className="md:hidden ">
+                            <div className="md:hidden">
                                 <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)} aria-label="Open menu">
                                     <Menu size={24} />
                                 </Button>
