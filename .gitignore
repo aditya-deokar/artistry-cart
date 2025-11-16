@@ -49,6 +49,7 @@ test-output
 
 .env
 
+/*.md
 # Next.js
 .next
 out
