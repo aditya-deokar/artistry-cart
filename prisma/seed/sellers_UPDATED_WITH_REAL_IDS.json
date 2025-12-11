@@ -1,0 +1,1561 @@
+[
+  {
+    "_id": {
+      "$oid": "693acb298110207905a34d95"
+    },
+    "name": "Saharanpur Wood Heritage",
+    "slug": "saharanpur-wood-heritage",
+    "bio": "Generations of artisans crafting intricate Sheesham wood furniture and Jali work.",
+    "category": "Woodwork",
+    "avatar": {
+      "url": "https://placehold.co/150",
+      "alt": "wood carving logo"
+    },
+    "coverBanner": "https://placehold.co/800x200",
+    "address": "Wooden Market, Saharanpur, UP",
+    "opening_hours": "Mon-Sat 9AM-7PM",
+    "website": "https://saharanpurcrafts.in",
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "sellerId": {
+      "$oid": "693acd598110207905a34d95"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336860000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336860000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29bd3acc1211f07767"
+    },
+    "name": "Channapatna Toy City",
+    "slug": "channapatna-toy-city",
+    "bio": "Safe, eco-friendly wooden toys colored with natural vegetable dyes.",
+    "category": "Toys",
+    "avatar": {
+      "url": "https://placehold.co/150",
+      "alt": "toy logo"
+    },
+    "coverBanner": null,
+    "address": "Toy Town, Channapatna, KA",
+    "opening_hours": "Daily 10AM-8PM",
+    "website": "https://channapatnatoys.com",
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "sellerId": {
+      "$oid": "693acd59e76ab7c7863c1aa5"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336861000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336861000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb2982165bda189e9d60"
+    },
+    "name": "Mithila Folk Art Gallery",
+    "slug": "mithila-folk-art-gallery",
+    "bio": "Original Madhubani paintings on handmade paper and canvas.",
+    "category": "Creative Art",
+    "avatar": null,
+    "coverBanner": "https://placehold.co/800x200",
+    "address": "Madhubani District, Bihar, BR",
+    "opening_hours": "Mon-Fri 10AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "sellerId": {
+      "$oid": "693acd5982165bda189e9d60"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336862000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336862000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29bf1aac9c2df05794"
+    },
+    "name": "Kashmir Walnut Wonders",
+    "slug": "kashmir-walnut-wonders",
+    "bio": "Exquisite hand-carved walnut wood boxes, trays and furniture from Srinagar.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Lal Chowk, Srinagar, JK",
+    "opening_hours": "Mon-Sat 10AM-7PM",
+    "website": "https://kashmirwalnut.com",
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "sellerId": {
+      "$oid": "693acd598b9c89591c47ee8a"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336863000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336863000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29ca2fc4564a03d837"
+    },
+    "name": "Jaipur Blue Pottery",
+    "slug": "jaipur-blue-pottery",
+    "bio": "Traditional blue glazed pottery items including vases and plates.",
+    "category": "Pottery",
+    "avatar": {
+      "url": "https://placehold.co/150",
+      "alt": "pottery logo"
+    },
+    "coverBanner": "https://placehold.co/800x200",
+    "address": "Amer Road, Jaipur, RJ",
+    "opening_hours": "Daily 10AM-8PM",
+    "website": "https://bluepotteryjaipur.in",
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.6"
+    },
+    "sellerId": {
+      "$oid": "693acd59ca2fc4564a03d837"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336864000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336864000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29844fa3972b156f75"
+    },
+    "name": "Odisha Pattachitra Studio",
+    "slug": "odisha-pattachitra-studio",
+    "bio": "Intricate palm leaf engravings and cloth paintings depicting mythology.",
+    "category": "Creative Art",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Raghurajpur Heritage Village, Puri, OD",
+    "opening_hours": "Daily 9AM-9PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "5.0"
+    },
+    "sellerId": {
+      "$oid": "693acd59844fa3972b156f75"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336865000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336865000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29807d3287fd2d74c3"
+    },
+    "name": "Warli Tribal Art",
+    "slug": "warli-tribal-art",
+    "bio": "Minimalist geometric tribal art from the Sahyadri mountains.",
+    "category": "Creative Art",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Dahanu, Palghar, MH",
+    "opening_hours": "Mon-Sat 10AM-6PM",
+    "website": "https://warliart.org",
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "sellerId": {
+      "$oid": "693acd59807d3287fd2d74c3"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336866000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336866000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29c0def61c618b7059"
+    },
+    "name": "Dhokra Metal Crafts",
+    "slug": "dhokra-metal-crafts",
+    "bio": "Ancient lost-wax casting bell metal figures from Bastar.",
+    "category": "Metal Craft",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Jagdalpur, Bastar, CG",
+    "opening_hours": "Mon-Fri 9AM-5PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "sellerId": {
+      "$oid": "693acd5910ea7107b226f9ff"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336867000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336867000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb2985add672fb816278"
+    },
+    "name": "Mysore Sandalwood Carvings",
+    "slug": "mysore-sandalwood-carvings",
+    "bio": "Premium aromatic sandalwood figurines and artifacts.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": "https://placehold.co/800x200",
+    "address": "Devaraja Market, Mysore, KA",
+    "opening_hours": "Mon-Sat 10AM-8:30PM",
+    "website": "https://mysoresandalart.com",
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "sellerId": {
+      "$oid": "693acd59bf1aac9c2df05794"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336868000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336868000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29ea1f6bf3e3c64b02"
+    },
+    "name": "Kondapalli Bommalu",
+    "slug": "kondapalli-bommalu",
+    "bio": "Lightweight softwood toys depicting rural Indian life.",
+    "category": "Toys",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Kondapalli Village, Vijayawada, AP",
+    "opening_hours": "Daily 8AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.6"
+    },
+    "sellerId": {
+      "$oid": "693acd59bd3acc1211f07767"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336869000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336869000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29dde2077cd4f4a3cc"
+    },
+    "name": "Tanjore Gold Art",
+    "slug": "tanjore-gold-art",
+    "bio": "Rich relief paintings with real gold foil and semi-precious stones.",
+    "category": "Creative Art",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "South Street, Thanjavur, TN",
+    "opening_hours": "Mon-Sat 10AM-7PM",
+    "website": "https://tanjorepaintings.in",
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "sellerId": {
+      "$oid": "693acd59dde2077cd4f4a3cc"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336870000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336870000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29158765c95fe7c5d9"
+    },
+    "name": "Bankura Terracotta",
+    "slug": "bankura-terracotta",
+    "bio": "Famous Bankura horses and clay handicrafts from Bengal.",
+    "category": "Pottery",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Panchmura, Bankura, WB",
+    "opening_hours": "Mon-Fri 9AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "sellerId": {
+      "$oid": "693acd59158765c95fe7c5d9"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336871000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336871000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb292bf148c9d3c522d1"
+    },
+    "name": "Kutch Embroidery Works",
+    "slug": "kutch-embroidery-works",
+    "bio": "Vibrant mirror work and hand embroidery from the Rann of Kutch.",
+    "category": "Textiles",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Bhujodi, Bhuj, GJ",
+    "opening_hours": "Daily 10AM-8PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "sellerId": {
+      "$oid": "693acd59ac4a9bdb79e0fe00"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336872000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336872000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb295d02275ca37caf96"
+    },
+    "name": "Moradabad Brass House",
+    "slug": "moradabad-brass-house",
+    "bio": "Finest brass artifacts, lamps and home decor.",
+    "category": "Metal Craft",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Peetal Nagri, Moradabad, UP",
+    "opening_hours": "Mon-Sat 10AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.3"
+    },
+    "sellerId": {
+      "$oid": "693acd590613b8c55220bcc9"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336873000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336873000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb292660e533c5994fb9"
+    },
+    "name": "Kerala Rosewood Arts",
+    "slug": "kerala-rosewood-arts",
+    "bio": "Heavy rosewood furniture and elephant inlays.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "MG Road, Trivandrum, KL",
+    "opening_hours": "Mon-Sat 9:30AM-8PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.6"
+    },
+    "sellerId": {
+      "$oid": "693acd5985add672fb816278"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336874000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336874000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb2983a3cd477192d480"
+    },
+    "name": "Pippli Applique Works",
+    "slug": "pippli-applique-works",
+    "bio": "Colorful applique lanterns and umbrellas from Orissa.",
+    "category": "Textiles",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Pipli, Puri District, OD",
+    "opening_hours": "Daily 8AM-8PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "sellerId": {
+      "$oid": "693acd5987048ea6339425a6"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336875000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336875000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb2910ea7107b226f9ff"
+    },
+    "name": "Bastar Iron Craft",
+    "slug": "bastar-iron-craft",
+    "bio": "Wrought iron tribal figurines and wall hangings.",
+    "category": "Metal Craft",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Kondagaon, Chhattisgarh, CG",
+    "opening_hours": "Mon-Sat 10AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.2"
+    },
+    "sellerId": {
+      "$oid": "693acd59ae57d0c2d66fcf30"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336876000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336876000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29e76ab7c7863c1aa5"
+    },
+    "name": "Etikoppaka Lacquer Toys",
+    "slug": "etikoppaka-lacquer-toys",
+    "bio": "Traditional turned wood lacquer toys from Andhra.",
+    "category": "Toys",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Etikoppaka Village, Visakhapatnam, AP",
+    "opening_hours": "Mon-Sat 9AM-5PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "sellerId": {
+      "$oid": "693acd59852b42aad6324631"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336877000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336877000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb2947d4e1ec677bda9a"
+    },
+    "name": "Kangra Miniature Art",
+    "slug": "kangra-miniature-art",
+    "bio": "Delicate Pahari miniature paintings from Himachal.",
+    "category": "Creative Art",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Kangra Valley, HP",
+    "opening_hours": "Mon-Fri 10AM-5PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "sellerId": {
+      "$oid": "693acd5947d4e1ec677bda9a"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336878000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336878000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb292079b4141bc6b3c8"
+    },
+    "name": "Nizamabad Black Pottery",
+    "slug": "nizamabad-black-pottery",
+    "bio": "Unique black clay pottery with silver inlay designs.",
+    "category": "Pottery",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Azamgarh, UP",
+    "opening_hours": "Mon-Sat 10AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "sellerId": {
+      "$oid": "693acd592079b4141bc6b3c8"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336879000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336879000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29ab48b5477e766a91"
+    },
+    "name": "Gond Tribal Creations",
+    "slug": "gond-tribal-creations",
+    "bio": "Dot and line paintings celebrating nature by Gond artisans.",
+    "category": "Creative Art",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Patangarh, Dindori, MP",
+    "opening_hours": "Mon-Sat 10AM-5PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.6"
+    },
+    "sellerId": {
+      "$oid": "693acd59ab48b5477e766a91"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336880000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336880000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb2901f67f0a50988f21"
+    },
+    "name": "Jodhpur Antique Wood",
+    "slug": "jodhpur-antique-wood",
+    "bio": "Restored antique wooden doors and rustic furniture.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": "https://placehold.co/800x200",
+    "address": "Boranada, Jodhpur, RJ",
+    "opening_hours": "Mon-Sat 9AM-7PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "sellerId": {
+      "$oid": "693acd592660e533c5994fb9"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336881000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336881000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29c9432bdd9843c25f"
+    },
+    "name": "Kinnal Art Craft",
+    "slug": "kinnal-art-craft",
+    "bio": "Ancient wooden craft of Kinnal, famous for idols and stools.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Kinnal Village, Koppal, KA",
+    "opening_hours": "Daily 9AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.3"
+    },
+    "sellerId": {
+      "$oid": "693acd5901f67f0a50988f21"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336882000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336882000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29ac4a9bdb79e0fe00"
+    },
+    "name": "Sanganeri Block Prints",
+    "slug": "sanganeri-block-prints",
+    "bio": "Hand block printed cotton textiles with floral motifs.",
+    "category": "Textiles",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Sanganer, Jaipur, RJ",
+    "opening_hours": "Mon-Sat 10AM-8PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "sellerId": {
+      "$oid": "693acd595597983ac179381b"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336883000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336883000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb290613b8c55220bcc9"
+    },
+    "name": "Bidriware Crafts",
+    "slug": "bidriware-crafts",
+    "bio": "Silver inlay work on blackened zinc and copper alloy.",
+    "category": "Metal Craft",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Bidar Fort Area, Bidar, KA",
+    "opening_hours": "Mon-Fri 10AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "sellerId": {
+      "$oid": "693acd59c0def61c618b7059"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336884000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336884000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb2971e032632e7fbad5"
+    },
+    "name": "Shantiniketan Leather",
+    "slug": "shantiniketan-leather",
+    "bio": "Artistic leather bags and wallets with embossed batik designs.",
+    "category": "Handicrafts",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Bolpur, Shantiniketan, WB",
+    "opening_hours": "Mon-Sat 10AM-7PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "sellerId": {
+      "$oid": "693acd5971e032632e7fbad5"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336885000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336885000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6881cc1c089195fea5a29127"
+    },
+    "name": "Kathputli Colony Arts",
+    "slug": "kathputli-colony-arts",
+    "bio": "Traditional Rajasthani string puppets and dolls.",
+    "category": "Toys",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Shadipur, New Delhi, DL",
+    "opening_hours": "Daily 10AM-8PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "sellerId": {
+      "$oid": "693acd59de9c35e8302c2d27"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336886000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336886000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb297a9870de14221854"
+    },
+    "name": "Kashmir Papier Mache",
+    "slug": "kashmir-papier-mache",
+    "bio": "Delicate hand-painted paper pulp boxes and decor.",
+    "category": "Handicrafts",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Zadibal, Srinagar, JK",
+    "opening_hours": "Mon-Sat 9AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "sellerId": {
+      "$oid": "693acd597a9870de14221854"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336887000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336887000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29c1b0b8656952f0b6"
+    },
+    "name": "Assam Bamboo Works",
+    "slug": "assam-bamboo-works",
+    "bio": "Eco-friendly cane and bamboo furniture and baskets.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Guwahati, Assam, AS",
+    "opening_hours": "Mon-Sat 9AM-7PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.6"
+    },
+    "sellerId": {
+      "$oid": "693acd59c9432bdd9843c25f"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336888000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336888000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb2987048ea6339425a6"
+    },
+    "name": "Pochampally Ikat Weaves",
+    "slug": "pochampally-ikat-weaves",
+    "bio": "Geometric pattern Ikat fabrics from Telangana.",
+    "category": "Textiles",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Pochampally, Yadadri Bhuvanagiri, TG",
+    "opening_hours": "Daily 9AM-8PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "sellerId": {
+      "$oid": "693acd593a1827ac94830938"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336889000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336889000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29fbcfbbd7f12267e7"
+    },
+    "name": "Sankheda Furniture",
+    "slug": "sankheda-furniture",
+    "bio": "Traditional colorful teak wood furniture from Gujarat.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Sankheda, Vadodara, GJ",
+    "opening_hours": "Mon-Sat 10AM-7PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "sellerId": {
+      "$oid": "693acd59c1b0b8656952f0b6"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336890000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336890000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb295597983ac179381b"
+    },
+    "name": "Chamba Rumal Art",
+    "slug": "chamba-rumal-art",
+    "bio": "Embroidery on handkerchiefs depicting Krishna's life.",
+    "category": "Textiles",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Chamba, Himachal Pradesh, HP",
+    "opening_hours": "Mon-Fri 10AM-5PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "sellerId": {
+      "$oid": "693acd59de007b98bfc6034b"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336891000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336891000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb292808c40827077979"
+    },
+    "name": "Molela Clay Art",
+    "slug": "molela-clay-art",
+    "bio": "Terracotta plaques of deities from a village near Nathdwara.",
+    "category": "Pottery",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Molela Village, Rajsamand, RJ",
+    "opening_hours": "Daily 9AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "sellerId": {
+      "$oid": "693acd592808c40827077979"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336892000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336892000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29852b42aad6324631"
+    },
+    "name": "Thanjavur Doll House",
+    "slug": "thanjavur-doll-house",
+    "bio": "Famous bobblehead dolls (Thanjavur Thalaiyatti Bommai).",
+    "category": "Toys",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "West Main Street, Thanjavur, TN",
+    "opening_hours": "Daily 9AM-8PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.6"
+    },
+    "sellerId": {
+      "$oid": "693acd59ea1f6bf3e3c64b02"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336893000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336893000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb295b12ab960680a038"
+    },
+    "name": "Wood Carvings of Kerala",
+    "slug": "wood-carvings-of-kerala",
+    "bio": "Temple architecture inspired wooden pillars and wall panels.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Cochin Arts & Crafts, Kochi, KL",
+    "opening_hours": "Mon-Sat 10AM-7PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "sellerId": {
+      "$oid": "693acd59fbcfbbd7f12267e7"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336894000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336894000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb298924b28d84a4e595"
+    },
+    "name": "Phad Scroll Paintings",
+    "slug": "phad-scroll-paintings",
+    "bio": "Narrative scroll paintings of local deities on cloth.",
+    "category": "Creative Art",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Bhilwara, Rajasthan, RJ",
+    "opening_hours": "Mon-Fri 10AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "sellerId": {
+      "$oid": "693acd598924b28d84a4e595"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336895000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336895000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb296eac30a4a76d15fd"
+    },
+    "name": "Khavda Pottery",
+    "slug": "khavda-pottery",
+    "bio": "Hand-painted earthen pots from North Kutch.",
+    "category": "Pottery",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Khavda Village, Kutch, GJ",
+    "opening_hours": "Daily 8AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "sellerId": {
+      "$oid": "693acd596eac30a4a76d15fd"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336896000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336896000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb292acef5ab851ea23d"
+    },
+    "name": "Nagaland Bamboo Crafts",
+    "slug": "nagaland-bamboo-crafts",
+    "bio": "Tribal baskets, mugs and decorative items.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Dimapur, Nagaland, NL",
+    "opening_hours": "Mon-Sat 9AM-5PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.3"
+    },
+    "sellerId": {
+      "$oid": "693acd595b12ab960680a038"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336897000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336897000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29a40660f2a1b6e93d"
+    },
+    "name": "Kalighat Pat",
+    "slug": "kalighat-pat",
+    "bio": "Bold watercolours depicting social and mythological themes.",
+    "category": "Creative Art",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Kalighat, Kolkata, WB",
+    "opening_hours": "Mon-Sat 10AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "sellerId": {
+      "$oid": "693acd59a40660f2a1b6e93d"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336898000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336898000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb293a1827ac94830938"
+    },
+    "name": "Lucknow Chikan Palace",
+    "slug": "lucknow-chikan-palace",
+    "bio": "Fine white embroidery on muslin and cotton.",
+    "category": "Textiles",
+    "avatar": null,
+    "coverBanner": "https://placehold.co/800x200",
+    "address": "Chowk, Lucknow, UP",
+    "opening_hours": "Daily 11AM-9PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "sellerId": {
+      "$oid": "693acd59fc6fffbaf726c042"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336899000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336899000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6881cc1c089195fea5a29141"
+    },
+    "name": "Araku Valley Tribal Arts",
+    "slug": "araku-valley-tribal-arts",
+    "bio": "Authentic handicrafts from the tribes of Andhra.",
+    "category": "Handicrafts",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Araku Valley, Visakhapatnam, AP",
+    "opening_hours": "Daily 9AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "sellerId": {
+      "$oid": "693acd59ee39cad4fe4ea049"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336900000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336900000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb293203894e25b1a845"
+    },
+    "name": "Khurja Pottery Works",
+    "slug": "khurja-pottery-works",
+    "bio": "Colorful ceramic crockery and planters.",
+    "category": "Pottery",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "GT Road, Khurja, Bulandshahr, UP",
+    "opening_hours": "Mon-Sat 9AM-7PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.2"
+    },
+    "sellerId": {
+      "$oid": "693acd593203894e25b1a845"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336901000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336901000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb2972d82ba9255187c4"
+    },
+    "name": "Mughal Wood Inlay",
+    "slug": "mughal-wood-inlay",
+    "bio": "Geometric wood inlay work inspired by Mughal architecture.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Hoshiarpur, Punjab, PB",
+    "opening_hours": "Mon-Sat 9AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.6"
+    },
+    "sellerId": {
+      "$oid": "693acd592acef5ab851ea23d"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336902000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336902000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29de007b98bfc6034b"
+    },
+    "name": "Chanderi Handloom Weaves",
+    "slug": "chanderi-handloom-weaves",
+    "bio": "Sheer texture silk and cotton sarees.",
+    "category": "Textiles",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Chanderi, Ashoknagar, MP",
+    "opening_hours": "Mon-Sat 10AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "sellerId": {
+      "$oid": "693acd592bf148c9d3c522d1"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336903000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336903000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29f1dac92449fb8fd7"
+    },
+    "name": "Sohrai Art Centre",
+    "slug": "sohrai-art-centre",
+    "bio": "Tribal mural art from Hazaribagh.",
+    "category": "Creative Art",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Hazaribagh, Jharkhand, JH",
+    "opening_hours": "Mon-Fri 9AM-5PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "sellerId": {
+      "$oid": "693acd59f1dac92449fb8fd7"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336904000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336904000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6881cc1c089195fea5a29146"
+    },
+    "name": "Nettur Petti Crafts",
+    "slug": "nettur-petti-crafts",
+    "bio": "Traditional jewelry boxes from Kerala made of rosewood and brass.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Kannur, Kerala, KL",
+    "opening_hours": "Mon-Sat 10AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "sellerId": {
+      "$oid": "693acd5972d82ba9255187c4"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336905000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336905000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6881cc1c089195fea5a29147"
+    },
+    "name": "Pahari Wood Carving",
+    "slug": "pahari-wood-carving",
+    "bio": "Intricately carved doors and windows from Himachal.",
+    "category": "Woodwork",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Kullu, Himachal Pradesh, HP",
+    "opening_hours": "Mon-Sat 10AM-5PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.6"
+    },
+    "sellerId": {
+      "$oid": "693acd59dad0e484123e59ce"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336906000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336906000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29c94c352131455e40"
+    },
+    "name": "Roghan Art Kutch",
+    "slug": "roghan-art-kutch",
+    "bio": "Rare oil-based fabric painting art form.",
+    "category": "Creative Art",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Nirona Village, Kutch, GJ",
+    "opening_hours": "Daily 9AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "5.0"
+    },
+    "sellerId": {
+      "$oid": "693acd59c94c352131455e40"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336907000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336907000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29fc6fffbaf726c042"
+    },
+    "name": "Bagh Block Prints",
+    "slug": "bagh-block-prints",
+    "bio": "Natural color geometric and floral block prints.",
+    "category": "Textiles",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Bagh, Dhar, MP",
+    "opening_hours": "Mon-Sat 10AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "sellerId": {
+      "$oid": "693acd5983a3cd477192d480"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336908000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336908000"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "693acb29ae57d0c2d66fcf30"
+    },
+    "name": "Dokra Art Studio",
+    "slug": "dokra-art-studio",
+    "bio": "Tribal metal craft from West Bengal's Dariyapur.",
+    "category": "Metal Craft",
+    "avatar": null,
+    "coverBanner": null,
+    "address": "Dariyapur, Bardhaman, WB",
+    "opening_hours": "Mon-Sat 9AM-6PM",
+    "website": null,
+    "socialLinks": [],
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "sellerId": {
+      "$oid": "693acd595d02275ca37caf96"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1753336909000"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1753336909000"
+      }
+    }
+  }
+]

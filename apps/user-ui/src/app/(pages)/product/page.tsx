@@ -77,7 +77,7 @@ const ProductPage = () => {
         queryFn: async () => {
             try {
                 // Updated endpoint for categories
-                const res = await axiosInstance.get("/product/api/products/categories");
+                const res = await axiosInstance.get("/product/api/categories");
                 return res.data.data; // Access the data property
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
