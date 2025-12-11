@@ -404,7 +404,9 @@ model UserAnalytics {
   lastVisited DateTime
 
   // The Json type is perfectly suited for MongoDB's flexible schema
-  actions Json[]
+  actions         Json[]
+  recommendations String[]
+  lastTrained     DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

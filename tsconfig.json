@@ -39,6 +39,12 @@
     },
     {
       "path": "./apps/order-service"
+    },
+    {
+      "path": "./apps/recommendation-service-e2e"
+    },
+    {
+      "path": "./apps/recommendation-service"
     }
   ]
 }
