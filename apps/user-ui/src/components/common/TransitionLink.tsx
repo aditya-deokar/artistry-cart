@@ -1,14 +1,12 @@
 // src/components/common/TransitionLink.tsx
-import  { type LinkProps } from "next/link";
+import { type LinkProps } from "next/link";
 import { Link } from "next-view-transitions";
-import { type ReactNode, type MouseEventHandler } from "react";
+import { type ReactNode } from "react";
 
-// The component props extend the standard Next.js LinkProps
-export type TransitionLinkProps = LinkProps & {
+// The component props extend the standard Next.js LinkProps and HTMLAnchorElement attributes
+export type TransitionLinkProps = LinkProps & React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   children: ReactNode;
-  className?: string;
-  onClick?: MouseEventHandler<HTMLAnchorElement>;
-  tabIndex?: number;
+  className?: string; // Explicitly defined, though also in AnchorHTMLAttributes.
 };
 
 /**
@@ -16,27 +14,17 @@ export type TransitionLinkProps = LinkProps & {
  * This provides a single component for all internal links, making it easy
  * to add page transition libraries or other global link logic in the future.
  */
-export const TransitionLink = ({
-  children,
-  className,
-  onClick,
-  tabIndex,
-  href,
-  ...rest
-}: TransitionLinkProps) => {
-  // If no href is provided, it's not a valid link.
+export const TransitionLink = (props: TransitionLinkProps) => {
+  const { href, children, ...rest } = props;
+
   if (!href) {
     console.warn("TransitionLink: `href` prop is missing.");
-    // Render a non-interactive span to avoid breaking the layout.
-    return <span className={className}>{children}</span>;
+    return <span className={props.className}>{children}</span>;
   }
 
   return (
     <Link
-      href={href}
-      className={className}
-      onClick={onClick}
-      tabIndex={tabIndex}
+      href={href as any}
       {...rest}
     >
       {children}

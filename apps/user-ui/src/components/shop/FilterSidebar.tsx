@@ -1,31 +1,30 @@
 'use client';
 
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // UI Components
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from '@/components/ui/button';
+
 
 // Utils & Icons
 import { formatPrice } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
-import { Filter, RotateCw } from 'lucide-react';
+import { RotateCcw, Plus, Minus, Check } from 'lucide-react';
 
 // --- Define strong types for the component's state and props ---
 export interface FilterState {
-  sortBy: 'newest' | 'price-asc' | 'price-desc' | 'relevance';
-  category: string;
-  priceRange: [number, number];
+    sortBy: 'newest' | 'price-asc' | 'price-desc' | 'relevance';
+    category: string;
+    priceRange: [number, number];
 }
 
-type ParentFilterState = FilterState & { page: number };
+type ParentFilterState = FilterState & { page: number; search: string; };
 
 type FilterSidebarProps = {
-  filters: FilterState;
-  setFilters: React.Dispatch<React.SetStateAction<ParentFilterState>>;
-  categories: string[];
+    filters: FilterState;
+    setFilters: React.Dispatch<React.SetStateAction<ParentFilterState>>;
+    categories: string[];
 };
 
 // Define the default state for the reset functionality
@@ -34,11 +33,62 @@ const defaultFilters: ParentFilterState = {
     sortBy: 'newest',
     category: 'all',
     priceRange: [0, 50000],
+    search: '',
 };
 
+// Custom Accordion Component to match the vibe
+const CreativeAccordion = ({
+    title,
+    children,
+    isOpen,
+    onToggle
+}: {
+    title: string;
+    children: React.ReactNode;
+    isOpen: boolean;
+    onToggle: () => void
+}) => (
+    <div className="border-b border-neutral-200 dark:border-neutral-800 py-4">
+        <button
+            onClick={onToggle}
+            className="flex items-center justify-between w-full group"
+        >
+            <span className="font-display text-xl uppercase tracking-wider">{title}</span>
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                {isOpen ? <Minus size={16} /> : <Plus size={16} />}
+            </span>
+        </button>
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    className="overflow-hidden"
+                >
+                    <div className="pt-4 pb-2">
+                        {children}
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    </div>
+);
+
 export const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilters, categories }) => {
-    
-    // Handlers are now strongly typed and reset the page
+    // State for accordion sections
+    const [openSections, setOpenSections] = React.useState<Record<string, boolean>>({
+        sort: true,
+        category: true,
+        price: true
+    });
+
+    const toggleSection = (section: string) => {
+        setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+    };
+
+    // Handlers
     const handleCategoryChange = (category: string) => {
         setFilters(prev => ({ ...prev, category, page: 1 }));
     };
@@ -46,7 +96,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilter
     const handlePriceChange = (value: number[]) => {
         setFilters(prev => ({ ...prev, priceRange: [value[0], value[1]], page: 1 }));
     };
-    
+
     const handleSortChange = (value: FilterState['sortBy']) => {
         setFilters(prev => ({ ...prev, sortBy: value, page: 1 }));
     };
@@ -56,86 +106,105 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilter
     };
 
     return (
-        <div className="p-6 border border-border rounded-lg bg-background sticky top-24">
-            {/* --- Main Header --- */}
-            <div className="flex justify-between items-center pb-4 border-b border-border/80">
-                <div className="flex items-center gap-2">
-                    <Filter size={20} />
-                    <h2 className="font-display text-2xl">Filters</h2>
-                </div>
-                <Button variant="ghost" size="sm" onClick={handleClearFilters} className="flex items-center gap-1.5 text-sm">
-                    <RotateCw size={14} />
+        <div className="sticky top-32 pr-8 hidden lg:block">
+            <div className="flex justify-between items-end mb-8">
+                <h2 className="font-display text-4xl font-bold leading-none ">Filter</h2>
+                <button
+                    onClick={handleClearFilters}
+                    className="text-xs uppercase tracking-widest text-neutral-500 hover:text-black dark:hover:text-white transition-colors flex items-center gap-2 pb-1"
+                >
+                    <RotateCcw size={12} />
                     Reset
-                </Button>
+                </button>
             </div>
 
-            <div className="space-y-6 pt-6">
-                {/* --- Sort By Section --- */}
-                <div>
-                    <h3 className="font-semibold text-lg mb-3">Sort By</h3>
-                    <Select onValueChange={handleSortChange} defaultValue={filters.sortBy}>
-                        <SelectTrigger className="w-full bg-background/80 border-border/80 rounded-none">
-                            <SelectValue placeholder="Sort artworks" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {/* Adding 'relevance' is good practice for search pages */}
-                            <SelectItem value="relevance">Relevance</SelectItem> 
-                            <SelectItem value="newest">Newest</SelectItem>
-                            <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                            <SelectItem value="price-desc">Price: High to Low</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                
-                {/* --- Accordion for Filters --- */}
-                <Accordion type="multiple" defaultValue={['category', 'price']} className="w-full">
-                    <AccordionItem value="category">
-                        <AccordionTrigger className="font-semibold text-lg hover:no-underline">Category</AccordionTrigger>
-                        <AccordionContent className="pt-3 space-y-2">
-                            <button 
-                                onClick={() => handleCategoryChange('all')} 
+            <div className="flex flex-col gap-2">
+                {/* --- Sort By --- */}
+                <CreativeAccordion
+                    title="Sort By"
+                    isOpen={openSections.sort}
+                    onToggle={() => toggleSection('sort')}
+                >
+                    <div className="flex flex-col gap-2">
+                        {[
+                            { label: 'Just In', value: 'newest' },
+                            { label: 'Relevance', value: 'relevance' },
+                            { label: 'Price: Low - High', value: 'price-asc' },
+                            { label: 'Price: High - Low', value: 'price-desc' },
+                        ].map((option) => (
+                            <button
+                                key={option.value}
+                                onClick={() => handleSortChange(option.value as any)}
                                 className={cn(
-                                    "block w-full text-left p-2  transition-colors text-sm font-medium",
-                                    filters.category === 'all' ? 'bg-secondary/60 text-primary' : 'text-primary/70 hover:bg-secondary/40'
+                                    "text-left text-sm py-1 transition-all duration-300 flex items-center gap-3 group relative pl-6",
+                                    filters.sortBy === option.value
+                                        ? "text-primary font-medium"
+                                        : "text-neutral-500 hover:text-primary"
                                 )}
                             >
-                                All Categories
+                                <span className={cn(
+                                    "absolute left-0 w-2 h-2 rounded-full border border-current transition-all duration-300",
+                                    filters.sortBy === option.value ? "bg-primary border-primary" : "bg-transparent border-neutral-300 group-hover:border-primary"
+                                )}></span>
+                                {option.label}
                             </button>
-                            {categories.map(cat => (
-                                <button 
-                                    key={cat} 
-                                    onClick={() => handleCategoryChange(cat)} 
-                                    className={cn(
-                                        "block w-full text-left p-2 transition-colors text-sm font-medium capitalize",
-                                        filters.category === cat ? 'bg-secondary/60 text-primary' : 'text-primary/70 hover:bg-secondary/40'
-                                    )}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
-                        </AccordionContent>
-                    </AccordionItem>
+                        ))}
+                    </div>
+                </CreativeAccordion>
 
-                    <AccordionItem value="price">
-                        <AccordionTrigger className="font-semibold text-lg hover:no-underline">Price Range</AccordionTrigger>
-                        <AccordionContent className="pt-6 space-y-4">
-                            <Slider
-                                defaultValue={filters.priceRange}
-                                max={50000}
-                                step={100}
-                                onValueChange={handlePriceChange}
-                            />
-                            <div className="flex justify-between items-center text-sm">
-                                <div className="px-3 py-1 bg-accent border border-border rounded-md">
-                                    {formatPrice(filters.priceRange[0])}
-                                </div>
-                                <div className="px-3 py-1 bg-accent border border-border rounded-md">
-                                    {formatPrice(filters.priceRange[1])}
-                                </div>
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
+                {/* --- Categories --- */}
+                <CreativeAccordion
+                    title="Collection"
+                    isOpen={openSections.category}
+                    onToggle={() => toggleSection('category')}
+                >
+                    <div className="flex flex-col gap-2">
+                        <button
+                            onClick={() => handleCategoryChange('all')}
+                            className={cn(
+                                "text-left text-lg font-light transition-all duration-300 hover:translate-x-2 w-full flex justify-between items-center group",
+                                filters.category === 'all' ? "text-primary translate-x-2" : "text-neutral-500 hover:text-primary"
+                            )}
+                        >
+                            All
+                            {filters.category === 'all' && <Check size={14} className="opacity-50" />}
+                        </button>
+                        {categories.map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => handleCategoryChange(cat)}
+                                className={cn(
+                                    "text-left text-lg font-light capitalize transition-all duration-300 hover:translate-x-2 w-full flex justify-between items-center",
+                                    filters.category === cat ? "text-primary translate-x-2" : "text-neutral-500 hover:text-primary"
+                                )}
+                            >
+                                {cat}
+                                {filters.category === cat && <Check size={14} className="opacity-50" />}
+                            </button>
+                        ))}
+                    </div>
+                </CreativeAccordion>
+
+                {/* --- Price Range --- */}
+                <CreativeAccordion
+                    title="Price"
+                    isOpen={openSections.price}
+                    onToggle={() => toggleSection('price')}
+                >
+                    <div className="pt-4 px-1">
+                        <div className="flex justify-between mb-4 font-mono text-xs text-neutral-500">
+                            <span>{formatPrice(filters.priceRange[0])}</span>
+                            <span>{formatPrice(filters.priceRange[1])}+</span>
+                        </div>
+                        <Slider
+                            defaultValue={filters.priceRange}
+                            max={50000}
+                            step={100}
+                            onValueChange={handlePriceChange}
+                            className="py-4"
+                        />
+                    </div>
+                </CreativeAccordion>
             </div>
         </div>
     );

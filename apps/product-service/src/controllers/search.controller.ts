@@ -2,38 +2,68 @@ import { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
 import prisma from '../../../../packages/libs/prisma';
 
+// Helper to build advanced search conditions splitting by terms
+const buildSearchQuery = (query: string): Prisma.productsWhereInput => {
+  if (!query) return {};
+
+  const terms = query.trim().split(/\s+/).filter(t => t.length > 0);
+  if (terms.length === 0) return {};
+
+  const termConditions = terms.map(term => ({
+    OR: [
+      { title: { contains: term, mode: 'insensitive' as const } },
+      { description: { contains: term, mode: 'insensitive' as const } },
+      { category: { contains: term, mode: 'insensitive' as const } },
+      { brand: { contains: term, mode: 'insensitive' as const } },
+      { tags: { has: term.toLowerCase() } },
+    ]
+  }));
+
+  return {
+    AND: termConditions
+  };
+};
+
+const buildShopSearchQuery = (query: string): Prisma.shopsWhereInput => {
+  if (!query) return {};
+  const terms = query.trim().split(/\s+/).filter(t => t.length > 0);
+
+  const termConditions = terms.map(term => ({
+    OR: [
+      { name: { contains: term, mode: 'insensitive' as const } },
+      { bio: { contains: term, mode: 'insensitive' as const } },
+      { category: { contains: term, mode: 'insensitive' as const } }
+    ]
+  }));
+
+  return {
+    AND: termConditions
+  };
+};
+
 export const liveSearch = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const query = req.query.q as string;
 
     if (!query || query.trim().length < 2) {
-      return res.status(200).json({ 
-        success: true, 
+      return res.status(200).json({
+        success: true,
         data: { products: [], shops: [], events: [] }
       });
     }
 
     const now = new Date();
 
-    // Enhanced search conditions with pricing awareness
+    // Enhanced search conditions
     const productSearchCondition: Prisma.productsWhereInput = {
-      OR: [
-        { title: { contains: query, mode: 'insensitive' } },
-        { description: { contains: query, mode: 'insensitive' } },
-        { category: { contains: query, mode: 'insensitive' } },
-        { tags: { has: query.toLowerCase() } }
-      ],
+      ...buildSearchQuery(query),
       isDeleted: false,
       status: 'Active',
       stock: { gt: 0 }
     };
 
     const shopSearchCondition: Prisma.shopsWhereInput = {
-      OR: [
-        { name: { contains: query, mode: 'insensitive' } },
-        { bio: { contains: query, mode: 'insensitive' } },
-        { category: { contains: query, mode: 'insensitive' } }
-      ]
+      ...buildShopSearchQuery(query)
     };
 
     const eventSearchCondition: Prisma.eventsWhereInput = {
@@ -49,11 +79,11 @@ export const liveSearch = async (req: Request, res: Response, next: NextFunction
     const [products, shops, events] = await Promise.all([
       prisma.products.findMany({
         where: productSearchCondition,
-        select: { 
-          id: true, 
-          title: true, 
-          slug: true, 
-          images: true, 
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          images: true,
           regular_price: true,
           current_price: true,
           is_on_discount: true,
@@ -80,13 +110,13 @@ export const liveSearch = async (req: Request, res: Response, next: NextFunction
           { ratings: 'desc' }
         ]
       }),
-      
+
       prisma.shops.findMany({
         where: shopSearchCondition,
-        select: { 
-          id: true, 
-          name: true, 
-          slug: true, 
+        select: {
+          id: true,
+          name: true,
+          slug: true,
           avatar: true,
           category: true,
           ratings: true,
@@ -104,7 +134,7 @@ export const liveSearch = async (req: Request, res: Response, next: NextFunction
         take: 3,
         orderBy: { ratings: 'desc' }
       }),
-      
+
       prisma.events.findMany({
         where: eventSearchCondition,
         select: {
@@ -137,8 +167,8 @@ export const liveSearch = async (req: Request, res: Response, next: NextFunction
       })
     ]);
 
-    res.status(200).json({ 
-      success: true, 
+    res.status(200).json({
+      success: true,
       data: { products, shops, events }
     });
 
@@ -167,20 +197,15 @@ export const fullSearch = async (req: Request, res: Response, next: NextFunction
     const shopId = req.query.shopId as string;
 
     if (!query || query.trim().length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Search query is required.' 
+      return res.status(400).json({
+        success: false,
+        message: 'Search query is required.'
       });
     }
 
     // Build comprehensive where clause
     const whereClause: Prisma.productsWhereInput = {
-      OR: [
-        { title: { contains: query, mode: 'insensitive' } },
-        { description: { contains: query, mode: 'insensitive' } },
-        { tags: { has: query.toLowerCase() } },
-        { brand: { contains: query, mode: 'insensitive' } }
-      ],
+      ...buildSearchQuery(query),
       isDeleted: false,
       status: 'Active',
       stock: { gt: 0 }
@@ -284,9 +309,9 @@ export const fullSearch = async (req: Request, res: Response, next: NextFunction
         take: limit,
         orderBy: orderByClause
       }),
-      
+
       prisma.products.count({ where: whereClause }),
-      
+
       // Category facets
       prisma.products.groupBy({
         by: ['category'],
@@ -295,7 +320,7 @@ export const fullSearch = async (req: Request, res: Response, next: NextFunction
         orderBy: { _count: { id: 'desc' } },
         take: 10
       }),
-      
+
       // Shop facets
       prisma.products.groupBy({
         by: ['shopId'],
@@ -309,13 +334,13 @@ export const fullSearch = async (req: Request, res: Response, next: NextFunction
           where: { id: { in: shopIds } },
           select: { id: true, name: true, slug: true, avatar: true }
         });
-        
+
         return shopGroups.map(group => ({
           ...group,
           shop: shops.find(s => s.id === group.shopId)
         }));
       }),
-      
+
       // Price range for filters
       prisma.products.aggregate({
         where: whereClause,
@@ -337,7 +362,7 @@ export const fullSearch = async (req: Request, res: Response, next: NextFunction
         distinct: ['category'],
         take: 5
       });
-      
+
       suggestions = suggestionProducts
         .map(p => p.category)
         .filter(cat => cat.toLowerCase().includes(query.toLowerCase().substring(0, 3)));
@@ -393,11 +418,7 @@ export const searchProducts = async (req: Request, res: Response, next: NextFunc
 
     const products = await prisma.products.findMany({
       where: {
-        OR: [
-          { title: { contains: query, mode: "insensitive" } },
-          { description: { contains: query, mode: "insensitive" } },
-          { tags: { has: query.toLowerCase() } }
-        ],
+        ...buildSearchQuery(query),
         isDeleted: false,
         status: 'Active',
         stock: { gt: 0 }
@@ -451,11 +472,17 @@ export const searchEvents = async (req: Request, res: Response, next: NextFuncti
     }
 
     const now = new Date();
-    const whereClause: Prisma.eventsWhereInput = {
+
+    const terms = query.trim().split(/\s+/).filter(t => t.length > 0);
+    const termConditions = terms.map(term => ({
       OR: [
-        { title: { contains: query, mode: "insensitive" } },
-        { description: { contains: query, mode: "insensitive" } }
-      ],
+        { title: { contains: term, mode: "insensitive" as const } },
+        { description: { contains: term, mode: "insensitive" as const } }
+      ]
+    }));
+
+    const whereClause: Prisma.eventsWhereInput = {
+      AND: termConditions,
       is_active: true,
       starting_date: { lte: now },
       ending_date: { gte: now }
@@ -548,12 +575,9 @@ export const searchShops = async (req: Request, res: Response, next: NextFunctio
       });
     }
 
+
     const whereClause: Prisma.shopsWhereInput = {
-      OR: [
-        { name: { contains: query, mode: "insensitive" } },
-        { bio: { contains: query, mode: "insensitive" } },
-        { category: { contains: query, mode: "insensitive" } }
-      ]
+      ...buildShopSearchQuery(query)
     };
 
     if (category && category !== 'all') {
@@ -634,7 +658,7 @@ export const getSearchSuggestions = async (req: Request, res: Response, next: Ne
         distinct: ['title'],
         take: 5
       }),
-      
+
       // Category suggestions
       prisma.products.findMany({
         where: {
@@ -646,7 +670,7 @@ export const getSearchSuggestions = async (req: Request, res: Response, next: Ne
         distinct: ['category'],
         take: 3
       }),
-      
+
       // Shop name suggestions
       prisma.shops.findMany({
         where: {
@@ -705,12 +729,7 @@ export const sellerSearch = async (req: Request, res: Response, next: NextFuncti
       const products = await prisma.products.findMany({
         where: {
           shopId: sellerId,
-          OR: [
-            { title: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } },
-            { category: { contains: query, mode: 'insensitive' } },
-            { tags: { has: query.toLowerCase() } }
-          ],
+          ...buildSearchQuery(query),
           isDeleted: false
         },
         select: {
@@ -748,13 +767,18 @@ export const sellerSearch = async (req: Request, res: Response, next: NextFuncti
 
     // Search Events
     if (category === 'all' || category === 'events') {
+      const eTerms = query.trim().split(/\s+/).filter(t => t.length > 0);
+      const eTermConditions = eTerms.map(term => ({
+        OR: [
+          { title: { contains: term, mode: 'insensitive' as const } },
+          { description: { contains: term, mode: 'insensitive' as const } }
+        ]
+      }));
+
       const events = await prisma.events.findMany({
         where: {
           shopId: sellerId,
-          OR: [
-            { title: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } }
-          ]
+          AND: eTermConditions
         },
         select: {
           id: true,
@@ -779,8 +803,8 @@ export const sellerSearch = async (req: Request, res: Response, next: NextFuncti
         description: `${event.event_type} - ${event._count.products} products`,
         category: 'events' as const,
         url: `/dashboard/events/${event.id}`,
-        imageUrl: typeof event.banner_image === 'object' && event.banner_image !== null 
-          ? (event.banner_image as any).url 
+        imageUrl: typeof event.banner_image === 'object' && event.banner_image !== null
+          ? (event.banner_image as any).url
           : event.banner_image || null,
         metadata: {
           status: event.is_active && event.ending_date > now ? 'Active' : 'Inactive',
@@ -792,14 +816,19 @@ export const sellerSearch = async (req: Request, res: Response, next: NextFuncti
 
     // Search Discounts
     if (category === 'all' || category === 'discounts') {
+      const dTerms = query.trim().split(/\s+/).filter(t => t.length > 0);
+      const dTermConditions = dTerms.map(term => ({
+        OR: [
+          { discountCode: { contains: term, mode: 'insensitive' as const } },
+          { description: { contains: term, mode: 'insensitive' as const } },
+          { publicName: { contains: term, mode: 'insensitive' as const } }
+        ]
+      }));
+
       const discountCodes = await prisma.discount_codes.findMany({
         where: {
           shopId: sellerId,
-          OR: [
-            { discountCode: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } },
-            { publicName: { contains: query, mode: 'insensitive' } }
-          ]
+          AND: dTermConditions
         },
         select: {
           id: true,
@@ -829,8 +858,8 @@ export const sellerSearch = async (req: Request, res: Response, next: NextFuncti
         metadata: {
           status: discount.isActive && (!discount.validUntil || discount.validUntil > now) ? 'Active' : 'Inactive',
           type: discount.discountType,
-          value: discount.discountType === 'PERCENTAGE' 
-            ? `${discount.discountValue}%` 
+          value: discount.discountType === 'PERCENTAGE'
+            ? `${discount.discountValue}%`
             : `$${discount.discountValue}`,
           usage: `${discount.currentUsageCount}/${discount.usageLimit || '∞'}`
         }

@@ -20,6 +20,11 @@ export default function HomePage() {
         imageUrl="/images/wooden-hero.jpg"
       />
 
+      <ScrollText
+        eyebrow="The Philosophy"
+        text="We believe wood is more than just material — it’s a canvas of nature. Each grain tells a story, each creation a legacy of craftsmanship."
+      />
+
       <RecommendedProducts limit={3} />
 
       <ProductList
@@ -34,10 +39,7 @@ export default function HomePage() {
         product={featuredProduct}
       />
 
-      <ScrollText
-        eyebrow="The Philosophy"
-        text="We believe wood is more than just material — it’s a canvas of nature. Each grain tells a story, each creation a legacy of craftsmanship."
-      />
+
 
       <CallToAction
         eyebrow="Bring Art Home"
