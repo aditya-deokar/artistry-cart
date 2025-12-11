@@ -1,4 +1,4 @@
-import * as tf from '@tensorflow/tfjs-node';
+import * as tf from '@tensorflow/tfjs';
 import { getUserActivity } from './fetch-user-activity';
 import { preprocessData } from '../utils/preprocessData';
 
@@ -26,27 +26,40 @@ async function fetchUserActivity(userId: string): Promise<UserAction[]> {
     return Array.isArray(userActions) ? (userActions as unknown as UserAction[]) : [];
 }
 
+
 export const recommendProducts = async (userId: string, allProducts: any): Promise<string[]> => {
+    console.log(`Starting recommendation for user: ${userId}`);
     const userActions: UserAction[] = await fetchUserActivity(userId);
+    console.log(`Fetched ${userActions.length} user actions.`);
 
     if (userActions.length === 0) {
+        console.log('No user actions found.');
         return [];
     }
 
-    const processedData = preprocessData(userActions, allProducts);
+    const processedData = preprocessData(userActions, allProducts, userId);
 
     if (!processedData || !processedData.interactions || processedData.products) {
+        // Note: processedData.products is expected to be returned, the check 'processedData.products' as a failure condition seems wrong if it is truthy.
+        // Original code: if (!processedData || !processedData.interactions || processedData.products)
+        // 'processedData.products' is truthy (array), so this if statement might be evaluating to true and returning []?
+        // Let's check preprocessData return type. It returns { interactions, products }.
+        // If processedData.products is present, the original condition '|| processedData.products' would return []! 
+        // That looks like a BUG in the original code.
+    }
+
+    // Fix logic: If processedData is null or interactions missing. Remove incorrect products check.
+    if (!processedData || !processedData.interactions || processedData.interactions.length === 0) {
+        console.log('Preprocess returned empty interactions.');
         return [];
     }
 
     const { interactions } = processedData as {
         interactions: Interaction[];
     }
+    console.log(`Preprocessed interactions count: ${interactions.length}`);
 
-    const userMap: Record<string, number> = {
-
-    }
-
+    const userMap: Record<string, number> = {}
     const productMap: Record<string, number> = {}
 
     let userCount = 0;
@@ -54,10 +67,17 @@ export const recommendProducts = async (userId: string, allProducts: any): Promi
 
     interactions.forEach(({ userId, productId }) => {
         if (!(userId in userMap)) userMap[userId] = userCount++;
-
         if (!(productId in productMap)) productMap[productId] = productCount++;
-
     })
+    console.log(`User map size: ${userCount}, Product map size: ${productCount}`);
+
+    // Ensure current user is in map (should be if interactions exist)
+    if (!(userId in userMap)) {
+        console.log('User ID not found in userMap after processing interactions.');
+        // This is possible if all interactions were filtered out or something.
+        // But we checked interactions.length > 0.
+        // Wait, interactions in preprocessData are FORCED to have the passed userId.
+    }
 
     // define Model input layar
 
@@ -142,17 +162,29 @@ export const recommendProducts = async (userId: string, allProducts: any): Promi
         // validationSplit: 0.2
     })
 
+    console.log('Model training complete.');
+
     const productTensorAll = tf.tensor1d(
         Object.values(productMap),
         "int32"
     );
 
+    // Predict for the specific user
+    // If user is new (not in map), use 0 (unknown) - though logic above implies they are in map.
+    const userIndex = userMap[userId] ?? 0;
+
+    if (Object.keys(productMap).length === 0) {
+        console.log('No products in productMap to recommend.');
+        return [];
+    }
+
     const predictions = model.predict([
-        tf.tensor1d([userMap[userId] ?? 0], "int32"),
+        tf.tensor1d([userIndex], "int32"), // Create a tensor for the single user
         productTensorAll
     ]) as tf.Tensor;
 
     const scores = (await predictions.array()) as number[];
+    console.log(`Generated ${scores.length} scores.`);
 
     // sort and select top 10 recommended products
     const recommendedProducts: RecommendedProduct[] = Object.keys(productMap)
@@ -163,5 +195,8 @@ export const recommendProducts = async (userId: string, allProducts: any): Promi
         .sort((a, b) => b.score - a.score)
         .slice(0, 10);
 
+    console.log('Top recommendations:', recommendedProducts);
+
     return recommendedProducts.map(({ productId }) => productId);
 }
+

@@ -18,6 +18,8 @@ import WishlistButton from '@/components/products/WishlistButton';
 import { DeliveryInfo } from '@/components/products/DeliveryInfo';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Tag, TrendingUp } from 'lucide-react';
+import { RecommendedProducts } from './RecommendedProducts';
+
 
 type ProductPageClientProps = {
   product: ArtProduct;
@@ -200,12 +202,10 @@ export function ProductPageClient({ product, validImages }: ProductPageClientPro
         <ProductDetailsTabs product={product} />
       </div>
 
-      {/* Placeholder for Related Products */}
-      <div className="pt-24">
-        {/* <Suspense fallback={<div>Loading similar art...</div>}>
-          <OtherProductsV2 promise={...} />
-        </Suspense> */}
+      <div className="pt-24 border-t border-primary/10 mt-16">
+        <RecommendedProducts variant="grid" title="You Might Also Like" />
       </div>
     </Bounded>
   );
 }
+
