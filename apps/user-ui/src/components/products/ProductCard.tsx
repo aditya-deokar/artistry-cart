@@ -77,8 +77,8 @@ export const ProductCard: FC<ProductCardProps> = ({ product }) => {
 
         {/* Price */}
         <div className="mb-8 text-2xl font-semibold text-white">
-          ₹{product?.sale_price!.toLocaleString('en-IN')}
-          {product.regular_price > product?.sale_price! && (
+          ₹{(product.sale_price ?? product.regular_price).toLocaleString('en-IN')}
+          {product.sale_price && product.regular_price > product.sale_price && (
             <span className="ml-3 text-lg line-through text-white/60">
               ₹{product.regular_price.toLocaleString('en-IN')}
             </span>

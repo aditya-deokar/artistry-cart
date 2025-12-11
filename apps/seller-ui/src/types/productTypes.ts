@@ -34,7 +34,7 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   shopId: string;
-  Shop: Shop;
+  Shop: Shop | null;
   eventId?: string;
   event?: Event;
 }
@@ -80,13 +80,13 @@ export interface ProductFormData {
   images: ProductImage[];
   status: ProductStatus;
   customProperties?: Record<string, any>;
-  
+
   // SEO fields
   seoTitle?: string;
   seoDescription?: string;
   slug: string;
   focusKeywords?: string;
-  
+
   // Inventory fields
   trackQuantity?: boolean;
   allowBackorders?: boolean;
@@ -95,7 +95,7 @@ export interface ProductFormData {
   barcode?: string;
   stockStatus?: string;
   backorderMessage?: string;
-  
+
   // Tax fields
   taxable?: boolean;
 }

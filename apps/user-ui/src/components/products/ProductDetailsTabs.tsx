@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ArtProduct } from '@/types/products';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { ReadMoreDescription } from './ReadMoreDescription'; 
+import { ReadMoreDescription } from './ReadMoreDescription';
 
 export const ProductDetailsTabs: React.FC<{ product: ArtProduct }> = ({ product }) => {
   const [activeTab, setActiveTab] = useState('description');
@@ -12,7 +12,7 @@ export const ProductDetailsTabs: React.FC<{ product: ArtProduct }> = ({ product 
   const tabs = [
     { id: 'description', label: 'Description' },
     { id: 'specs', label: 'Specifications', disabled: !product.custom_specifications?.length },
-    { id: 'artist', label: 'About The Artist' },
+    { id: 'artist', label: 'About The Artist', disabled: !product.Shop },
     { id: 'warranty', label: 'Warranty', disabled: !product.warranty },
   ];
 
@@ -31,32 +31,32 @@ export const ProductDetailsTabs: React.FC<{ product: ArtProduct }> = ({ product 
       </div>
       <div className="py-8">
         {activeTab === 'description' && (
-            <ReadMoreDescription htmlContent={product.detailed_description} />
+          <ReadMoreDescription htmlContent={product.detailed_description} />
         )}
         {activeTab === 'specs' && (
-            <div className="space-y-3">
-                {product.custom_specifications.map(spec => (
-                    <div key={spec.name} className="flex justify-between border-b border-neutral-800 pb-2 text-sm">
-                        <span className="text-primary/70">{spec.name}</span>
-                        <span className="font-medium">{spec.value}</span>
-                    </div>
-                ))}
-            </div>
+          <div className="space-y-3">
+            {product.custom_specifications.map(spec => (
+              <div key={spec.name} className="flex justify-between border-b border-neutral-800 pb-2 text-sm">
+                <span className="text-primary/70">{spec.name}</span>
+                <span className="font-medium">{spec.value}</span>
+              </div>
+            ))}
+          </div>
         )}
-        {activeTab === 'artist' && (
-            <div className="prose prose-invert max-w-none">
-                <h3>{product.Shop.name}</h3>
-                <p>{product.Shop.bio || 'This artist has not provided a biography yet.'}</p>
-                <Link href={`/artist/${product.Shop.id}`} className="text-primary/50 hover:underline not-prose">
-                    View Artist's Collection &rarr;
-                </Link>
-            </div>
+        {activeTab === 'artist' && product.Shop && (
+          <div className="prose prose-invert max-w-none">
+            <h3>{product.Shop.name}</h3>
+            <p>{product.Shop.bio || 'This artist has not provided a biography yet.'}</p>
+            <Link href={`/artist/${product.Shop.id}`} className="text-primary/50 hover:underline not-prose">
+              View Artist's Collection &rarr;
+            </Link>
+          </div>
         )}
         {activeTab === 'warranty' && (
-             <div className="prose prose-invert max-w-none">
-                <h3>Warranty Information</h3>
-                <p>{product.warranty}</p>
-            </div>
+          <div className="prose prose-invert max-w-none">
+            <h3>Warranty Information</h3>
+            <p>{product.warranty}</p>
+          </div>
         )}
       </div>
     </div>

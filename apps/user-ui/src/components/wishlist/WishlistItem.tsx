@@ -14,7 +14,7 @@ import { type ArtProduct } from '@/types/products';
 type WishlistItemProps = {
   product: ArtProduct;
   onRemove: (productId: string) => void;
-  onMoveToCart: (product: ArtProduct) => void; 
+  onMoveToCart: (product: ArtProduct) => void;
 };
 
 
@@ -23,7 +23,7 @@ export const WishlistItem = ({ product, onRemove, onMoveToCart }: WishlistItemPr
   const isInStock = product.stock > 0;
   const isLimited = product.stock <= 5 && isInStock;
 
-  
+
   const getStockInfo = () => {
     if (isLimited) return { text: "Limited Stock", className: "text-amber-600" };
     if (isInStock) return { text: "In Stock", className: "text-green-600" };
@@ -44,10 +44,10 @@ export const WishlistItem = ({ product, onRemove, onMoveToCart }: WishlistItemPr
       <Link href={`/product/${product.slug}`} className="col-span-3 md:col-span-2">
         <div className="aspect-square relative rounded-md overflow-hidden bg-muted group">
           {primaryImage ? (
-            <Image 
-              src={primaryImage.url} 
-              alt={product.title} 
-              fill 
+            <Image
+              src={primaryImage.url}
+              alt={product.title}
+              fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
@@ -63,7 +63,11 @@ export const WishlistItem = ({ product, onRemove, onMoveToCart }: WishlistItemPr
             <Link href={`/product/${product.slug}`}>{product.title}</Link>
           </h3>
           <p className="text-sm text-muted-foreground mt-1">
-            by <Link href={`/shop/${product.Shop.id}`} className="hover:text-primary transition-colors">{product.Shop.name}</Link>
+            by {product.Shop ? (
+              <Link href={`/shop/${product.Shop.id}`} className="hover:text-primary transition-colors">{product.Shop.name}</Link>
+            ) : (
+              <span>Unknown Artist</span>
+            )}
           </p>
         </div>
 
@@ -79,28 +83,28 @@ export const WishlistItem = ({ product, onRemove, onMoveToCart }: WishlistItemPr
 
       {/* --- Column 3: Actions (Spans 4 columns) --- */}
       <div className="col-span-12 md:col-span-5 flex flex-col md:items-end gap-2 w-full">
-        <Button 
-            onClick={() => onMoveToCart(product)} 
-            disabled={!isInStock}
-            className="w-full md:w-48"
+        <Button
+          onClick={() => onMoveToCart(product)}
+          disabled={!isInStock}
+          className="w-full md:w-48"
         >
-            Move to Cart
+          Move to Cart
         </Button>
-       
+
         <Link href={`/products/${product.slug}`} className="w-full md:w-48">
           <Button variant="secondary" className="w-full flex items-center justify-center gap-2">
-              View Product <ArrowRight size={14} />
+            View Product <ArrowRight size={14} />
           </Button>
         </Link>
-        <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onRemove(product.id)} 
-            className="flex items-center gap-1 text-muted-foreground hover:text-red-500 w-fit self-end mt-2"
-            aria-label="Remove item"
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onRemove(product.id)}
+          className="flex items-center gap-1 text-muted-foreground hover:text-red-500 w-fit self-end mt-2"
+          aria-label="Remove item"
         >
-            <X size={14} />
-            <span>Remove</span>
+          <X size={14} />
+          <span>Remove</span>
         </Button>
       </div>
     </motion.div>

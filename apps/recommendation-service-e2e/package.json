@@ -1,0 +1,26 @@
+{
+  "name": "@artistry-cart/recommendation-service-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@artistry-cart/recommendation-service"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "apps/recommendation-service-e2e/jest.config.ts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@artistry-cart/recommendation-service:build",
+          "@artistry-cart/recommendation-service:serve"
+        ]
+      }
+    }
+  }
+}

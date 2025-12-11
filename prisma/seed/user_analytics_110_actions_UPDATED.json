@@ -1,0 +1,1066 @@
+{
+  "_id": {
+    "$oid": "693adf60d1f1dac92449fb8f"
+  },
+  "userId": {
+    "$oid": "68753b8419c4db23db02afed"
+  },
+  "lastVisited": {
+    "$date": {
+      "$numberLong": "1763865431490"
+    }
+  },
+  "actions": [
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1762789991490"
+        }
+      },
+      "productId": "693acfddc9289b49fdd582b9",
+      "shopId": "693acb2910ea7107b226f9ff"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1762895231490"
+        }
+      },
+      "productId": "693acfdda4988493ab3bad3f",
+      "shopId": "693acb29158765c95fe7c5d9"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1762959131490"
+        }
+      },
+      "productId": "693acfdd19b703f6d8f16378",
+      "shopId": "693acb29c0def61c618b7059"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763007911490"
+        }
+      },
+      "productId": "693acfdd895b2a1ba0eff512",
+      "shopId": "693acb29ea1f6bf3e3c64b02"
+    },
+    {
+      "action": "PRODUCT_SHARE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763012651490"
+        }
+      },
+      "productId": "693acfddcfba59bb012fb36b",
+      "shopId": "693acb29852b42aad6324631"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763069231490"
+        }
+      }
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763078891490"
+        }
+      },
+      "productId": "693acfdd4a3fb442d83c9483",
+      "shopId": "693acb29de007b98bfc6034b"
+    },
+    {
+      "action": "CATEGORY_BROWSE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763095811490"
+        }
+      }
+    },
+    {
+      "action": "CATEGORY_BROWSE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763109371490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763168111490"
+        }
+      },
+      "productId": "693acfddffbbf724544b7e29",
+      "shopId": "693acb293203894e25b1a845"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763187791490"
+        }
+      },
+      "productId": "693acfddc9a7ae33f26c6d60",
+      "shopId": "693acb296eac30a4a76d15fd"
+    },
+    {
+      "action": "PURCHASE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763205491490"
+        }
+      },
+      "productId": "693acfddb4068816c9aeabea",
+      "shopId": "693acb292808c40827077979"
+    },
+    {
+      "action": "WISHLIST_ADD",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763222591490"
+        }
+      },
+      "productId": "693acfdd4c811c2df5407e21",
+      "shopId": "693acb29ca2fc4564a03d837"
+    },
+    {
+      "action": "SHOP_VISIT",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763264531490"
+        }
+      },
+      "shopId": "693acb2947d4e1ec677bda9a"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763277491490"
+        }
+      },
+      "productId": "693acfddd2ec9414820fc419",
+      "shopId": "693acb2987048ea6339425a6"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763329571490"
+        }
+      }
+    },
+    {
+      "action": "CATEGORY_BROWSE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763331731490"
+        }
+      }
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763363771490"
+        }
+      },
+      "productId": "693acfdd19b703f6d8f16378",
+      "shopId": "693acb29c0def61c618b7059"
+    },
+    {
+      "action": "CATEGORY_BROWSE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763405111490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763415911490"
+        }
+      },
+      "productId": "693acfdd29754e36b5eeb44b",
+      "shopId": "693acb29158765c95fe7c5d9"
+    },
+    {
+      "action": "PRODUCT_RATING",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763442131490"
+        }
+      },
+      "productId": "693acfdd74b90c3b0be5be1c",
+      "shopId": "693acb2947d4e1ec677bda9a"
+    },
+    {
+      "action": "SHOP_VISIT",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763443511490"
+        }
+      },
+      "shopId": "693acb29ca2fc4564a03d837"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763450111490"
+        }
+      },
+      "productId": "693acfddb4068816c9aeabea",
+      "shopId": "693acb292808c40827077979"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763460491490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763511131490"
+        }
+      },
+      "productId": "693acfdddfa9b29ea547fd74",
+      "shopId": "693acb29ac4a9bdb79e0fe00"
+    },
+    {
+      "action": "PURCHASE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763515031490"
+        }
+      },
+      "productId": "693acfdde50f7e0497679d14",
+      "shopId": "693acb29f1dac92449fb8fd7"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763565191490"
+        }
+      },
+      "productId": "693acfddbcc985add672fb81",
+      "shopId": "693acb2985add672fb816278"
+    },
+    {
+      "action": "SHOP_VISIT",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763570051490"
+        }
+      },
+      "shopId": "693acb29852b42aad6324631"
+    },
+    {
+      "action": "WISHLIST_ADD",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763634791490"
+        }
+      },
+      "productId": "693acfdd2808c40827077979",
+      "shopId": "693acb29c1b0b8656952f0b6"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763678771490"
+        }
+      }
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763742311490"
+        }
+      },
+      "productId": "693acfdda99e135fccefd757",
+      "shopId": "693acb29dde2077cd4f4a3cc"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763760371490"
+        }
+      },
+      "productId": "693acfdd37f96b82280daac7",
+      "shopId": "693acb292079b4141bc6b3c8"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763825111490"
+        }
+      },
+      "productId": "693acfdd2808c40827077979",
+      "shopId": "693acb29c1b0b8656952f0b6"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763825111490"
+        }
+      },
+      "productId": "693acfdde69c99258e78a686",
+      "shopId": "693acb293a1827ac94830938"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763825231490"
+        }
+      }
+    },
+    {
+      "action": "SHOP_VISIT",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763825291490"
+        }
+      },
+      "shopId": "693acb29fbcfbbd7f12267e7"
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763825291490"
+        }
+      },
+      "productId": "693acfdd74b90c3b0be5be1c",
+      "shopId": "693acb2947d4e1ec677bda9a"
+    },
+    {
+      "action": "CATEGORY_BROWSE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763826071490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_RATING",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763826731490"
+        }
+      },
+      "productId": "693acfdd29754e36b5eeb44b",
+      "shopId": "693acb29158765c95fe7c5d9"
+    },
+    {
+      "action": "WISHLIST_REMOVE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763827391490"
+        }
+      },
+      "productId": "693acfdd2328956a68047c2a",
+      "shopId": "693acb295d02275ca37caf96"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763827691490"
+        }
+      },
+      "productId": "693acfdd19b703f6d8f16378",
+      "shopId": "693acb29c0def61c618b7059"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763827751490"
+        }
+      },
+      "productId": "693acfddd967b3688e1805aa",
+      "shopId": "693acb295597983ac179381b"
+    },
+    {
+      "action": "CATEGORY_BROWSE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763827871490"
+        }
+      }
+    },
+    {
+      "action": "SHOP_VISIT",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763827871490"
+        }
+      },
+      "shopId": "693acb2910ea7107b226f9ff"
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763827931490"
+        }
+      },
+      "productId": "693acfdde41f62908f6313fa",
+      "shopId": "693acb2971e032632e7fbad5"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763827931490"
+        }
+      },
+      "productId": "693acfdd4c811c2df5407e21",
+      "shopId": "693acb29ca2fc4564a03d837"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763828471490"
+        }
+      },
+      "productId": "693acfdde50f7e0497679d14",
+      "shopId": "693acb29f1dac92449fb8fd7"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763828531490"
+        }
+      },
+      "productId": "693acfdd70661e252e3aa96b",
+      "shopId": "693acb290613b8c55220bcc9"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763828591490"
+        }
+      },
+      "productId": "693acfdd894e25b1a8452ace",
+      "shopId": "693acb295b12ab960680a038"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763828951490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763829071490"
+        }
+      },
+      "productId": "693acfdde50f7e0497679d14",
+      "shopId": "693acb29f1dac92449fb8fd7"
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763829671490"
+        }
+      },
+      "productId": "693acfddd2ec9414820fc419",
+      "shopId": "693acb2987048ea6339425a6"
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763830871490"
+        }
+      },
+      "productId": "693acfddc9a7ae33f26c6d60",
+      "shopId": "693acb296eac30a4a76d15fd"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763831111490"
+        }
+      },
+      "productId": "693acfdd983ac179381bc0de",
+      "shopId": "693acb2901f67f0a50988f21"
+    },
+    {
+      "action": "WISHLIST_ADD",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763831171490"
+        }
+      },
+      "productId": "693acfddd2ec9414820fc419",
+      "shopId": "693acb2987048ea6339425a6"
+    },
+    {
+      "action": "WISHLIST_ADD",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763831171490"
+        }
+      },
+      "productId": "693acfdd10b4a6b3372d52ee",
+      "shopId": "693acb29807d3287fd2d74c3"
+    },
+    {
+      "action": "PURCHASE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763831171490"
+        }
+      },
+      "productId": "693acfdd983ac179381bc0de",
+      "shopId": "693acb2901f67f0a50988f21"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763831711490"
+        }
+      },
+      "productId": "693acfdd29754e36b5eeb44b",
+      "shopId": "693acb29158765c95fe7c5d9"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763832011490"
+        }
+      },
+      "productId": "693acfddcfba59bb012fb36b",
+      "shopId": "693acb29852b42aad6324631"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763832191490"
+        }
+      },
+      "productId": "693acfddac4976cebb42552a",
+      "shopId": "693acb29ca2fc4564a03d837"
+    },
+    {
+      "action": "WISHLIST_ADD",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763832551490"
+        }
+      },
+      "productId": "693acfddc2640654a7a13cc4",
+      "shopId": "693acb2983a3cd477192d480"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763832611490"
+        }
+      },
+      "productId": "693acfdda4988493ab3bad3f",
+      "shopId": "693acb29158765c95fe7c5d9"
+    },
+    {
+      "action": "WISHLIST_REMOVE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763832611490"
+        }
+      },
+      "productId": "693acfdde69c99258e78a686",
+      "shopId": "693acb293a1827ac94830938"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763832851490"
+        }
+      },
+      "productId": "693acfddf561d0623d76bc04",
+      "shopId": "693acb29a40660f2a1b6e93d"
+    },
+    {
+      "action": "PRODUCT_SHARE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763833031490"
+        }
+      },
+      "productId": "693acfddc363a054b17e8cb6",
+      "shopId": "693acb2972d82ba9255187c4"
+    },
+    {
+      "action": "CATEGORY_BROWSE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763833151490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763833271490"
+        }
+      },
+      "productId": "693acfddffbbf724544b7e29",
+      "shopId": "693acb293203894e25b1a845"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763833571490"
+        }
+      }
+    },
+    {
+      "action": "CATEGORY_BROWSE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763833991490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763834471490"
+        }
+      },
+      "productId": "693acfdd983ac179381bc0de",
+      "shopId": "693acb2901f67f0a50988f21"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763834771490"
+        }
+      },
+      "productId": "693acfddde14221854c9432b",
+      "shopId": "693acb29c9432bdd9843c25f"
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763834891490"
+        }
+      },
+      "productId": "693acfdd895b2a1ba0eff512",
+      "shopId": "693acb29ea1f6bf3e3c64b02"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763835251490"
+        }
+      },
+      "productId": "693acfddac4976cebb42552a",
+      "shopId": "693acb29ca2fc4564a03d837"
+    },
+    {
+      "action": "PRODUCT_RATING",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763835971490"
+        }
+      },
+      "productId": "693acfdd29754e36b5eeb44b",
+      "shopId": "693acb29158765c95fe7c5d9"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763836031490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763836271490"
+        }
+      },
+      "productId": "693acfdd7bda9a2079b4141b",
+      "shopId": "693acb292660e533c5994fb9"
+    },
+    {
+      "action": "WISHLIST_ADD",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763837351490"
+        }
+      },
+      "productId": "693acfddf561d0623d76bc04",
+      "shopId": "693acb29a40660f2a1b6e93d"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763837711490"
+        }
+      },
+      "productId": "693acfdda99e135fccefd757",
+      "shopId": "693acb29dde2077cd4f4a3cc"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763837771490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763839211490"
+        }
+      },
+      "productId": "693acfdd10b4a6b3372d52ee",
+      "shopId": "693acb29807d3287fd2d74c3"
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763839751490"
+        }
+      },
+      "productId": "693acfdd8635c9b88f491d10",
+      "shopId": "693acb29e76ab7c7863c1aa5"
+    },
+    {
+      "action": "CATEGORY_BROWSE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763839931490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763841011490"
+        }
+      },
+      "productId": "693acfdde69c99258e78a686",
+      "shopId": "693acb293a1827ac94830938"
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763841011490"
+        }
+      },
+      "productId": "693acfdd895b2a1ba0eff512",
+      "shopId": "693acb29ea1f6bf3e3c64b02"
+    },
+    {
+      "action": "WISHLIST_ADD",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763841071490"
+        }
+      },
+      "productId": "693acfdda70346ee6d8f7d91",
+      "shopId": "693acb29ab48b5477e766a91"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763841431490"
+        }
+      }
+    },
+    {
+      "action": "WISHLIST_ADD",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763841791490"
+        }
+      },
+      "productId": "693acfdd926fd889242112c3",
+      "shopId": "693acb29ae57d0c2d66fcf30"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763842691490"
+        }
+      },
+      "productId": "693acfddac4976cebb42552a",
+      "shopId": "693acb29ca2fc4564a03d837"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763844011490"
+        }
+      }
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763844011490"
+        }
+      },
+      "productId": "693acfddbcc985add672fb81",
+      "shopId": "693acb2985add672fb816278"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763845211490"
+        }
+      },
+      "productId": "693acfddf561d0623d76bc04",
+      "shopId": "693acb29a40660f2a1b6e93d"
+    },
+    {
+      "action": "WISHLIST_REMOVE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763845931490"
+        }
+      },
+      "productId": "693acfdd66e4858350fddbdd",
+      "shopId": "693acb298924b28d84a4e595"
+    },
+    {
+      "action": "PRODUCT_RATING",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763846891490"
+        }
+      },
+      "productId": "693acfddac4976cebb42552a",
+      "shopId": "693acb29ca2fc4564a03d837"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763847251490"
+        }
+      }
+    },
+    {
+      "action": "SHOP_VISIT",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763847851490"
+        }
+      },
+      "shopId": "693acb295597983ac179381b"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763848091490"
+        }
+      }
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763848811490"
+        }
+      },
+      "productId": "693acfdd74b90c3b0be5be1c",
+      "shopId": "693acb2947d4e1ec677bda9a"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763849471490"
+        }
+      },
+      "productId": "693acfdd37f96b82280daac7",
+      "shopId": "693acb292079b4141bc6b3c8"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763850791490"
+        }
+      },
+      "productId": "693acfddde14221854c9432b",
+      "shopId": "693acb29c9432bdd9843c25f"
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763851391490"
+        }
+      },
+      "productId": "693acfdd29754e36b5eeb44b",
+      "shopId": "693acb29158765c95fe7c5d9"
+    },
+    {
+      "action": "PRODUCT_SHARE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763851571490"
+        }
+      },
+      "productId": "693acfdd66e4858350fddbdd",
+      "shopId": "693acb298924b28d84a4e595"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763852531490"
+        }
+      },
+      "productId": "693acfdd016e85e87dd01581",
+      "shopId": "693acb292bf148c9d3c522d1"
+    },
+    {
+      "action": "ADD_TO_CART",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763852711490"
+        }
+      },
+      "productId": "693acfdde26e639a5657f7e8",
+      "shopId": "693acb2982165bda189e9d60"
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763853131490"
+        }
+      }
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763854271490"
+        }
+      }
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763855951490"
+        }
+      },
+      "productId": "693acfdda99e135fccefd757",
+      "shopId": "693acb29dde2077cd4f4a3cc"
+    },
+    {
+      "action": "CATEGORY_BROWSE",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763857211490"
+        }
+      }
+    },
+    {
+      "action": "SEARCH",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763858351490"
+        }
+      }
+    },
+    {
+      "action": "SHOP_VISIT",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763860691490"
+        }
+      },
+      "shopId": "693acb29c0def61c618b7059"
+    },
+    {
+      "action": "PRODUCT_VIEW",
+      "timestamp": {
+        "$date": {
+          "$numberLong": "1763865431490"
+        }
+      },
+      "productId": "693acfddb4068816c9aeabea",
+      "shopId": "693acb292808c40827077979"
+    }
+  ],
+  "createdAt": {
+    "$date": {
+      "$numberLong": "1762789991490"
+    }
+  },
+  "updatedAt": {
+    "$date": {
+      "$numberLong": "1763865431490"
+    }
+  }
+}

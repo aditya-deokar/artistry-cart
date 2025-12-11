@@ -76,18 +76,24 @@ export const DeliveryInfo: React.FC<DeliveryInfoProps> = ({ product }) => {
             {product.warranty}
           </InfoItem>
         )}
-        
+
         {product.cash_on_delivery && (
-            <InfoItem icon={<Banknote />} title="Payment Method">
-                Cash on Delivery Available
-            </InfoItem>
+          <InfoItem icon={<Banknote />} title="Payment Method">
+            Cash on Delivery Available
+          </InfoItem>
         )}
 
-        <InfoItem icon={<ShoppingBagIcon />} title="Sold By">
+        {product.Shop ? (
+          <InfoItem icon={<ShoppingBagIcon />} title="Sold By">
             <Link href={`/artist/${product.Shop.id}`} className="hover:text-primary hover:underline transition-colors">
-                {product.Shop.name}
+              {product.Shop.name}
             </Link>
-        </InfoItem>
+          </InfoItem>
+        ) : (
+          <InfoItem icon={<ShoppingBagIcon />} title="Sold By">
+            <span>Unknown Artist</span>
+          </InfoItem>
+        )}
       </ul>
     </div>
   );

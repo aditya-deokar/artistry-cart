@@ -5,16 +5,13 @@ import { ProductFeature } from '@/components/sections/ProductFeature';
 import { ProductList } from '@/components/sections/ProductList';
 import { ScrollText } from '@/components/sections/ScrollText';
 import { products } from '@/lib/data';
-
-
-
+import { RecommendedProducts } from '@/components/products/RecommendedProducts';
 
 export default function HomePage() {
   const featuredProduct = products[0]; // Example: feature the first product
 
   return (
     <>
-      
       <Hero
         heading="Crafted with Nature’s Touch"
         body="Discover timeless handmade wooden creations that bring warmth, elegance, and artistry into your home."
@@ -22,6 +19,8 @@ export default function HomePage() {
         buttonLink="/product"
         imageUrl="/images/wooden-hero.jpg"
       />
+
+      <RecommendedProducts limit={3} />
 
       <ProductList
         eyebrow="Our Creations"

@@ -1,0 +1,5565 @@
+[
+  {
+    "_id": {
+      "$oid": "693acfdd8110207905a34d95"
+    },
+    "title": "Classic Sheesham Wood Jali Screen",
+    "description": "Intricately carved wooden partition screen featuring traditional Jali work patterns.",
+    "detailed_description": "<p>Intricately carved wooden partition screen featuring traditional Jali work patterns. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "43cm x 32cm"
+      }
+    ],
+    "slug": "classic-sheesham-wood-jali-screen",
+    "tags": [
+      "wood",
+      "jali",
+      "partition",
+      "handcarved",
+      "traditional"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Saharanpur Wood Heritage",
+    "video_url": null,
+    "category": "Woodwork",
+    "subCategory": "Furniture",
+    "colors": [
+      "#8B4513",
+      "#654321"
+    ],
+    "sizes": [
+      "XS",
+      "XL",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "8"
+    },
+    "sale_price": {
+      "$numberDouble": "13500.0"
+    },
+    "regular_price": {
+      "$numberDouble": "15000.0"
+    },
+    "current_price": {
+      "$numberDouble": "13500.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd165bda189e9d608b",
+        "url": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd9c89591c47ee8aca",
+        "url": "https://images.unsplash.com/photo-1618220179428-22790b461013?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764425181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb298110207905a34d95"
+    },
+    "totalSales": {
+      "$numberLong": "54"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd03d837844fa3972b"
+    },
+    "title": "Channapatna Wooden Toy Set",
+    "description": "Colorful wooden toys made with natural vegetable dyes, safe for children.",
+    "detailed_description": "<p>Colorful wooden toys made with natural vegetable dyes, safe for children. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "43cm x 22cm"
+      }
+    ],
+    "slug": "channapatna-wooden-toy-set",
+    "tags": [
+      "toys",
+      "wooden",
+      "eco-friendly",
+      "kids",
+      "colorful"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Channapatna Toy City",
+    "video_url": null,
+    "category": "Toys",
+    "subCategory": "Wooden Toys",
+    "colors": [
+      "#FF6B6B",
+      "#4ECDC4",
+      "#FFE66D"
+    ],
+    "sizes": [
+      "XL",
+      "XS",
+      "S",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "50"
+    },
+    "sale_price": {
+      "$numberDouble": "999.0"
+    },
+    "regular_price": {
+      "$numberDouble": "1200.0"
+    },
+    "current_price": {
+      "$numberDouble": "999.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.1"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd74c310ea7107b226",
+        "url": "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddf9ffbf1aac9c2df0",
+        "url": "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1763561181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29bd3acc1211f07767"
+    },
+    "totalSales": {
+      "$numberLong": "42"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfddcc1211f07767dde2"
+    },
+    "title": "Kashmiri Walnut Wood Jewellery Box",
+    "description": "Hand-carved walnut wood box with intricate floral patterns and velvet interior.",
+    "detailed_description": "<p>Hand-carved walnut wood box with intricate floral patterns and velvet interior. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "40cm x 31cm"
+      }
+    ],
+    "slug": "kashmiri-walnut-wood-jewellery-box",
+    "tags": [
+      "walnut",
+      "jewellery box",
+      "carved",
+      "kashmir",
+      "premium"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Kashmir Walnut Wonders",
+    "video_url": null,
+    "category": "Woodwork",
+    "subCategory": "Decorative Boxes",
+    "colors": [
+      "#5D4E37"
+    ],
+    "sizes": [
+      "L",
+      "XS",
+      "M",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "15"
+    },
+    "sale_price": {
+      "$numberDouble": "3999.0"
+    },
+    "regular_price": {
+      "$numberDouble": "4500.0"
+    },
+    "current_price": {
+      "$numberDouble": "3999.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.2"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfddc95fe7c5d9ac4a9b",
+        "url": "https://images.unsplash.com/photo-1611652022419-a9419f74343a?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdddb79e0fe000613b8",
+        "url": "https://images.unsplash.com/photo-1585664811087-47f65abbad64?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1761141981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29bf1aac9c2df05794"
+    },
+    "totalSales": {
+      "$numberLong": "95"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfddbcc985add672fb81"
+    },
+    "title": "Mysore Sandalwood Ganesha Idol",
+    "description": "Aromatic sandalwood carving of Lord Ganesha with fine detailing.",
+    "detailed_description": "<p>Aromatic sandalwood carving of Lord Ganesha with fine detailing. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "1 year",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "28cm x 15cm"
+      }
+    ],
+    "slug": "mysore-sandalwood-ganesha-idol",
+    "tags": [
+      "sandalwood",
+      "ganesha",
+      "religious",
+      "aromatic",
+      "handcarved"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Mysore Sandalwood Carvings",
+    "video_url": null,
+    "category": "Woodwork",
+    "subCategory": "Religious Idols",
+    "colors": [
+      "#F5DEB3"
+    ],
+    "sizes": [
+      "XS",
+      "M",
+      "L"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "12"
+    },
+    "sale_price": {
+      "$numberDouble": "7650.0"
+    },
+    "regular_price": {
+      "$numberDouble": "8500.0"
+    },
+    "current_price": {
+      "$numberDouble": "7650.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.3"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd57d0c2d66fcf3085",
+        "url": "https://images.unsplash.com/photo-1580137189272-c9379f8864fd?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd2b42aad632463147",
+        "url": "https://images.unsplash.com/photo-1582042564106-8f29ff6b7685?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1760796381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb2985add672fb816278"
+    },
+    "totalSales": {
+      "$numberLong": "61"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd7bda9a2079b4141b"
+    },
+    "title": "Kerala Rosewood Elephant Statue",
+    "description": "Heavy rosewood elephant with intricate ivory inlay work.",
+    "detailed_description": "<p>Heavy rosewood elephant with intricate ivory inlay work. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "32cm x 33cm"
+      }
+    ],
+    "slug": "kerala-rosewood-elephant-statue",
+    "tags": [
+      "rosewood",
+      "elephant",
+      "sculpture",
+      "inlay",
+      "kerala"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Kerala Rosewood Arts",
+    "video_url": null,
+    "category": "Woodwork",
+    "subCategory": "Sculptures",
+    "colors": [
+      "#3E2723"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "XS",
+      "L"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "6"
+    },
+    "sale_price": {
+      "$numberDouble": "10800.0"
+    },
+    "regular_price": {
+      "$numberDouble": "12000.0"
+    },
+    "current_price": {
+      "$numberDouble": "10800.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd6a912660e533c599",
+        "url": "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd4fb901f67f0a5098",
+        "url": "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1762351581910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb292660e533c5994fb9"
+    },
+    "totalSales": {
+      "$numberLong": "13"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd983ac179381bc0de"
+    },
+    "title": "Jodhpur Antique Wooden Door Panel",
+    "description": "Restored vintage carved door panel with traditional Rajasthani motifs.",
+    "detailed_description": "<p>Restored vintage carved door panel with traditional Rajasthani motifs. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "45cm x 33cm"
+      }
+    ],
+    "slug": "jodhpur-antique-wooden-door-panel",
+    "tags": [
+      "antique",
+      "door",
+      "rajasthani",
+      "vintage",
+      "architectural"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Jodhpur Antique Wood",
+    "video_url": null,
+    "category": "Woodwork",
+    "subCategory": "Architectural Elements",
+    "colors": [
+      "#8B4513",
+      "#CD853F"
+    ],
+    "sizes": [
+      "XL",
+      "M",
+      "L",
+      "XS"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "3"
+    },
+    "sale_price": {
+      "$numberDouble": "22000.0"
+    },
+    "regular_price": {
+      "$numberDouble": "25000.0"
+    },
+    "current_price": {
+      "$numberDouble": "22000.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd5971e032632e7fba",
+        "url": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddd5de9c35e8302c2d",
+        "url": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764597981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb2901f67f0a50988f21"
+    },
+    "totalSales": {
+      "$numberLong": "35"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfddde14221854c9432b"
+    },
+    "title": "Kinnal Wooden Rocking Horse",
+    "description": "Traditional painted wooden rocking horse from Karnataka.",
+    "detailed_description": "<p>Traditional painted wooden rocking horse from Karnataka. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "29cm x 19cm"
+      }
+    ],
+    "slug": "kinnal-wooden-rocking-horse",
+    "tags": [
+      "rocking horse",
+      "kinnal",
+      "painted",
+      "traditional",
+      "kids"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Kinnal Art Craft",
+    "video_url": "https://youtu.be/example_6",
+    "category": "Woodwork",
+    "subCategory": "Toys & Decor",
+    "colors": [
+      "#FF6347",
+      "#FFD700",
+      "#4169E1"
+    ],
+    "sizes": [
+      "XS",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "10"
+    },
+    "sale_price": {
+      "$numberDouble": "3150.0"
+    },
+    "regular_price": {
+      "$numberDouble": "3500.0"
+    },
+    "current_price": {
+      "$numberDouble": "3150.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd830938c1b0b86569",
+        "url": "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd52f0b6de007b98bf",
+        "url": "https://images.unsplash.com/photo-1597137980088-8e3e0c8e5b18?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1757772381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29c9432bdd9843c25f"
+    },
+    "totalSales": {
+      "$numberLong": "54"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd2808c40827077979"
+    },
+    "title": "Assam Cane Furniture Set",
+    "description": "Eco-friendly bamboo and cane chair and table set.",
+    "detailed_description": "<p>Eco-friendly bamboo and cane chair and table set. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "26cm x 30cm"
+      }
+    ],
+    "slug": "assam-cane-furniture-set",
+    "tags": [
+      "bamboo",
+      "cane",
+      "furniture",
+      "eco-friendly",
+      "assam"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Assam Bamboo Works",
+    "video_url": null,
+    "category": "Woodwork",
+    "subCategory": "Furniture",
+    "colors": [
+      "#D2B48C"
+    ],
+    "sizes": [
+      "S",
+      "XS",
+      "XL",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "5"
+    },
+    "sale_price": {
+      "$numberDouble": "16200.0"
+    },
+    "regular_price": {
+      "$numberDouble": "18000.0"
+    },
+    "current_price": {
+      "$numberDouble": "16200.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfddbbd7f12267e78924",
+        "url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddb28d84a4e5956eac",
+        "url": "https://images.unsplash.com/photo-1551298370-9d3d53740c72?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764338781910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29c1b0b8656952f0b6"
+    },
+    "totalSales": {
+      "$numberLong": "46"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd15fd5b12ab960680"
+    },
+    "title": "Sankheda Colorful Wooden Swing",
+    "description": "Traditional Gujarati teak wood swing with vibrant lacquer work.",
+    "detailed_description": "<p>Traditional Gujarati teak wood swing with vibrant lacquer work. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "46cm x 35cm"
+      }
+    ],
+    "slug": "sankheda-colorful-wooden-swing",
+    "tags": [
+      "swing",
+      "teak",
+      "lacquer",
+      "colorful",
+      "gujarat"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Sankheda Furniture",
+    "video_url": null,
+    "category": "Woodwork",
+    "subCategory": "Furniture",
+    "colors": [
+      "#FF0000",
+      "#00FF00",
+      "#FFD700"
+    ],
+    "sizes": [
+      "S",
+      "L",
+      "XL",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "4"
+    },
+    "sale_price": {
+      "$numberDouble": "19800.0"
+    },
+    "regular_price": {
+      "$numberDouble": "22000.0"
+    },
+    "current_price": {
+      "$numberDouble": "19800.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd3dfc6fffbaf726c0",
+        "url": "https://images.unsplash.com/photo-1618220179428-22790b461013?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd42ee39cad4fe4ea0",
+        "url": "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1763820381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29fbcfbbd7f12267e7"
+    },
+    "totalSales": {
+      "$numberLong": "93"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd894e25b1a8452ace"
+    },
+    "title": "Kerala Temple Style Wooden Pillar",
+    "description": "Intricately carved wooden pillar inspired by temple architecture.",
+    "detailed_description": "<p>Intricately carved wooden pillar inspired by temple architecture. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "43cm x 25cm"
+      }
+    ],
+    "slug": "kerala-temple-style-wooden-pillar",
+    "tags": [
+      "pillar",
+      "temple",
+      "carved",
+      "architectural",
+      "kerala"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Wood Carvings of Kerala",
+    "video_url": "https://youtu.be/example_9",
+    "category": "Woodwork",
+    "subCategory": "Architectural Elements",
+    "colors": [
+      "#654321"
+    ],
+    "sizes": [
+      "M",
+      "XS",
+      "L",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "2"
+    },
+    "sale_price": {
+      "$numberDouble": "31500.0"
+    },
+    "regular_price": {
+      "$numberDouble": "35000.0"
+    },
+    "current_price": {
+      "$numberDouble": "31500.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.1"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfddd3c522d1f1dac924",
+        "url": "https://images.unsplash.com/photo-1621641382409-b22a2aa6ba49?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd49fb8fd772d82ba9",
+        "url": "https://images.unsplash.com/photo-1618220924273-338d82d6a6f9?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1758377181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb295b12ab960680a038"
+    },
+    "totalSales": {
+      "$numberLong": "14"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfddc4dad0e484123e59"
+    },
+    "title": "Nagaland Tribal Bamboo Basket Set",
+    "description": "Handwoven bamboo baskets with traditional tribal patterns.",
+    "detailed_description": "<p>Handwoven bamboo baskets with traditional tribal patterns. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "40cm x 27cm"
+      }
+    ],
+    "slug": "nagaland-tribal-bamboo-basket-set",
+    "tags": [
+      "bamboo",
+      "basket",
+      "tribal",
+      "handwoven",
+      "nagaland"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Nagaland Bamboo Crafts",
+    "video_url": null,
+    "category": "Woodwork",
+    "subCategory": "Home Decor",
+    "colors": [
+      "#8B7355"
+    ],
+    "sizes": [
+      "XS",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "25"
+    },
+    "sale_price": {
+      "$numberDouble": "2250.0"
+    },
+    "regular_price": {
+      "$numberDouble": "2500.0"
+    },
+    "current_price": {
+      "$numberDouble": "2250.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.6"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd5e4083a3cd477192",
+        "url": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddd4805d02275ca37c",
+        "url": "https://images.unsplash.com/photo-1617069427900-7db9f70bc7c4?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1761660381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb292acef5ab851ea23d"
+    },
+    "totalSales": {
+      "$numberLong": "42"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfddc363a054b17e8cb6"
+    },
+    "title": "Mughal Inlay Wooden Console Table",
+    "description": "Geometric wood inlay table inspired by Mughal architecture.",
+    "detailed_description": "<p>Geometric wood inlay table inspired by Mughal architecture. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "1 year",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "39cm x 32cm"
+      }
+    ],
+    "slug": "mughal-inlay-wooden-console-table",
+    "tags": [
+      "inlay",
+      "mughal",
+      "table",
+      "geometric",
+      "premium"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Mughal Wood Inlay",
+    "video_url": null,
+    "category": "Woodwork",
+    "subCategory": "Furniture",
+    "colors": [
+      "#8B4513",
+      "#F5DEB3"
+    ],
+    "sizes": [
+      "M",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "3"
+    },
+    "sale_price": {
+      "$numberDouble": "25200.0"
+    },
+    "regular_price": {
+      "$numberDouble": "28000.0"
+    },
+    "current_price": {
+      "$numberDouble": "25200.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd4fe7029a317e24a1",
+        "url": "https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd0d42d5fa19217844",
+        "url": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1759068381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb2972d82ba9255187c4"
+    },
+    "totalSales": {
+      "$numberLong": "43"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfddac4976cebb42552a"
+    },
+    "title": "Jaipur Blue Pottery Vase Set",
+    "description": "Traditional blue glazed pottery vases with floral designs.",
+    "detailed_description": "<p>Traditional blue glazed pottery vases with floral designs. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "33cm x 24cm"
+      }
+    ],
+    "slug": "jaipur-blue-pottery-vase-set",
+    "tags": [
+      "pottery",
+      "blue",
+      "vase",
+      "jaipur",
+      "glazed"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Jaipur Blue Pottery",
+    "video_url": null,
+    "category": "Pottery",
+    "subCategory": "Decorative Items",
+    "colors": [
+      "#4169E1",
+      "#FFFFFF"
+    ],
+    "sizes": [
+      "XS",
+      "XL",
+      "L",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "20"
+    },
+    "sale_price": {
+      "$numberDouble": "3150.0"
+    },
+    "regular_price": {
+      "$numberDouble": "3500.0"
+    },
+    "current_price": {
+      "$numberDouble": "3150.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.1"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfddb152bd24776ab07a",
+        "url": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddcaec801abb9ddb32",
+        "url": "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1763561181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29ca2fc4564a03d837"
+    },
+    "totalSales": {
+      "$numberLong": "23"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdda4988493ab3bad3f"
+    },
+    "title": "Bankura Terracotta Horse",
+    "description": "Famous Bankura horse sculpture in traditional terracotta.",
+    "detailed_description": "<p>Famous Bankura horse sculpture in traditional terracotta. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "44cm x 25cm"
+      }
+    ],
+    "slug": "bankura-terracotta-horse",
+    "tags": [
+      "terracotta",
+      "horse",
+      "bankura",
+      "sculpture",
+      "bengal"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Bankura Terracotta",
+    "video_url": null,
+    "category": "Pottery",
+    "subCategory": "Sculptures",
+    "colors": [
+      "#CD853F"
+    ],
+    "sizes": [
+      "M",
+      "L"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "15"
+    },
+    "sale_price": {
+      "$numberDouble": "4050.0"
+    },
+    "regular_price": {
+      "$numberDouble": "4500.0"
+    },
+    "current_price": {
+      "$numberDouble": "4050.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.0"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd5e381493cf0c0bb7",
+        "url": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd6789d859afef924d",
+        "url": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1761919581910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29158765c95fe7c5d9"
+    },
+    "totalSales": {
+      "$numberLong": "13"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd37f96b82280daac7"
+    },
+    "title": "Nizamabad Black Pottery Bowl",
+    "description": "Unique black clay pottery with silver inlay designs.",
+    "detailed_description": "<p>Unique black clay pottery with silver inlay designs. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "40cm x 28cm"
+      }
+    ],
+    "slug": "nizamabad-black-pottery-bowl",
+    "tags": [
+      "pottery",
+      "black",
+      "silver inlay",
+      "bowl",
+      "unique"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Nizamabad Black Pottery",
+    "video_url": null,
+    "category": "Pottery",
+    "subCategory": "Tableware",
+    "colors": [
+      "#000000",
+      "#C0C0C0"
+    ],
+    "sizes": [
+      "XS",
+      "M",
+      "L",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "18"
+    },
+    "sale_price": {
+      "$numberDouble": "2520.0"
+    },
+    "regular_price": {
+      "$numberDouble": "2800.0"
+    },
+    "current_price": {
+      "$numberDouble": "2520.0"
+    },
+    "ratings": {
+      "$numberDouble": "5.0"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd8aaf347005241b04",
+        "url": "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd383165bebaaa5356",
+        "url": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1761487581910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb292079b4141bc6b3c8"
+    },
+    "totalSales": {
+      "$numberLong": "11"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfddb4068816c9aeabea"
+    },
+    "title": "Molela Terracotta Wall Plaque",
+    "description": "Decorative clay plaque featuring deity designs from Rajasthan.",
+    "detailed_description": "<p>Decorative clay plaque featuring deity designs from Rajasthan. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "40cm x 38cm"
+      }
+    ],
+    "slug": "molela-terracotta-wall-plaque",
+    "tags": [
+      "terracotta",
+      "wall art",
+      "plaque",
+      "deity",
+      "rajasthan"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Molela Clay Art",
+    "video_url": "https://youtu.be/example_15",
+    "category": "Pottery",
+    "subCategory": "Wall Art",
+    "colors": [
+      "#D2691E",
+      "#FFD700"
+    ],
+    "sizes": [
+      "S",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "12"
+    },
+    "sale_price": {
+      "$numberDouble": "2880.0"
+    },
+    "regular_price": {
+      "$numberDouble": "3200.0"
+    },
+    "current_price": {
+      "$numberDouble": "2880.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd4ac6654940dbdca2",
+        "url": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddee2f1ada47cfede5",
+        "url": "https://images.unsplash.com/photo-1620127807580-990c3ecebd14?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1759673181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb292808c40827077979"
+    },
+    "totalSales": {
+      "$numberLong": "52"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfddc9a7ae33f26c6d60"
+    },
+    "title": "Khavda Hand-Painted Pottery Set",
+    "description": "Colorful earthen pots with traditional Kutch patterns.",
+    "detailed_description": "<p>Colorful earthen pots with traditional Kutch patterns. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "31cm x 15cm"
+      }
+    ],
+    "slug": "khavda-hand-painted-pottery-set",
+    "tags": [
+      "pottery",
+      "hand-painted",
+      "kutch",
+      "colorful",
+      "earthen"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Khavda Pottery",
+    "video_url": null,
+    "category": "Pottery",
+    "subCategory": "Tableware",
+    "colors": [
+      "#FF6347",
+      "#4169E1",
+      "#FFD700"
+    ],
+    "sizes": [
+      "S",
+      "XS",
+      "XL"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "30"
+    },
+    "sale_price": {
+      "$numberDouble": "1980.0"
+    },
+    "regular_price": {
+      "$numberDouble": "2200.0"
+    },
+    "current_price": {
+      "$numberDouble": "1980.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.1"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd888a73b6f71dae42",
+        "url": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd67f2fc056c9d8bbb",
+        "url": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1763733981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb296eac30a4a76d15fd"
+    },
+    "totalSales": {
+      "$numberLong": "22"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfddffbbf724544b7e29"
+    },
+    "title": "Khurja Ceramic Dinner Set",
+    "description": "Colorful ceramic crockery set with 24 pieces.",
+    "detailed_description": "<p>Colorful ceramic crockery set with 24 pieces. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "37cm x 19cm"
+      }
+    ],
+    "slug": "khurja-ceramic-dinner-set",
+    "tags": [
+      "ceramic",
+      "dinner set",
+      "khurja",
+      "crockery",
+      "colorful"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Khurja Pottery Works",
+    "video_url": null,
+    "category": "Pottery",
+    "subCategory": "Tableware",
+    "colors": [
+      "#FF6B6B",
+      "#4ECDC4",
+      "#FFFFFF"
+    ],
+    "sizes": [
+      "XL",
+      "S",
+      "L",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "10"
+    },
+    "sale_price": {
+      "$numberDouble": "4950.0"
+    },
+    "regular_price": {
+      "$numberDouble": "5500.0"
+    },
+    "current_price": {
+      "$numberDouble": "4950.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.3"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfddc5b26a33e3e5ecb0",
+        "url": "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd1324f338107e473b",
+        "url": "https://images.unsplash.com/photo-1584990347449-2f14533f6e3e?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1759932381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb293203894e25b1a845"
+    },
+    "totalSales": {
+      "$numberLong": "34"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd4c811c2df5407e21"
+    },
+    "title": "Terracotta Garden Planters",
+    "description": "Large handmade terracotta planters with carved patterns.",
+    "detailed_description": "<p>Large handmade terracotta planters with carved patterns. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "1 year",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "37cm x 30cm"
+      }
+    ],
+    "slug": "terracotta-garden-planters",
+    "tags": [
+      "terracotta",
+      "planter",
+      "garden",
+      "large",
+      "carved"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Bankura Terracotta",
+    "video_url": null,
+    "category": "Pottery",
+    "subCategory": "Garden Decor",
+    "colors": [
+      "#CD853F"
+    ],
+    "sizes": [
+      "L",
+      "XS",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "8"
+    },
+    "sale_price": {
+      "$numberDouble": "3420.0"
+    },
+    "regular_price": {
+      "$numberDouble": "3800.0"
+    },
+    "current_price": {
+      "$numberDouble": "3420.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd3d7620227e2aabb7",
+        "url": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd49a720a7aea0a545",
+        "url": "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764943581910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29ca2fc4564a03d837"
+    },
+    "totalSales": {
+      "$numberLong": "23"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd29754e36b5eeb44b"
+    },
+    "title": "Blue Pottery Decorative Plates",
+    "description": "Hand-painted blue pottery wall plates set of 3.",
+    "detailed_description": "<p>Hand-painted blue pottery wall plates set of 3. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "47cm x 36cm"
+      }
+    ],
+    "slug": "blue-pottery-decorative-plates",
+    "tags": [
+      "pottery",
+      "plates",
+      "wall decor",
+      "blue",
+      "hand-painted"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Jaipur Blue Pottery",
+    "video_url": "https://youtu.be/example_19",
+    "category": "Pottery",
+    "subCategory": "Wall Decor",
+    "colors": [
+      "#4169E1",
+      "#FFFFFF",
+      "#FFD700"
+    ],
+    "sizes": [
+      "M",
+      "S",
+      "XS"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "15"
+    },
+    "sale_price": {
+      "$numberDouble": "3780.0"
+    },
+    "regular_price": {
+      "$numberDouble": "4200.0"
+    },
+    "current_price": {
+      "$numberDouble": "3780.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd5d0090724a107ee7",
+        "url": "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddd220440e6cc39be8",
+        "url": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1762610781910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29158765c95fe7c5d9"
+    },
+    "totalSales": {
+      "$numberLong": "90"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdde26e639a5657f7e8"
+    },
+    "title": "Madhubani Painting on Canvas",
+    "description": "Original Madhubani artwork depicting nature and mythology.",
+    "detailed_description": "<p>Original Madhubani artwork depicting nature and mythology. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "30cm x 40cm"
+      }
+    ],
+    "slug": "madhubani-painting-on-canvas",
+    "tags": [
+      "madhubani",
+      "painting",
+      "folk art",
+      "canvas",
+      "bihar"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Mithila Folk Art Gallery",
+    "video_url": "https://youtu.be/example_20",
+    "category": "Creative Art",
+    "subCategory": "Paintings",
+    "colors": [
+      "#FF0000",
+      "#FFD700",
+      "#000000"
+    ],
+    "sizes": [
+      "L",
+      "XS",
+      "XL"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "8"
+    },
+    "sale_price": {
+      "$numberDouble": "5850.0"
+    },
+    "regular_price": {
+      "$numberDouble": "6500.0"
+    },
+    "current_price": {
+      "$numberDouble": "5850.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd7d32e3425cffc07f",
+        "url": "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddf6812a5ebf82c331",
+        "url": "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764684381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb2982165bda189e9d60"
+    },
+    "totalSales": {
+      "$numberLong": "10"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfddc35861cbda839e6f"
+    },
+    "title": "Pattachitra Palm Leaf Engraving",
+    "description": "Intricate palm leaf art depicting Jagannath mythology.",
+    "detailed_description": "<p>Intricate palm leaf art depicting Jagannath mythology. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "28cm x 25cm"
+      }
+    ],
+    "slug": "pattachitra-palm-leaf-engraving",
+    "tags": [
+      "pattachitra",
+      "palm leaf",
+      "engraving",
+      "odisha",
+      "mythology"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Odisha Pattachitra Studio",
+    "video_url": "https://youtu.be/example_21",
+    "category": "Creative Art",
+    "subCategory": "Traditional Art",
+    "colors": [
+      "#8B4513",
+      "#FFD700"
+    ],
+    "sizes": [
+      "XL",
+      "M",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "10"
+    },
+    "sale_price": {
+      "$numberDouble": "4950.0"
+    },
+    "regular_price": {
+      "$numberDouble": "5500.0"
+    },
+    "current_price": {
+      "$numberDouble": "4950.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd6a4b826fb7dc5171",
+        "url": "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd4100209e0b0cd271",
+        "url": "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764684381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29844fa3972b156f75"
+    },
+    "totalSales": {
+      "$numberLong": "90"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd10b4a6b3372d52ee"
+    },
+    "title": "Warli Art Wall Hanging",
+    "description": "Minimalist tribal art on cloth depicting village life.",
+    "detailed_description": "<p>Minimalist tribal art on cloth depicting village life. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "40cm x 28cm"
+      }
+    ],
+    "slug": "warli-art-wall-hanging",
+    "tags": [
+      "warli",
+      "tribal",
+      "wall hanging",
+      "minimalist",
+      "maharashtra"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Warli Tribal Art",
+    "video_url": "https://youtu.be/example_22",
+    "category": "Creative Art",
+    "subCategory": "Wall Art",
+    "colors": [
+      "#FFFFFF",
+      "#8B4513"
+    ],
+    "sizes": [
+      "XL",
+      "L",
+      "M",
+      "XS"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "15"
+    },
+    "sale_price": {
+      "$numberDouble": "3420.0"
+    },
+    "regular_price": {
+      "$numberDouble": "3800.0"
+    },
+    "current_price": {
+      "$numberDouble": "3420.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.2"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd1bd7819d8659d047",
+        "url": "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddc30a615cacb943d7",
+        "url": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1763993181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29807d3287fd2d74c3"
+    },
+    "totalSales": {
+      "$numberLong": "23"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdda99e135fccefd757"
+    },
+    "title": "Tanjore Gold Foil Painting",
+    "description": "Rich relief painting with real gold foil and gemstones.",
+    "detailed_description": "<p>Rich relief painting with real gold foil and gemstones. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "1 year",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "47cm x 31cm"
+      }
+    ],
+    "slug": "tanjore-gold-foil-painting",
+    "tags": [
+      "tanjore",
+      "gold foil",
+      "painting",
+      "relief",
+      "premium"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Tanjore Gold Art",
+    "video_url": null,
+    "category": "Creative Art",
+    "subCategory": "Religious Art",
+    "colors": [
+      "#FFD700",
+      "#FF0000"
+    ],
+    "sizes": [
+      "XS",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "5"
+    },
+    "sale_price": {
+      "$numberDouble": "13500.0"
+    },
+    "regular_price": {
+      "$numberDouble": "15000.0"
+    },
+    "current_price": {
+      "$numberDouble": "13500.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd232ed1295747c729",
+        "url": "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddaca407ba6f8c09c8",
+        "url": "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1762005981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29dde2077cd4f4a3cc"
+    },
+    "totalSales": {
+      "$numberLong": "71"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd74b90c3b0be5be1c"
+    },
+    "title": "Kangra Miniature Painting",
+    "description": "Delicate Pahari miniature art from Himachal Pradesh.",
+    "detailed_description": "<p>Delicate Pahari miniature art from Himachal Pradesh. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "1 year",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "44cm x 28cm"
+      }
+    ],
+    "slug": "kangra-miniature-painting",
+    "tags": [
+      "kangra",
+      "miniature",
+      "pahari",
+      "painting",
+      "himachal"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Kangra Miniature Art",
+    "video_url": null,
+    "category": "Creative Art",
+    "subCategory": "Miniature Art",
+    "colors": [
+      "#8B0000",
+      "#FFD700",
+      "#4169E1"
+    ],
+    "sizes": [
+      "XL",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "6"
+    },
+    "sale_price": {
+      "$numberDouble": "7650.0"
+    },
+    "regular_price": {
+      "$numberDouble": "8500.0"
+    },
+    "current_price": {
+      "$numberDouble": "7650.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.2"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd9796ac7ad2db28fe",
+        "url": "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd9b66fca4121cbe97",
+        "url": "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb2947d4e1ec677bda9a"
+    },
+    "totalSales": {
+      "$numberLong": "96"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdda70346ee6d8f7d91"
+    },
+    "title": "Gond Tribal Dot Painting",
+    "description": "Nature-inspired dot and line artwork by Gond artisans.",
+    "detailed_description": "<p>Nature-inspired dot and line artwork by Gond artisans. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "23cm x 38cm"
+      }
+    ],
+    "slug": "gond-tribal-dot-painting",
+    "tags": [
+      "gond",
+      "tribal",
+      "dot painting",
+      "nature",
+      "madhya pradesh"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Gond Tribal Creations",
+    "video_url": "https://youtu.be/example_25",
+    "category": "Creative Art",
+    "subCategory": "Tribal Art",
+    "colors": [
+      "#FF6347",
+      "#4169E1",
+      "#FFD700"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XS"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "12"
+    },
+    "sale_price": {
+      "$numberDouble": "4050.0"
+    },
+    "regular_price": {
+      "$numberDouble": "4500.0"
+    },
+    "current_price": {
+      "$numberDouble": "4050.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd74779396da4054f4",
+        "url": "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddd3011c6f9a8b8fd5",
+        "url": "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1765116381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29ab48b5477e766a91"
+    },
+    "totalSales": {
+      "$numberLong": "92"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd66e4858350fddbdd"
+    },
+    "title": "Phad Scroll Painting",
+    "description": "Narrative scroll painting of local deities on cloth.",
+    "detailed_description": "<p>Narrative scroll painting of local deities on cloth. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "1 year",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "48cm x 35cm"
+      }
+    ],
+    "slug": "phad-scroll-painting",
+    "tags": [
+      "phad",
+      "scroll",
+      "painting",
+      "narrative",
+      "rajasthan"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Phad Scroll Paintings",
+    "video_url": null,
+    "category": "Creative Art",
+    "subCategory": "Traditional Art",
+    "colors": [
+      "#FF0000",
+      "#FFD700",
+      "#4169E1"
+    ],
+    "sizes": [
+      "XS",
+      "XL"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "7"
+    },
+    "sale_price": {
+      "$numberDouble": "6750.0"
+    },
+    "regular_price": {
+      "$numberDouble": "7500.0"
+    },
+    "current_price": {
+      "$numberDouble": "6750.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdda7678ef532f207e1",
+        "url": "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddd73fcdc1a96e792f",
+        "url": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1760709981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb298924b28d84a4e595"
+    },
+    "totalSales": {
+      "$numberLong": "52"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfddf561d0623d76bc04"
+    },
+    "title": "Kalighat Pat Watercolor",
+    "description": "Bold watercolor painting depicting social themes.",
+    "detailed_description": "<p>Bold watercolor painting depicting social themes. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "46cm x 20cm"
+      }
+    ],
+    "slug": "kalighat-pat-watercolor",
+    "tags": [
+      "kalighat",
+      "watercolor",
+      "bold",
+      "social",
+      "kolkata"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Kalighat Pat",
+    "video_url": "https://youtu.be/example_27",
+    "category": "Creative Art",
+    "subCategory": "Watercolor Art",
+    "colors": [
+      "#FF6347",
+      "#4169E1",
+      "#FFD700"
+    ],
+    "sizes": [
+      "XS",
+      "M",
+      "XL",
+      "L"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "9"
+    },
+    "sale_price": {
+      "$numberDouble": "5220.0"
+    },
+    "regular_price": {
+      "$numberDouble": "5800.0"
+    },
+    "current_price": {
+      "$numberDouble": "5220.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.1"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfddd4f2a9e495d34fc6",
+        "url": "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd89cc34f8909edce9",
+        "url": "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1761314781910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29a40660f2a1b6e93d"
+    },
+    "totalSales": {
+      "$numberLong": "58"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdde50f7e0497679d14"
+    },
+    "title": "Sohrai Tribal Mural Art",
+    "description": "Traditional Jharkhand tribal wall mural artwork.",
+    "detailed_description": "<p>Traditional Jharkhand tribal wall mural artwork. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "47cm x 18cm"
+      }
+    ],
+    "slug": "sohrai-tribal-mural-art",
+    "tags": [
+      "sohrai",
+      "tribal",
+      "mural",
+      "jharkhand",
+      "traditional"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Sohrai Art Centre",
+    "video_url": "https://youtu.be/example_28",
+    "category": "Creative Art",
+    "subCategory": "Mural Art",
+    "colors": [
+      "#8B4513",
+      "#FFFFFF",
+      "#FF6347"
+    ],
+    "sizes": [
+      "S",
+      "XS",
+      "XL"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "8"
+    },
+    "sale_price": {
+      "$numberDouble": "5580.0"
+    },
+    "regular_price": {
+      "$numberDouble": "6200.0"
+    },
+    "current_price": {
+      "$numberDouble": "5580.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdded485fff44dff1de",
+        "url": "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd15f4b20f3cd342a0",
+        "url": "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1763561181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29f1dac92449fb8fd7"
+    },
+    "totalSales": {
+      "$numberLong": "77"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd4f209288dc4ab751"
+    },
+    "title": "Roghan Fabric Painting",
+    "description": "Rare oil-based fabric painting from Kutch.",
+    "detailed_description": "<p>Rare oil-based fabric painting from Kutch. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "46cm x 35cm"
+      }
+    ],
+    "slug": "roghan-fabric-painting",
+    "tags": [
+      "roghan",
+      "fabric",
+      "oil painting",
+      "kutch",
+      "rare"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Roghan Art Kutch",
+    "video_url": null,
+    "category": "Creative Art",
+    "subCategory": "Fabric Art",
+    "colors": [
+      "#FF0000",
+      "#FFD700",
+      "#008000"
+    ],
+    "sizes": [
+      "XS",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "4"
+    },
+    "sale_price": {
+      "$numberDouble": "8550.0"
+    },
+    "regular_price": {
+      "$numberDouble": "9500.0"
+    },
+    "current_price": {
+      "$numberDouble": "8550.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.2"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd5b184a220083a3c8",
+        "url": "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd50cf63b8362313bc",
+        "url": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764597981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29c94c352131455e40"
+    },
+    "totalSales": {
+      "$numberLong": "89"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd016e85e87dd01581"
+    },
+    "title": "Kutch Mirror Work Bedspread",
+    "description": "Vibrant embroidered bedspread with traditional mirror work.",
+    "detailed_description": "<p>Vibrant embroidered bedspread with traditional mirror work. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "1 year",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "25cm x 39cm"
+      }
+    ],
+    "slug": "kutch-mirror-work-bedspread",
+    "tags": [
+      "embroidery",
+      "mirror work",
+      "bedspread",
+      "kutch",
+      "vibrant"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Kutch Embroidery Works",
+    "video_url": null,
+    "category": "Textiles",
+    "subCategory": "Home Textiles",
+    "colors": [
+      "#FF6347",
+      "#FFD700",
+      "#4169E1"
+    ],
+    "sizes": [
+      "M",
+      "XS",
+      "XL",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "12"
+    },
+    "sale_price": {
+      "$numberDouble": "4950.0"
+    },
+    "regular_price": {
+      "$numberDouble": "5500.0"
+    },
+    "current_price": {
+      "$numberDouble": "4950.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfddbaa45541af2c840f",
+        "url": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd30ff860fc94bb279",
+        "url": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764165981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb292bf148c9d3c522d1"
+    },
+    "totalSales": {
+      "$numberLong": "19"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfddc2640654a7a13cc4"
+    },
+    "title": "Pipli Applique Wall Hanging",
+    "description": "Colorful applique work depicting traditional motifs.",
+    "detailed_description": "<p>Colorful applique work depicting traditional motifs. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "47cm x 25cm"
+      }
+    ],
+    "slug": "pipli-applique-wall-hanging",
+    "tags": [
+      "applique",
+      "wall hanging",
+      "colorful",
+      "pipli",
+      "orissa"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Pippli Applique Works",
+    "video_url": "https://youtu.be/example_31",
+    "category": "Textiles",
+    "subCategory": "Wall Decor",
+    "colors": [
+      "#FF0000",
+      "#FFD700",
+      "#00FF00"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "18"
+    },
+    "sale_price": {
+      "$numberDouble": "2880.0"
+    },
+    "regular_price": {
+      "$numberDouble": "3200.0"
+    },
+    "current_price": {
+      "$numberDouble": "2880.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.2"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd94cccd16f7eb3059",
+        "url": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddac2014089129c137",
+        "url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1762783581910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb2983a3cd477192d480"
+    },
+    "totalSales": {
+      "$numberLong": "94"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdddfa9b29ea547fd74"
+    },
+    "title": "Sanganeri Block Print Saree",
+    "description": "Hand block printed cotton saree with floral patterns.",
+    "detailed_description": "<p>Hand block printed cotton saree with floral patterns. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "44cm x 18cm"
+      }
+    ],
+    "slug": "sanganeri-block-print-saree",
+    "tags": [
+      "block print",
+      "saree",
+      "cotton",
+      "floral",
+      "sanganer"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Sanganeri Block Prints",
+    "video_url": "https://youtu.be/example_32",
+    "category": "Textiles",
+    "subCategory": "Sarees",
+    "colors": [
+      "#FF6B6B",
+      "#FFFFFF"
+    ],
+    "sizes": [
+      "S",
+      "XL"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "20"
+    },
+    "sale_price": {
+      "$numberDouble": "4050.0"
+    },
+    "regular_price": {
+      "$numberDouble": "4500.0"
+    },
+    "current_price": {
+      "$numberDouble": "4050.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd556b6b67875f46dc",
+        "url": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd44327e792f32850c",
+        "url": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1759154781910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29ac4a9bdb79e0fe00"
+    },
+    "totalSales": {
+      "$numberLong": "15"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfddd2ec9414820fc419"
+    },
+    "title": "Pochampally Ikat Dupatta",
+    "description": "Geometric pattern Ikat silk dupatta from Telangana.",
+    "detailed_description": "<p>Geometric pattern Ikat silk dupatta from Telangana. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "1 year",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "27cm x 28cm"
+      }
+    ],
+    "slug": "pochampally-ikat-dupatta",
+    "tags": [
+      "ikat",
+      "dupatta",
+      "silk",
+      "geometric",
+      "pochampally"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Pochampally Ikat Weaves",
+    "video_url": null,
+    "category": "Textiles",
+    "subCategory": "Dupattas",
+    "colors": [
+      "#8B0000",
+      "#FFD700"
+    ],
+    "sizes": [
+      "XS",
+      "L"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "25"
+    },
+    "sale_price": {
+      "$numberDouble": "3420.0"
+    },
+    "regular_price": {
+      "$numberDouble": "3800.0"
+    },
+    "current_price": {
+      "$numberDouble": "3420.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.3"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdda01b2d2c4862df71",
+        "url": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddb176b5301733b61a",
+        "url": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1763301981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb2987048ea6339425a6"
+    },
+    "totalSales": {
+      "$numberLong": "50"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfddd967b3688e1805aa"
+    },
+    "title": "Chamba Rumal Embroidered Handkerchief",
+    "description": "Silk embroidery on handkerchief depicting Krishna leela.",
+    "detailed_description": "<p>Silk embroidery on handkerchief depicting Krishna leela. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "2 years",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "47cm x 32cm"
+      }
+    ],
+    "slug": "chamba-rumal-embroidered-handkerchief",
+    "tags": [
+      "embroidery",
+      "handkerchief",
+      "silk",
+      "krishna",
+      "chamba"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Chamba Rumal Art",
+    "video_url": null,
+    "category": "Textiles",
+    "subCategory": "Handkerchiefs",
+    "colors": [
+      "#FFD700",
+      "#FF0000",
+      "#4169E1"
+    ],
+    "sizes": [
+      "S",
+      "XS",
+      "M",
+      "L"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "30"
+    },
+    "sale_price": {
+      "$numberDouble": "2250.0"
+    },
+    "regular_price": {
+      "$numberDouble": "2500.0"
+    },
+    "current_price": {
+      "$numberDouble": "2250.0"
+    },
+    "ratings": {
+      "$numberDouble": "5.0"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd69e289482e8084eb",
+        "url": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddbd5ce5cc45d0c824",
+        "url": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1763647581910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb295597983ac179381b"
+    },
+    "totalSales": {
+      "$numberLong": "45"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdde69c99258e78a686"
+    },
+    "title": "Lucknow Chikankari Kurta",
+    "description": "Fine white embroidery on cotton kurta.",
+    "detailed_description": "<p>Fine white embroidery on cotton kurta. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "50cm x 21cm"
+      }
+    ],
+    "slug": "lucknow-chikankari-kurta",
+    "tags": [
+      "chikankari",
+      "kurta",
+      "embroidery",
+      "cotton",
+      "lucknow"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Lucknow Chikan Palace",
+    "video_url": null,
+    "category": "Textiles",
+    "subCategory": "Clothing",
+    "colors": [
+      "#FFFFFF"
+    ],
+    "sizes": [
+      "M",
+      "L"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "15"
+    },
+    "sale_price": {
+      "$numberDouble": "4950.0"
+    },
+    "regular_price": {
+      "$numberDouble": "5500.0"
+    },
+    "current_price": {
+      "$numberDouble": "4950.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd005b8bf7ae26cc7a",
+        "url": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd05bcf2ec1a227c13",
+        "url": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1758204381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb293a1827ac94830938"
+    },
+    "totalSales": {
+      "$numberLong": "15"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd4a3fb442d83c9483"
+    },
+    "title": "Chanderi Silk Saree",
+    "description": "Sheer texture silk saree with golden border.",
+    "detailed_description": "<p>Sheer texture silk saree with golden border. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "34cm x 32cm"
+      }
+    ],
+    "slug": "chanderi-silk-saree",
+    "tags": [
+      "chanderi",
+      "silk",
+      "saree",
+      "sheer",
+      "golden"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Chanderi Handloom Weaves",
+    "video_url": null,
+    "category": "Textiles",
+    "subCategory": "Sarees",
+    "colors": [
+      "#FFD700",
+      "#8B0000"
+    ],
+    "sizes": [
+      "M",
+      "XL",
+      "S",
+      "L"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "10"
+    },
+    "sale_price": {
+      "$numberDouble": "7650.0"
+    },
+    "regular_price": {
+      "$numberDouble": "8500.0"
+    },
+    "current_price": {
+      "$numberDouble": "7650.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd3864a4609b2a819b",
+        "url": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd2f5ba9fb7bfebf92",
+        "url": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764511581910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29de007b98bfc6034b"
+    },
+    "totalSales": {
+      "$numberLong": "82"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd9f2f6ef99a662a17"
+    },
+    "title": "Bagh Print Cotton Bedsheet",
+    "description": "Natural color block print bedsheet with geometric patterns.",
+    "detailed_description": "<p>Natural color block print bedsheet with geometric patterns. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "35cm x 34cm"
+      }
+    ],
+    "slug": "bagh-print-cotton-bedsheet",
+    "tags": [
+      "bagh print",
+      "bedsheet",
+      "cotton",
+      "geometric",
+      "natural"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Bagh Block Prints",
+    "video_url": "https://youtu.be/example_37",
+    "category": "Textiles",
+    "subCategory": "Home Textiles",
+    "colors": [
+      "#8B4513",
+      "#FFFFFF"
+    ],
+    "sizes": [
+      "XS",
+      "L"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "22"
+    },
+    "sale_price": {
+      "$numberDouble": "3150.0"
+    },
+    "regular_price": {
+      "$numberDouble": "3500.0"
+    },
+    "current_price": {
+      "$numberDouble": "3150.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd5f49e9d41cedc3d4",
+        "url": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd0577b1d047a8bfa6",
+        "url": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1759845981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29fc6fffbaf726c042"
+    },
+    "totalSales": {
+      "$numberLong": "96"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd80527dd14217bcef"
+    },
+    "title": "Dhokra Brass Tribal Figurine",
+    "description": "Lost-wax casting brass figurine from Bastar.",
+    "detailed_description": "<p>Lost-wax casting brass figurine from Bastar. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "43cm x 39cm"
+      }
+    ],
+    "slug": "dhokra-brass-tribal-figurine",
+    "tags": [
+      "dhokra",
+      "brass",
+      "tribal",
+      "figurine",
+      "lost-wax"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Dhokra Metal Crafts",
+    "video_url": "https://youtu.be/example_38",
+    "category": "Metal Craft",
+    "subCategory": "Sculptures",
+    "colors": [
+      "#B87333"
+    ],
+    "sizes": [
+      "XL",
+      "S",
+      "XS"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "10"
+    },
+    "sale_price": {
+      "$numberDouble": "4050.0"
+    },
+    "regular_price": {
+      "$numberDouble": "4500.0"
+    },
+    "current_price": {
+      "$numberDouble": "4050.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.3"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd37df2721fddcd6cb",
+        "url": "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd875d4e5dd080c378",
+        "url": "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1757945181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29c0def61c618b7059"
+    },
+    "totalSales": {
+      "$numberLong": "43"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd2328956a68047c2a"
+    },
+    "title": "Moradabad Brass Lamp",
+    "description": "Ornate brass diya lamp with intricate engravings.",
+    "detailed_description": "<p>Ornate brass diya lamp with intricate engravings. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "46cm x 33cm"
+      }
+    ],
+    "slug": "moradabad-brass-lamp",
+    "tags": [
+      "brass",
+      "lamp",
+      "diya",
+      "moradabad",
+      "engraved"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Moradabad Brass House",
+    "video_url": null,
+    "category": "Metal Craft",
+    "subCategory": "Lighting",
+    "colors": [
+      "#FFD700"
+    ],
+    "sizes": [
+      "L",
+      "XL",
+      "M",
+      "XS"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "25"
+    },
+    "sale_price": {
+      "$numberDouble": "2880.0"
+    },
+    "regular_price": {
+      "$numberDouble": "3200.0"
+    },
+    "current_price": {
+      "$numberDouble": "2880.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.2"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd0c7cc5b63ac13cd1",
+        "url": "https://images.unsplash.com/photo-1603006905003-be475563bc59?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd6ab0b028dfd813e0",
+        "url": "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1765116381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb295d02275ca37caf96"
+    },
+    "totalSales": {
+      "$numberLong": "54"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfddc9289b49fdd582b9"
+    },
+    "title": "Bastar Iron Wall Hanging",
+    "description": "Wrought iron tribal art depicting nature.",
+    "detailed_description": "<p>Wrought iron tribal art depicting nature. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "1 year",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "39cm x 22cm"
+      }
+    ],
+    "slug": "bastar-iron-wall-hanging",
+    "tags": [
+      "iron",
+      "wall hanging",
+      "tribal",
+      "wrought",
+      "bastar"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Bastar Iron Craft",
+    "video_url": "https://youtu.be/example_40",
+    "category": "Metal Craft",
+    "subCategory": "Wall Decor",
+    "colors": [
+      "#2F4F4F"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "XL",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "15"
+    },
+    "sale_price": {
+      "$numberDouble": "2520.0"
+    },
+    "regular_price": {
+      "$numberDouble": "2800.0"
+    },
+    "current_price": {
+      "$numberDouble": "2520.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd60b8bc1895ba1657",
+        "url": "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd77a13ea57f1c14f7",
+        "url": "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1763474781910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb2910ea7107b226f9ff"
+    },
+    "totalSales": {
+      "$numberLong": "97"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd70661e252e3aa96b"
+    },
+    "title": "Bidriware Silver Inlay Box",
+    "description": "Black metal box with intricate silver inlay work.",
+    "detailed_description": "<p>Black metal box with intricate silver inlay work. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Natural"
+      },
+      {
+        "name": "Dimensions",
+        "value": "23cm x 27cm"
+      }
+    ],
+    "slug": "bidriware-silver-inlay-box",
+    "tags": [
+      "bidriware",
+      "silver inlay",
+      "box",
+      "black metal",
+      "premium"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Bidriware Crafts",
+    "video_url": null,
+    "category": "Metal Craft",
+    "subCategory": "Decorative Boxes",
+    "colors": [
+      "#000000",
+      "#C0C0C0"
+    ],
+    "sizes": [
+      "M",
+      "S",
+      "XL",
+      "XS"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "8"
+    },
+    "sale_price": {
+      "$numberDouble": "5850.0"
+    },
+    "regular_price": {
+      "$numberDouble": "6500.0"
+    },
+    "current_price": {
+      "$numberDouble": "5850.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd4b5c3bbc6d7f4d9c",
+        "url": "https://images.unsplash.com/photo-1611652022419-a9419f74343a?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddf6bdee0a352347b5",
+        "url": "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1761314781910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb290613b8c55220bcc9"
+    },
+    "totalSales": {
+      "$numberLong": "44"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd926fd889242112c3"
+    },
+    "title": "Dokra Art Candle Stand",
+    "description": "Traditional tribal metal candle holder set.",
+    "detailed_description": "<p>Traditional tribal metal candle holder set. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "22cm x 27cm"
+      }
+    ],
+    "slug": "dokra-art-candle-stand",
+    "tags": [
+      "dokra",
+      "candle stand",
+      "tribal",
+      "metal",
+      "traditional"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Dokra Art Studio",
+    "video_url": null,
+    "category": "Metal Craft",
+    "subCategory": "Lighting",
+    "colors": [
+      "#B87333"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "18"
+    },
+    "sale_price": {
+      "$numberDouble": "3150.0"
+    },
+    "regular_price": {
+      "$numberDouble": "3500.0"
+    },
+    "current_price": {
+      "$numberDouble": "3150.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.6"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfddda5faf217070eee0",
+        "url": "https://images.unsplash.com/photo-1603006905003-be475563bc59?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd18f73797a682b34d",
+        "url": "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1757685981910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29ae57d0c2d66fcf30"
+    },
+    "totalSales": {
+      "$numberLong": "39"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd19b703f6d8f16378"
+    },
+    "title": "Brass Home Decor Set",
+    "description": "Vintage brass showpiece collection for home.",
+    "detailed_description": "<p>Vintage brass showpiece collection for home. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "37cm x 20cm"
+      }
+    ],
+    "slug": "brass-home-decor-set",
+    "tags": [
+      "brass",
+      "home decor",
+      "vintage",
+      "showpiece",
+      "collection"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Moradabad Brass House",
+    "video_url": "https://youtu.be/example_43",
+    "category": "Metal Craft",
+    "subCategory": "Home Decor",
+    "colors": [
+      "#FFD700",
+      "#B87333"
+    ],
+    "sizes": [
+      "XL",
+      "XS",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "12"
+    },
+    "sale_price": {
+      "$numberDouble": "4320.0"
+    },
+    "regular_price": {
+      "$numberDouble": "4800.0"
+    },
+    "current_price": {
+      "$numberDouble": "4320.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.8"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd13a626f2afb9e69a",
+        "url": "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd5b93e50601966d5e",
+        "url": "https://images.unsplash.com/photo-1603006905003-be475563bc59?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1763820381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29c0def61c618b7059"
+    },
+    "totalSales": {
+      "$numberLong": "14"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd895b2a1ba0eff512"
+    },
+    "title": "Kondapalli Wooden Toy Set",
+    "description": "Lightweight painted softwood toys depicting rural life.",
+    "detailed_description": "<p>Lightweight painted softwood toys depicting rural life. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "38cm x 19cm"
+      }
+    ],
+    "slug": "kondapalli-wooden-toy-set",
+    "tags": [
+      "kondapalli",
+      "toys",
+      "wooden",
+      "painted",
+      "rural"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Kondapalli Bommalu",
+    "video_url": null,
+    "category": "Toys",
+    "subCategory": "Wooden Toys",
+    "colors": [
+      "#FF6347",
+      "#FFD700",
+      "#4169E1"
+    ],
+    "sizes": [
+      "M",
+      "XS",
+      "L",
+      "XL"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "30"
+    },
+    "sale_price": {
+      "$numberDouble": "1620.0"
+    },
+    "regular_price": {
+      "$numberDouble": "1800.0"
+    },
+    "current_price": {
+      "$numberDouble": "1620.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd04927fb7f31eb78d",
+        "url": "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd152322311bb22fb4",
+        "url": "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1761833181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29ea1f6bf3e3c64b02"
+    },
+    "totalSales": {
+      "$numberLong": "40"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd8635c9b88f491d10"
+    },
+    "title": "Etikoppaka Lacquer Toys",
+    "description": "Traditional turned wood toys with natural lacquer.",
+    "detailed_description": "<p>Traditional turned wood toys with natural lacquer. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "49cm x 36cm"
+      }
+    ],
+    "slug": "etikoppaka-lacquer-toys",
+    "tags": [
+      "etikoppaka",
+      "lacquer",
+      "toys",
+      "wooden",
+      "traditional"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Etikoppaka Lacquer Toys",
+    "video_url": null,
+    "category": "Toys",
+    "subCategory": "Wooden Toys",
+    "colors": [
+      "#FF0000",
+      "#00FF00",
+      "#FFD700"
+    ],
+    "sizes": [
+      "S",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "40"
+    },
+    "sale_price": {
+      "$numberDouble": "1350.0"
+    },
+    "regular_price": {
+      "$numberDouble": "1500.0"
+    },
+    "current_price": {
+      "$numberDouble": "1350.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.9"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd610675543e2f6b4f",
+        "url": "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddc62078df67ceb6aa",
+        "url": "https://images.unsplash.com/photo-1597137980088-8e3e0c8e5b18?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764943581910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29e76ab7c7863c1aa5"
+    },
+    "totalSales": {
+      "$numberLong": "45"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdde194a72f661966e9"
+    },
+    "title": "Rajasthani Kathputli Puppet",
+    "description": "Traditional string puppet with colorful costume.",
+    "detailed_description": "<p>Traditional string puppet with colorful costume. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "36cm x 38cm"
+      }
+    ],
+    "slug": "rajasthani-kathputli-puppet",
+    "tags": [
+      "kathputli",
+      "puppet",
+      "string",
+      "rajasthani",
+      "traditional"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Kathputli Colony Arts",
+    "video_url": null,
+    "category": "Toys",
+    "subCategory": "Puppets",
+    "colors": [
+      "#FF6347",
+      "#FFD700",
+      "#4169E1"
+    ],
+    "sizes": [
+      "S",
+      "XS",
+      "M"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "20"
+    },
+    "sale_price": {
+      "$numberDouble": "1980.0"
+    },
+    "regular_price": {
+      "$numberDouble": "2200.0"
+    },
+    "current_price": {
+      "$numberDouble": "1980.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd63190f12e82b6a8e",
+        "url": "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddfd2aeaaf37c4a3dd",
+        "url": "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1758204381910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29bd3acc1211f07767"
+    },
+    "totalSales": {
+      "$numberLong": "91"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfddcfba59bb012fb36b"
+    },
+    "title": "Thanjavur Bobblehead Doll",
+    "description": "Traditional Tanjore dancing doll with wobbling head.",
+    "detailed_description": "<p>Traditional Tanjore dancing doll with wobbling head. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "6 months",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "26cm x 16cm"
+      }
+    ],
+    "slug": "thanjavur-bobblehead-doll",
+    "tags": [
+      "thanjavur",
+      "bobblehead",
+      "doll",
+      "dancing",
+      "traditional"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Thanjavur Doll House",
+    "video_url": "https://youtu.be/example_47",
+    "category": "Toys",
+    "subCategory": "Dolls",
+    "colors": [
+      "#FF6347",
+      "#FFD700"
+    ],
+    "sizes": [
+      "L",
+      "XS",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "35"
+    },
+    "sale_price": {
+      "$numberDouble": "1080.0"
+    },
+    "regular_price": {
+      "$numberDouble": "1200.0"
+    },
+    "current_price": {
+      "$numberDouble": "1080.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.4"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfddd4360143ae6e606c",
+        "url": "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800&q=80"
+      },
+      {
+        "file_id": "693acfddd40ba5d5e758cf46",
+        "url": "https://images.unsplash.com/photo-1597137980088-8e3e0c8e5b18?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764425181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb29852b42aad6324631"
+    },
+    "totalSales": {
+      "$numberLong": "40"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  },
+  {
+    "_id": {
+      "$oid": "693acfdde41f62908f6313fa"
+    },
+    "title": "Shantiniketan Leather Bag",
+    "description": "Hand-tooled leather bag with batik designs.",
+    "detailed_description": "<p>Hand-tooled leather bag with batik designs. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "1 year",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Handmade"
+      },
+      {
+        "name": "Dimensions",
+        "value": "38cm x 40cm"
+      }
+    ],
+    "slug": "shantiniketan-leather-bag",
+    "tags": [
+      "leather",
+      "bag",
+      "batik",
+      "shantiniketan",
+      "handmade"
+    ],
+    "cash_on_delivery": false,
+    "brand": "Shantiniketan Leather",
+    "video_url": null,
+    "category": "Handicrafts",
+    "subCategory": "Bags",
+    "colors": [
+      "#8B4513",
+      "#D2691E"
+    ],
+    "sizes": [
+      "L",
+      "M",
+      "S"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "12"
+    },
+    "sale_price": {
+      "$numberDouble": "4050.0"
+    },
+    "regular_price": {
+      "$numberDouble": "4500.0"
+    },
+    "current_price": {
+      "$numberDouble": "4050.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.7"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd0941da09eeb36ac9",
+        "url": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd14707770d4bcaa1f",
+        "url": "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1764079581910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb2971e032632e7fbad5"
+    },
+    "totalSales": {
+      "$numberLong": "35"
+    },
+    "isEvent": true,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": false
+  },
+  {
+    "_id": {
+      "$oid": "693acfdd7d6c454eaeb6e90d"
+    },
+    "title": "Kashmir Papier Mache Box",
+    "description": "Hand-painted paper pulp decorative box.",
+    "detailed_description": "<p>Hand-painted paper pulp decorative box. This handcrafted masterpiece represents the rich cultural heritage of India. Each piece is carefully made by skilled artisans using traditional techniques passed down through generations. The attention to detail and quality craftsmanship make this a unique addition to any collection. Perfect for gifting or personal use, this item brings authentic Indian art into your home.</p>",
+    "warranty": "No warranty",
+    "custom_specifications": [
+      {
+        "name": "Material",
+        "value": "Traditional"
+      },
+      {
+        "name": "Dimensions",
+        "value": "22cm x 28cm"
+      }
+    ],
+    "slug": "kashmir-papier-mache-box",
+    "tags": [
+      "papier mache",
+      "box",
+      "hand-painted",
+      "kashmir",
+      "decorative"
+    ],
+    "cash_on_delivery": true,
+    "brand": "Kashmir Papier Mache",
+    "video_url": "https://youtu.be/example_49",
+    "category": "Handicrafts",
+    "subCategory": "Decorative Boxes",
+    "colors": [
+      "#FF6347",
+      "#FFD700",
+      "#4169E1"
+    ],
+    "sizes": [
+      "M",
+      "L",
+      "XS"
+    ],
+    "discountCodes": null,
+    "stock": {
+      "$numberLong": "18"
+    },
+    "sale_price": {
+      "$numberDouble": "2520.0"
+    },
+    "regular_price": {
+      "$numberDouble": "2800.0"
+    },
+    "current_price": {
+      "$numberDouble": "2520.0"
+    },
+    "ratings": {
+      "$numberDouble": "4.5"
+    },
+    "isDeleted": false,
+    "customProperties": [
+      {
+        "label": "Handmade",
+        "values": [
+          "Yes"
+        ]
+      },
+      {
+        "label": "Origin",
+        "values": [
+          "India"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "file_id": "693acfdd983ef21627dd9d83",
+        "url": "https://images.unsplash.com/photo-1611652022419-a9419f74343a?w=800&q=80"
+      },
+      {
+        "file_id": "693acfdd9a890787616887f3",
+        "url": "https://images.unsplash.com/photo-1585664811087-47f65abbad64?w=800&q=80"
+      }
+    ],
+    "status": "Active",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1762697181910"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1765461981910"
+      }
+    },
+    "shopId": {
+      "$oid": "693acb297a9870de14221854"
+    },
+    "totalSales": {
+      "$numberLong": "78"
+    },
+    "isEvent": false,
+    "starting_date": {
+      "$date": {
+        "$numberLong": "1762869981910"
+      }
+    },
+    "ending_date": {
+      "$date": {
+        "$numberLong": "1770645981910"
+      }
+    },
+    "is_on_discount": true
+  }
+]
