@@ -35,7 +35,7 @@ const ProductPage = () => {
         sortBy: 'newest' as 'newest' | 'price-asc' | 'price-desc' | 'relevance', // Type assertion for enum values
         search: '', // We'll keep search for our API but handle it separately for the FilterSidebar
     });
-    
+
     // Use the debounced search term and price for the API query
     const debouncedSearch = useDebounce(filters.search, 500);
     const debouncedPriceRange = useDebounce(filters.priceRange, 500);
@@ -117,37 +117,30 @@ const ProductPage = () => {
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     <aside className="lg:col-span-1">
-                        <FilterSidebar 
-                            categories={categories} 
+                        <FilterSidebar
+                            categories={categories}
                             filters={{
                                 category: filters.category,
                                 priceRange: filters.priceRange,
                                 sortBy: filters.sortBy
-                            }} 
-                            setFilters={(newFilters) => {
-                                // Handle the FilterSidebar's filter updates while preserving the search property
-                                setFilters(prev => ({
-                                    ...prev,
-                                    ...newFilters,
-                                    search: prev.search, // Preserve search from our state
-                                }));
-                            }} 
+                            }}
+                            setFilters={setFilters}
                         />
                     </aside>
                     <section className="lg:col-span-3">
                         {isLoading && <div className="absolute inset-0 bg-white/50 z-20"></div>} {/* Subtle loading overlay */}
-                        
+
                         {products.length > 0 ? (
-                           <>
-                             <ProductGrid products={products} />
-                             {pagination && pagination.totalPages > 1 && (
-                                <Pagination 
-                                    currentPage={pagination.currentPage}
-                                    totalPages={pagination.totalPages}
-                                    onPageChange={handlePageChange}
-                                />
-                             )}
-                           </>
+                            <>
+                                <ProductGrid products={products} />
+                                {pagination && pagination.totalPages > 1 && (
+                                    <Pagination
+                                        currentPage={pagination.currentPage}
+                                        totalPages={pagination.totalPages}
+                                        onPageChange={handlePageChange}
+                                    />
+                                )}
+                            </>
                         ) : (
                             <div className="text-center py-20">
                                 <h3 className="text-2xl font-semibold">No Art Found</h3>

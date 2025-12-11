@@ -2,11 +2,11 @@
 import './global.css';
 import localFont from "next/font/local";
 import { ViewTransitions } from "next-view-transitions";
-import { Poppins, Raleway, Roboto} from "next/font/google"
+import { Poppins, Raleway, Roboto } from "next/font/google"
 import Providers from './Providers';
 import { ThemeProvider } from '@/components/theme/theme-provider';
+import { ReactLenis } from 'lenis/react';
 
-// import ReactLenis from "lenis/react";
 import Header from '@/shared/widgets/header';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -18,14 +18,14 @@ export const metadata = {
 
 const roboto = Roboto({
   subsets: ["latin"],
-  weight:["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable:"--font-roboto",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-roboto",
 })
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight:["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable:"--font-poppins",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins",
 })
 
 const raleway = Raleway({
@@ -47,24 +47,25 @@ export default function RootLayout({
 }) {
   return (
     <ViewTransitions>
-      <html lang="en" suppressHydrationWarning> 
+      <html lang="en" suppressHydrationWarning>
         <body className={`${roboto.variable} ${poppins.variable} ${raleway.variable} ${gambarino.variable} antialiased`} suppressHydrationWarning>
-           
 
+          <ReactLenis root>
             <ThemeProvider
               attribute="class"
               defaultTheme="system"
               enableSystem
               disableTransitionOnChange
             >
-            <Providers>
-              <Toaster position='top-center'/>
-              <Header />
-            {children}
+              <Providers>
+                <Toaster position='top-center' />
+                <Header />
+                {children}
 
-            </Providers>
+              </Providers>
             </ThemeProvider>
-         
+          </ReactLenis>
+
         </body>
       </html>
     </ViewTransitions>
