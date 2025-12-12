@@ -14,33 +14,33 @@ import { Filter, X } from 'lucide-react';
 
 // --- Define strong types for the component's props ---
 export interface SearchFilterState {
-  sortBy: 'relevance' | 'newest' | 'price-asc' | 'price-desc';
-  category: string;
-  priceRange: [number, number];
+    sortBy: string;
+    category: string;
+    priceRange: number[];
 }
 
 // The parent's state will also include the page number
 type ParentFilterState = SearchFilterState & { page: number };
 
 type SearchFiltersProps = {
-  filters: SearchFilterState;
-  setFilters: React.Dispatch<React.SetStateAction<ParentFilterState>>;
-  categories: string[]; // List of available categories to filter by
+    filters: SearchFilterState;
+    setFilters: any; // Relaxed type for nuqs compatibility
+    categories: string[]; // List of available categories to filter by
 };
 
 export const SearchFilters: React.FC<SearchFiltersProps> = ({ filters, setFilters, categories }) => {
-    
+
     // Handler functions update the parent's state, resetting the page to 1
     const handleCategoryChange = (category: string) => {
-        setFilters(prev => ({ ...prev, category, page: 1 }));
+        setFilters((prev: any) => ({ ...prev, category, page: 1 }));
     };
 
     const handlePriceChange = (value: number[]) => {
-        setFilters(prev => ({ ...prev, priceRange: [value[0], value[1]], page: 1 }));
+        setFilters((prev: any) => ({ ...prev, priceRange: [value[0], value[1]], page: 1 }));
     };
-    
+
     const handleSortChange = (value: SearchFilterState['sortBy']) => {
-        setFilters(prev => ({ ...prev, sortBy: value, page: 1 }));
+        setFilters((prev: any) => ({ ...prev, sortBy: value, page: 1 }));
     };
 
     const handleClearFilters = () => {
@@ -52,8 +52,8 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({ filters, setFilter
         });
     };
 
-    const hasActiveFilters = filters.category !== 'all' || 
-        filters.priceRange[0] !== 0 || 
+    const hasActiveFilters = filters.category !== 'all' ||
+        filters.priceRange[0] !== 0 ||
         filters.priceRange[1] !== 50000 ||
         filters.sortBy !== 'relevance';
 
@@ -93,7 +93,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({ filters, setFilter
                     </SelectContent>
                 </Select>
             </div>
-            
+
             <Accordion type="multiple" defaultValue={['category', 'price']} className="w-full">
                 <AccordionItem value="category" className="border-none">
                     <AccordionTrigger className="text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:no-underline py-3">

@@ -2,19 +2,26 @@
 import React, { useState } from 'react'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
-const Providers = ({children}:{children:React.ReactNode}) => {
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { LocationProvider } from '@/context/LocationContext'
 
-    const [ queryClient ]= useState(()=> new QueryClient({
-      defaultOptions:{
-        queries:{
-          refetchOnWindowFocus: false,
-          staleTime: 1000 * 60 * 5,
-        },
-      }
-    }))
+const Providers = ({ children }: { children: React.ReactNode }) => {
+
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 5,
+      },
+    }
+  }))
   return (
     <QueryClientProvider client={queryClient}>
-        {children}
+      <NuqsAdapter>
+        <LocationProvider>
+          {children}
+        </LocationProvider>
+      </NuqsAdapter>
     </QueryClientProvider>
   )
 }

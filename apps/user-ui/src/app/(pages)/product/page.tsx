@@ -26,18 +26,31 @@ const useDebounce = (value: any, delay: number) => {
     return debouncedValue;
 };
 
+// ... imports
+import { useQueryStates, parseAsInteger, parseAsString, parseAsArrayOf } from 'nuqs';
+
 const ProductPage = () => {
-    // Updated to match the FilterState interface from FilterSidebar
-    const [filters, setFilters] = useState({
-        page: 1,
-        category: 'all',
-        priceRange: [0, 50000] as [number, number], // Type assertion to match the expected type
-        sortBy: 'newest' as 'newest' | 'price-asc' | 'price-desc' | 'relevance', // Type assertion for enum values
-        search: '', // We'll keep search for our API but handle it separately for the FilterSidebar
+    // nuqs: Type-safe URL state management
+    const [filters, setFilters] = useQueryStates({
+        page: parseAsInteger.withDefault(1),
+        category: parseAsString.withDefault('all'),
+        // Store price as [min, max] URL params? Or a single param?
+        // The previous FilterSidebar expected priceRange: [number, number].
+        // Let's stick to the previous pattern of parsing distinct params if possible, 
+        // OR use a serializer. For simplicity and consistency with search filters, 
+        // let's use the array parser.
+        // NOTE: URL will look like ?priceRange=0,50000
+        priceRange: parseAsArrayOf(parseAsInteger).withDefault([0, 50000]),
+        sortBy: parseAsString.withDefault('newest'),
+        search: parseAsString.withDefault(''),
+    }, {
+        history: 'push', // Create history entries so back button works
+        shallow: true    // Client-side filtering, no need to run server components
     });
 
     // Use the debounced search term and price for the API query
     const debouncedSearch = useDebounce(filters.search, 500);
+    // priceRange from nuqs is number[] | null. We default it above, but debouncing might need care.
     const debouncedPriceRange = useDebounce(filters.priceRange, 500);
 
     const apiFilters = {
@@ -56,8 +69,9 @@ const ProductPage = () => {
                 limit: '12',
                 sortBy: apiFilters.sortBy,
                 category: apiFilters.category,
-                minPrice: apiFilters.priceRange[0].toString(),
-                maxPrice: apiFilters.priceRange[1].toString(),
+                // Default to 0/50000 if null/undefined (though .withDefault handles most)
+                minPrice: (apiFilters.priceRange?.[0] ?? 0).toString(),
+                maxPrice: (apiFilters.priceRange?.[1] ?? 50000).toString(),
             });
 
             if (apiFilters.search) {
@@ -122,7 +136,7 @@ const ProductPage = () => {
                             filters={{
                                 category: filters.category,
                                 priceRange: filters.priceRange,
-                                sortBy: filters.sortBy
+                                sortBy: filters.sortBy as any
                             }}
                             setFilters={setFilters}
                         />

@@ -40,6 +40,8 @@ const gambarino = localFont({
   variable: "--font-gambarino",
 });
 
+// ... (other imports)
+
 export default function RootLayout({
   children,
 }: {
@@ -61,7 +63,6 @@ export default function RootLayout({
                 <Toaster position='top-center' />
                 <Header />
                 {children}
-
               </Providers>
             </ThemeProvider>
           </ReactLenis>

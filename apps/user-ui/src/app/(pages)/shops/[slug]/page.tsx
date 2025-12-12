@@ -27,7 +27,7 @@ interface ShopData {
     website: string | null;
     socialLinks: { platform: string; url: string }[];
     ratings: number;
-    opening_hours :string
+    opening_hours: string
     _count: {
         products: number;
         reviews: number;
@@ -35,20 +35,27 @@ interface ShopData {
 }
 
 
+// ... imports
+import { useQueryState, parseAsString } from 'nuqs';
+
 const TabbedContent: React.FC<{ shop: ShopData }> = ({ shop }) => {
-    const [activeTab, setActiveTab] = React.useState('products');
+    // nuqs: URL state for tabs
+    const [activeTab, setActiveTab] = useQueryState('tab', parseAsString.withDefault('products').withOptions({
+        shallow: true,
+        history: 'push' // Bookmark-able tabs
+    }));
 
     return (
         <div>
             <div className="border-b border-neutral-800 mb-8">
-                <button 
-                    onClick={() => setActiveTab('products')} 
+                <button
+                    onClick={() => setActiveTab('products')}
                     className={`px-6 py-3 font-semibold ${activeTab === 'products' ? 'text-primary/50 border-b-2 border-accent' : 'text-primary/90'}`}
                 >
                     Products
                 </button>
-                <button 
-                    onClick={() => setActiveTab('reviews')} 
+                <button
+                    onClick={() => setActiveTab('reviews')}
                     className={`px-6 py-3 font-semibold ${activeTab === 'reviews' ? 'text-primary/50 border-b-2 border-accent' : 'text-primary/90'}`}
                 >
                     Reviews
@@ -84,7 +91,7 @@ export default function SingleShopPage() {
     }
 
     console.log(shop)
-    
+
     return (
         <>
             {/* ---  ShopHeader (Full-width) --- */}
@@ -92,7 +99,7 @@ export default function SingleShopPage() {
 
             <Bounded>
                 <main className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-8">
-                    
+
                     {/* --- ShopInfoSidebar --- */}
                     <aside className="lg:col-span-1">
                         <ShopInfoSidebar shop={shop} />
