@@ -5,26 +5,41 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { Eye, EyeOff, UserIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/store/authStore';
+import { toast } from 'sonner';
 
 type FormData = {
     email: string;
     password: string;
 };
 
+import { motion } from 'framer-motion';
+
 const LoginPage = () => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [serverError, setServerError] = useState<string | null>(null);
-    const [rememberMe, setRememberMe] = useState(false);
 
     const router = useRouter();
     const queryClient = useQueryClient();
     const { setLoggedIn } = useAuthStore();
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+    const searchParams = useSearchParams();
+
+    React.useEffect(() => {
+        const error = searchParams.get('error');
+        const message = searchParams.get('message');
+
+        if (error === 'login_required') {
+            toast.error("Please login to access this page");
+        }
+        if (message) {
+            toast.success(message);
+        }
+    }, [searchParams]);
 
     const loginMutation = useMutation({
         mutationFn: async (data: FormData) => {
@@ -39,16 +54,16 @@ const LoginPage = () => {
         },
         onSuccess: (data) => {
             setServerError(null);
-            
+
             // Update auth state
             setLoggedIn(true);
-            
+
             // Invalidate and refetch user query immediately
-            queryClient.invalidateQueries({ 
+            queryClient.invalidateQueries({
                 queryKey: ['user'],
                 refetchType: 'active'
             });
-            
+
             router.push("/");
         },
         onError: (error: AxiosError) => {
@@ -63,38 +78,49 @@ const LoginPage = () => {
     };
 
     return (
-        <div className='w-full py-10 min-h-[85vh]'>
-            <h1 className='text-4xl font-poppins font-semibold text-center'>Login</h1>
-            <p className='text-center text-lg font-medium py-3'>Home . Login</p>
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full"
+        >
+            <div className="mb-8 text-center sm:text-left">
+                <h1 className="text-3xl font-display font-bold tracking-tight">Welcome back</h1>
+                <p className="text-muted-foreground mt-2">
+                    Enter your email to sign in using your account.
+                </p>
+            </div>
 
-            <div className='w-full flex justify-center'>
-                <div className='md:w-[480px] p-8 shadow rounded-lg bg-accent'>
-                    <h3 className='text-3xl font-semibold text-center mb-2'>Login to Artistry Cart</h3>
-                    <p className='text-center text-gray-500 mb-4'>Don't have an account? {' '}
-                        <Link href={'/signup'} className='text-blue-500'>Sign up</Link>
-                    </p>
+            <div className="space-y-6">
+                <Button variant="outline" className="w-full h-12 gap-3 text-base font-normal rounded-xl border-muted-foreground/20 hover:bg-accent hover:text-accent-foreground transition-all duration-300">
+                    <UserIcon
+                        size={20}
+                        className="text-[#DB4437]"
+                        aria-hidden="true"
+                    />
+                    Continue with Google
+                </Button>
 
-                    <Button variant="outline" className='w-full'>
-                        <UserIcon
-                            className="text-[#DB4437] dark:text-white/60"
-                            size={16}
-                            aria-hidden="true"
-                        />
-                        Login with Google
-                    </Button>
-
-                    <div className='flex items-center my-5 text-sm text-primary/60'>
-                        <div className='flex-1 border-t' />
-                        <span className='px-3'>or Sign in with Email</span>
-                        <div className='flex-1 border-t' />
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-muted/50" />
                     </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">
+                            Or continue with
+                        </span>
+                    </div>
+                </div>
 
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <label className='block text-primary/90 mb-1'>Email</label>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                            Email
+                        </label>
                         <input
                             type="email"
-                            placeholder='Support@artistrycart.com'
-                            className='w-full p-2 border border-border outline-0 rounded mb-1'
+                            placeholder="name@example.com"
+                            className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300"
                             {...register("email", {
                                 required: "Email is Required",
                                 pattern: {
@@ -104,17 +130,29 @@ const LoginPage = () => {
                             })}
                         />
                         {errors.email && (
-                            <p className='text-red-500 text-sm'>
+                            <p className="text-sm font-medium text-destructive mt-1">
                                 {String(errors.email.message)}
                             </p>
                         )}
+                    </div>
 
-                        <label className='block text-primary/90 mb-1 mt-3'>Password</label>
-                        <div className='relative'>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Password
+                            </label>
+                            <Link
+                                href="/forgot-password"
+                                className="text-sm font-medium text-primary hover:underline underline-offset-4"
+                            >
+                                Forgot password?
+                            </Link>
+                        </div>
+                        <div className="relative">
                             <input
                                 type={passwordVisible ? "text" : "password"}
-                                placeholder='Min. 6 characters'
-                                className='w-full p-2 border border-border outline-0 rounded mb-1'
+                                className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10 transition-all duration-300"
+                                placeholder="••••••••"
                                 {...register("password", {
                                     required: "Password is Required",
                                     minLength: {
@@ -126,52 +164,41 @@ const LoginPage = () => {
                             <button
                                 type="button"
                                 onClick={() => setPasswordVisible(!passwordVisible)}
-                                className='absolute inset-y-0 p-2 origin-center right-3 flex items-center text-primary/80'
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                             >
-                                {passwordVisible ? <Eye /> : <EyeOff />}
+                                {passwordVisible ? <Eye size={18} /> : <EyeOff size={18} />}
                             </button>
                         </div>
                         {errors.password && (
-                            <p className='text-red-500 text-sm'>
+                            <p className="text-sm font-medium text-destructive mt-1">
                                 {String(errors.password.message)}
                             </p>
                         )}
+                    </div>
 
-                        <div className='flex justify-between items-center my-4'>
-                            <label htmlFor="" className='flex items-center text-primary/80'>
-                                <input
-                                    type="checkbox"
-                                    className='mr-2'
-                                    checked={rememberMe}
-                                    onChange={() => setRememberMe(!rememberMe)}
-                                />
-                                Remember Me
-                            </label>
+                    <Button
+                        disabled={loginMutation?.isPending}
+                        type="submit"
+                        className="w-full h-12 text-base rounded-xl font-medium transition-all duration-300 hover:scale-[1.01]"
+                    >
+                        {loginMutation?.isPending ? "Signing in..." : "Sign in"}
+                    </Button>
 
-                            <Link
-                                href={'/forgot-password'}
-                                className='text-blue-500 text-sm'
-                            >
-                                Forgot Password?
-                            </Link>
-                        </div>
+                    {serverError && (
+                        <p className="text-sm font-medium text-destructive text-center bg-destructive/10 p-3 rounded-lg">
+                            {serverError}
+                        </p>
+                    )}
+                </form>
 
-                        <Button
-                            disabled={loginMutation?.isPending}
-                            type='submit'
-                            variant={"default"}
-                            className='w-full'
-                        >
-                            {loginMutation?.isPending ? "Logging in..." : "Login"}
-                        </Button>
-
-                        {serverError && (
-                            <p className='text-red-500 text-sm mt-2'>{serverError}</p>
-                        )}
-                    </form>
-                </div>
+                <p className="text-center text-sm text-muted-foreground">
+                    Don't have an account?{" "}
+                    <Link href="/signup" className="font-semibold text-primary hover:underline underline-offset-4">
+                        Sign up
+                    </Link>
+                </p>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

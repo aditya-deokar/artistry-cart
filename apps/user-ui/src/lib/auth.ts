@@ -21,7 +21,7 @@ export interface AuthenticatedUser {
  */
 export const getCurrentUser = async (): Promise<AuthenticatedUser | null> => {
   // 1. Get the token from the HTTP-only cookies
-  const token = cookies().get('token')?.value;
+  const token = (await cookies()).get('access_token')?.value;
 
   // 2. If no token exists, the user is not logged in.
   if (!token) {
@@ -31,7 +31,7 @@ export const getCurrentUser = async (): Promise<AuthenticatedUser | null> => {
   try {
     // 3. Verify the token using the secret key.
     // This will throw an error if the token is invalid, expired, or malformed.
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET!) as { id: string };
 
     // 4. If token is valid, use the ID from the token to fetch the user from the database.
     const user = await prisma.users.findUnique({

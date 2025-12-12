@@ -6,12 +6,14 @@ import { ProductList } from '@/components/sections/ProductList';
 import { ScrollText } from '@/components/sections/ScrollText';
 import { products } from '@/lib/data';
 import { RecommendedProducts } from '@/components/products/RecommendedProducts';
+import Header from '@/shared/widgets/header';
 
 export default function HomePage() {
   const featuredProduct = products[0]; // Example: feature the first product
 
   return (
     <>
+      <Header />
       <Hero
         heading="Crafted with Nature’s Touch"
         body="Discover timeless handmade wooden creations that bring warmth, elegance, and artistry into your home."

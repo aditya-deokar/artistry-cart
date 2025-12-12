@@ -1,5 +1,6 @@
 
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import Header from '@/shared/widgets/header';
 
 export default function RootLayout({
   children,
@@ -8,7 +9,7 @@ export default function RootLayout({
 }) {
   return (
    <>
-   
+   <Header />
    <Breadcrumbs />
    {children}
    </>

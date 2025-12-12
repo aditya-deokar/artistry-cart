@@ -13,6 +13,18 @@ const nextConfig = {
   nx: {},
   images: {
     domains: ['plus.unsplash.com', 'images.unsplash.com', 'plus.unsplash.com', 'ik.imagekit.io', 'placehold.co']
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/auth/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/:path*`,
+      },
+      {
+        source: '/product/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_SERVER_URI}/product/api/:path*`,
+      },
+    ]
   }
 };
 
