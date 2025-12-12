@@ -16,14 +16,14 @@ import { RotateCcw, Plus, Minus, Check } from 'lucide-react';
 export interface FilterState {
     sortBy: 'newest' | 'price-asc' | 'price-desc' | 'relevance';
     category: string;
-    priceRange: [number, number];
+    priceRange: number[];
 }
 
 type ParentFilterState = FilterState & { page: number; search: string; };
 
 type FilterSidebarProps = {
     filters: FilterState;
-    setFilters: React.Dispatch<React.SetStateAction<ParentFilterState>>;
+    setFilters: any;
     categories: string[];
 };
 
@@ -90,15 +90,15 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilter
 
     // Handlers
     const handleCategoryChange = (category: string) => {
-        setFilters(prev => ({ ...prev, category, page: 1 }));
+        setFilters((prev: any) => ({ ...prev, category, page: 1 }));
     };
 
     const handlePriceChange = (value: number[]) => {
-        setFilters(prev => ({ ...prev, priceRange: [value[0], value[1]], page: 1 }));
+        setFilters((prev: any) => ({ ...prev, priceRange: [value[0], value[1]], page: 1 }));
     };
 
     const handleSortChange = (value: FilterState['sortBy']) => {
-        setFilters(prev => ({ ...prev, sortBy: value, page: 1 }));
+        setFilters((prev: any) => ({ ...prev, sortBy: value, page: 1 }));
     };
 
     const handleClearFilters = () => {

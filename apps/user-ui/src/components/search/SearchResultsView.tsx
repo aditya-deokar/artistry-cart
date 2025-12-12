@@ -1,39 +1,46 @@
 'use client'
 
-import React, { useState } from 'react';
+import React from 'react'; // removed useState
 import { useQuery } from '@tanstack/react-query';
 import axiosInstance from '@/utils/axiosinstance';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, Package, Grid3x3, List, ArrowUpDown } from 'lucide-react';
+import { useQueryStates, parseAsInteger, parseAsString, parseAsArrayOf } from 'nuqs';
 
 // Import Components
 import { SearchProductCard } from './SearchProductCard';
-import { SearchFilters, SearchFilterState } from './SearchFilters';
+import { SearchFilters } from './SearchFilters';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 export const SearchResultsView: React.FC = () => {
-    
+
+    // We keep reading 'q' from searchParams directly or via nuqs main query
     const searchParams = useSearchParams();
     const query = searchParams.get('q') || '';
-    
-    // Single state object to hold all filters and pagination
-    const [filters, setFilters] = useState({
-        page: 1,
-        sortBy: 'relevance' as SearchFilterState['sortBy'],
-        category: 'all',
-        priceRange: [0, 50000] as [number, number],
+
+    // nuqs: Type-safe URL state management
+    // We map 'priceRange' to a simpler 'price' URL param for cleaner URLs
+    const [filters, setFilters] = useQueryStates({
+        page: parseAsInteger.withDefault(1),
+        sortBy: parseAsString.withDefault('relevance'),
+        category: parseAsString.withDefault('all'),
+        // Store price as [min, max] array in state, serialize to comma-separated integers in URL
+        priceRange: parseAsArrayOf(parseAsInteger).withDefault([0, 50000]),
+    }, {
+        history: 'push',
+        shallow: false
     });
-    
+
     // Layout state
-    const [layout, setLayout] = useState<'grid' | 'list'>('grid');
-    
+    const [layout, setLayout] = React.useState<'grid' | 'list'>('grid');
+
     // Debounce the price range to avoid excessive API calls while sliding
     const debouncedPriceRange = useDebounce(filters.priceRange, 500);
 
@@ -43,16 +50,17 @@ export const SearchResultsView: React.FC = () => {
     const { data, isLoading, isError } = useQuery({
         queryKey,
         queryFn: async () => {
-            const params = new URLSearchParams({ 
-                q: encodeURIComponent(query), 
+            const params = new URLSearchParams({
+                q: encodeURIComponent(query),
                 page: filters.page.toString(),
                 sortBy: filters.sortBy,
                 category: filters.category,
-                minPrice: debouncedPriceRange[0].toString(),
-                maxPrice: debouncedPriceRange[1].toString(),
+                // Handle potential null/undefined from debounced range if generic defaults fail (unlikely with .withDefault)
+                minPrice: (debouncedPriceRange?.[0] ?? 0).toString(),
+                maxPrice: (debouncedPriceRange?.[1] ?? 50000).toString(),
             });
             const res = await axiosInstance.get(`/product/api/search?${params.toString()}`);
-            
+
             // Handle nested response structure
             if (res.data?.data) {
                 return res.data.data;
@@ -77,7 +85,7 @@ export const SearchResultsView: React.FC = () => {
             </div>
         );
     }
-    
+
     const products = data?.products || [];
     const pagination = data?.pagination;
 
@@ -96,10 +104,10 @@ export const SearchResultsView: React.FC = () => {
                 {/* Filters Sidebar */}
                 <aside className="lg:col-span-1">
                     <div className="sticky top-4">
-                        <SearchFilters 
-                            filters={filters} 
-                            setFilters={setFilters} 
-                            categories={availableCategories} 
+                        <SearchFilters
+                            filters={filters}
+                            setFilters={setFilters}
+                            categories={availableCategories}
                         />
                     </div>
                 </aside>
@@ -125,7 +133,7 @@ export const SearchResultsView: React.FC = () => {
                                         </p>
                                     )}
                                 </div>
-                                
+
                                 {/* View Toggle & Sort */}
                                 <div className="flex items-center gap-2">
                                     <DropdownMenu>
@@ -173,13 +181,13 @@ export const SearchResultsView: React.FC = () => {
                             </div>
 
                             {/* Products Grid/List */}
-                            <div className={layout === 'grid' 
-                                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+                            <div className={layout === 'grid'
+                                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                                 : "flex flex-col gap-4"
                             }>
                                 {products.map((p: any) => (
-                                    <SearchProductCard 
-                                        key={p.id || p.slug} 
+                                    <SearchProductCard
+                                        key={p.id || p.slug}
                                         product={p}
                                         layout={layout}
                                     />
@@ -197,7 +205,7 @@ export const SearchResultsView: React.FC = () => {
                                     >
                                         Previous
                                     </Button>
-                                    
+
                                     <div className="flex gap-1">
                                         {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
                                             let pageNum: number;
@@ -210,7 +218,7 @@ export const SearchResultsView: React.FC = () => {
                                             } else {
                                                 pageNum = filters.page - 2 + i;
                                             }
-                                            
+
                                             return (
                                                 <Button
                                                     key={pageNum}
