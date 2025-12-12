@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form';
+import { motion } from 'framer-motion';
 
 type FormData = {
     email: string;
@@ -47,7 +48,7 @@ const ForgotPasswordPage = () => {
     const requestOtpMutation = useMutation({
         mutationFn: async ({ email }: { email: string }) => {
             const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/forgot-password-user}`,
+                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/forgot-password-user`,
                 {
                     email
                 });
@@ -74,7 +75,7 @@ const ForgotPasswordPage = () => {
             if (!userEmail) return;
 
             const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/verify-forgot-password-user}`,
+                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/verify-forgot-password-user`,
                 {
                     email: userEmail,
                     otp: otp.join("")
@@ -99,7 +100,7 @@ const ForgotPasswordPage = () => {
             if (!password) return
 
             const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/reset-password-user}`,
+                `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/reset-password-user`,
                 {
                     email: userEmail,
                     newPassword: password
@@ -150,146 +151,143 @@ const ForgotPasswordPage = () => {
 
 
     return (
-        <div className='w-full py-10 min-h-[85vh]'>
-            <h1 className='text-4xl font-poppins font-semibold text-center'>Forgot Password</h1>
-            <p className='text-center text-lg font-medium py-3 '>Home .Forgot Password</p>
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full"
+        >
+            {step === "email" && (
+                <motion.div
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    className="space-y-6"
+                >
+                    <div className="mb-8 text-center sm:text-left">
+                        <h1 className="text-3xl font-display font-bold tracking-tight">Forgot password?</h1>
+                        <p className="text-muted-foreground mt-2">
+                            Enter your email address to reset your password.
+                        </p>
+                    </div>
 
-            <div className='w-full flex justify-center'>
-                <div className='md:w-[480px] p-8 shadow rounded-lg bg-accent'>
-                    {step === "email" && (
-                        <>
-                            <h3 className='text-3xl font-semibold text-center mb-2'>Login to Artistry Cart</h3>
-                            <p className='text-center text-gray-500 mb-4'>Go back to login{' '}
-
-                                <Link href={'/login'} className='text-blue-500'>Login</Link>
-                            </p>
-
-
-                            <div className='flex items-center my-5 text-sm text-primary/60'>
-                                <div className='flex-1 border-t ' />
-                                <span className='px-3'>or Sign in with Email</span>
-                                <div className='flex-1 border-t ' />
-                            </div>
-
-                            <form onSubmit={handleSubmit(onSubmitEmail)}>
-                                <label className='block text-primary/90 mb-1'>Email</label>
-                                <input type="email" placeholder='Support@artistrycart.com'
-                                    className='w-full p-2 border border-border outline-0 rounded mb-1'
-                                    {...register("email", {
-                                        required: "Email is Required",
-                                        pattern: {
-                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                            message: "Invalid Email Address",
-                                        },
-                                    })}
-
-                                />
-                                {errors.email && (
-                                    <p className='text-red-500 text-sm'>
-                                        {String(errors.email.message)}
-                                    </p>
-                                )}
-
-
-                                <Button
-                                    disabled={requestOtpMutation.isPending}
-                                    type='submit' variant={"default"}
-                                    className='w-full mt-4'>
-                                    {requestOtpMutation.isPending ? "Submitting..." : "Submit"}
-                                </Button>
-
-                                {serverError && (
-                                    <p className='text-red-500 text-sm mt-2'>{serverError}</p>
-                                )}
-
-
-                            </form>
-                        </>
-                    )}
-
-
-                    {step === "otp" && (
-                        <div >
-                            <h3 className='text-xl font-semibold text-center mb-4'>Enter OTP</h3>
-                            <div className='flex justify-center gap-6 '>
-                                {otp.map((digit, index) => (
-                                    <input type="text" key={index} ref={(el) => {
-                                        if (el) inputRef.current[index] = el;
-                                    }}
-                                        maxLength={1}
-                                        className='w-12 h-12 text-center border border-border outline-none rounded'
-                                        value={digit}
-                                        onChange={(e) => handleOtpChange(index, e.target.value)}
-                                        onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                                    />
-                                ))}
-                            </div>
-
-                            <Button className='w-full mt-4 text-lg cursor-pointer py-2 rounded-lg'
-                                disabled={verifyOtpMutation.isPending}
-                                onClick={() => verifyOtpMutation.mutate()}
-                            >
-                                {verifyOtpMutation.isPending ? "Verifying..." : "Verify OTP"}
-                            </Button>
-
-                            <p className='text-center text-sm mt-4'>
-                                {canResend ? (
-                                    <Button
-                                        onClick={() => requestOtpMutation.mutate({ email: userEmail! })}
-                                        className='cursor-pointer'
-                                    >Resend OTP</Button>
-                                ) : (`Resend OTP in ${timer}`)}
-                            </p>
-                            {verifyOtpMutation?.isError && verifyOtpMutation.error instanceof AxiosError && (
-                                <p className='text-red-500 mt-2 text-sm'>{verifyOtpMutation.error?.message || verifyOtpMutation.error?.response?.data?.message}</p>
-                            )}
+                    <form onSubmit={handleSubmit(onSubmitEmail)} className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium leading-none">Email</label>
+                            <input
+                                type="email"
+                                placeholder="name@example.com"
+                                className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300"
+                                {...register("email", {
+                                    required: "Email is Required",
+                                    pattern: {
+                                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                        message: "Invalid Email Address",
+                                    },
+                                })}
+                            />
+                            {errors.email && <p className="text-sm font-medium text-destructive mt-1">{String(errors.email.message)}</p>}
                         </div>
+
+                        <Button
+                            disabled={requestOtpMutation.isPending}
+                            type="submit"
+                            className="w-full h-12 text-base rounded-xl font-medium transition-all duration-300 hover:scale-[1.01]"
+                        >
+                            {requestOtpMutation.isPending ? "Sending code..." : "Send Reset Code"}
+                        </Button>
+
+                        {serverError && <p className="text-sm font-medium text-destructive text-center bg-destructive/10 p-3 rounded-lg">{serverError}</p>}
+                    </form>
+
+                    <p className="text-center text-sm text-muted-foreground">
+                        Remember your password?{" "}
+                        <Link href="/login" className="font-semibold text-primary hover:underline underline-offset-4">
+                            Back to login
+                        </Link>
+                    </p>
+                </motion.div>
+            )}
+
+            {step === "otp" && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 text-center">
+                    <div className="mb-8">
+                        <h3 className="text-3xl font-display font-bold tracking-tight">Enter Code</h3>
+                        <p className="text-muted-foreground mt-2">We sent a code to {userEmail}</p>
+                    </div>
+
+                    <div className="flex justify-center gap-4">
+                        {otp.map((digit, index) => (
+                            <input
+                                key={index}
+                                type="text"
+                                ref={(el) => { if (el) inputRef.current[index] = el; }}
+                                maxLength={1}
+                                className="w-14 h-14 text-center text-2xl font-semibold border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm"
+                                value={digit}
+                                onChange={(e) => handleOtpChange(index, e.target.value)}
+                                onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                            />
+                        ))}
+                    </div>
+
+                    <Button
+                        disabled={verifyOtpMutation.isPending}
+                        onClick={() => verifyOtpMutation.mutate()}
+                        className="w-full h-12 text-base rounded-xl font-medium mt-4 transition-all duration-300 hover:scale-[1.01]"
+                    >
+                        {verifyOtpMutation.isPending ? "Verifying..." : "Verify Code"}
+                    </Button>
+
+                    <div className="text-sm text-muted-foreground">
+                        {canResend ? (
+                            <button onClick={() => requestOtpMutation.mutate({ email: userEmail! })} className="text-primary font-medium hover:underline">
+                                Resend code
+                            </button>
+                        ) : (
+                            <span>Resend code in {timer}s</span>
+                        )}
+                    </div>
+                    {verifyOtpMutation?.isError && verifyOtpMutation.error instanceof AxiosError && (
+                        <p className="text-sm font-medium text-destructive bg-destructive/10 p-3 rounded-lg">
+                            {verifyOtpMutation.error?.message || (verifyOtpMutation.error?.response?.data as any)?.message}
+                        </p>
                     )}
+                </motion.div>
+            )}
 
-                    {step === "reset" && (
-                        <>
-                            <h3 className='text-xl font-semibold text-center mb-4'>
-                                Resend Password
-                            </h3>
+            {step === "reset" && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+                    <div className="mb-8 text-center sm:text-left">
+                        <h3 className="text-3xl font-display font-bold tracking-tight">Reset Password</h3>
+                        <p className="text-muted-foreground mt-2">Create a new strong password.</p>
+                    </div>
 
-                            <form onSubmit={handleSubmit(onSubmitPassword)}>
-                                <label className='block text-primary/90 mb-1'>New Password</label>
+                    <form onSubmit={handleSubmit(onSubmitPassword)} className="space-y-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium leading-none">New Password</label>
+                            <input
+                                type="password"
+                                placeholder="Min. 6 characters"
+                                className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300"
+                                {...register("password", {
+                                    required: "Password is Required",
+                                    minLength: { value: 6, message: "Password must be at least 6 characters" }
+                                })}
+                            />
+                            {errors.password && <p className="text-sm font-medium text-destructive mt-1">{String(errors.password.message)}</p>}
+                        </div>
 
-                                <input type={"password"}
-                                    placeholder='Min. 6 charecters'
-                                    className='w-full p-2 border border-border outline-0 rounded mb-'
-                                    {...register("password", {
-                                        required: "Password is Required",
-                                        minLength: {
-                                            value: 6,
-                                            message: "Password must be at least 6 charecters",
-                                        }
-                                    })}
-                                />
-
-                                {errors.password && (
-                                    <p className='text-red-500 text-sm'>
-                                        {String(errors.password.message)}
-                                    </p>
-                                )}
-
-                                <Button
-                                    type='submit'
-                                    variant={"default"}
-                                    className='w-full mt-4'
-                                    disabled={resetPasswordMutation.isPending}
-                                >
-                                    {resetPasswordMutation.isPending ? "Resetting ..." : "Reset Password"}
-                                </Button>
-                            </form>
-                        </>
-                    )}
-
-
-                </div>
-            </div>
-        </div>
-    )
+                        <Button
+                            type="submit"
+                            className="w-full h-12 text-base rounded-xl font-medium transition-all duration-300 hover:scale-[1.01]"
+                            disabled={resetPasswordMutation.isPending}
+                        >
+                            {resetPasswordMutation.isPending ? "Resetting..." : "Reset Password"}
+                        </Button>
+                    </form>
+                </motion.div>
+            )}
+        </motion.div>
+    );
 }
 
 export default ForgotPasswordPage

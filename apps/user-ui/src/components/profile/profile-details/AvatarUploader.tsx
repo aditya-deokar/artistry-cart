@@ -53,44 +53,63 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({ currentAvatarUrl
   };
 
   return (
-    <div className="p-6 border border-neutral-800 rounded-lg">
-      <h3 className="font-semibold text-lg mb-4">Profile Picture</h3>
-      <div className="flex items-center gap-6">
-        <div className="relative w-24 h-24 rounded-full bg-neutral-800 flex-shrink-0">
-          {preview && (
-            <Image src={preview} alt="Avatar Preview" fill className="object-cover rounded-full" />
-          )}
+    <div className="p-8 border border-border rounded-xl bg-card">
+      <div className="flex flex-col sm:flex-row gap-8 items-center sm:items-start">
+        <div className="relative group">
+          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-background ring-2 ring-border shadow-lg bg-muted relative">
+            {preview ? (
+              <Image src={preview} alt="Avatar Preview" fill className="object-cover" />
+            ) : (
+              <div className="flex items-center justify-center w-full h-full text-muted-foreground">
+                <span className="text-4xl">?</span>
+              </div>
+            )}
+          </div>
+
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center text-white opacity-0 hover:opacity-100 transition-opacity"
+            className="absolute bottom-1 right-1 bg-primary text-primary-foreground p-2 rounded-full shadow-md hover:bg-primary/90 transition-colors"
             aria-label="Change profile picture"
           >
-            <Camera size={24} />
+            <Camera size={18} />
           </button>
         </div>
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          accept="image/png, image/jpeg, image/webp"
-          className="hidden"
-        />
-        <div className="flex flex-col gap-2">
-          <p className="text-sm text-primary/70">JPG, PNG, or WEBP. 2MB max.</p>
-          {file ? (
-            <div className="flex items-center gap-2">
-                <Button onClick={handleUpload} disabled={isPending}>
-                    {isPending && <LoaderCircle className="animate-spin mr-2" size={16} />}
-                    Save Photo
+
+        <div className="flex-1 space-y-4 text-center sm:text-left">
+          <div>
+            <h3 className="font-display text-xl font-semibold">Profile Picture</h3>
+            <p className="text-muted-foreground text-sm mt-1">
+              Upload a high-quality (up to 2MB) image to represent your creative identity.
+              <br className="hidden sm:block" /> Supported formats: JPG, PNG, WEBP.
+            </p>
+          </div>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/png, image/jpeg, image/webp"
+            className="hidden"
+          />
+
+          <div className="flex items-center justify-center sm:justify-start gap-4 pt-2">
+            {file ? (
+              <>
+                <Button onClick={handleUpload} disabled={isPending} className="rounded-full px-6">
+                  {isPending && <LoaderCircle className="animate-spin mr-2" size={16} />}
+                  Save Photo
                 </Button>
-                <Button variant="ghost" onClick={() => { setFile(null); setPreview(currentAvatarUrl || null); }}>Cancel</Button>
-            </div>
-          ) : (
-            <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-              Upload Photo
-            </Button>
-          )}
+                <Button variant="ghost" onClick={() => { setFile(null); setPreview(currentAvatarUrl || null); }} className="rounded-full px-6">
+                  Cancel
+                </Button>
+              </>
+            ) : (
+              <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="rounded-full px-6 border-primary/20 hover:border-primary">
+                Upload New Photo
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

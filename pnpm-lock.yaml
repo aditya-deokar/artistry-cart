@@ -473,6 +473,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      framer-motion:
+        specifier: ^12.23.12
+        version: 12.23.12(@emotion/is-prop-valid@1.2.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       fuse.js:
         specifier: ^7.1.0
         version: 7.1.0

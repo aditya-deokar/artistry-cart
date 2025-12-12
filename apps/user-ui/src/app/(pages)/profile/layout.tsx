@@ -4,13 +4,14 @@ import { Bounded } from '@/components/common/Bounded';
 import { ProfileSidebar } from '@/components/profile/layout/ProfileSidebar';
 import { redirect } from 'next/navigation';
 import useUser from '@/hooks/useUser';
+import Loading from './loading';
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isError } = useUser();
 
   // While fetching user → show loading UI
   if (isLoading) {
-    return <div className="p-8 text-center">Loading...</div>;
+    return <Loading />;
   }
 
   // If request finished but user not found → redirect

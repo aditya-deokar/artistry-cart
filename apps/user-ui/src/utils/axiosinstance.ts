@@ -1,33 +1,43 @@
 import axios from "axios";
 import { runRedirectToLogin } from "./redirect";
+import { useAuthStore } from "@/store/authStore";
 
 const axiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_SERVER_URI,
+    baseURL: typeof window !== 'undefined' ? '' : process.env.NEXT_PUBLIC_SERVER_URI,
     withCredentials: true,
 });
 
 let isRefreshing = false;
-let refreshSubscribers : ( ()=> void )[] =[];
+let refreshSubscribers: (() => void)[] = [];
+
 
 // handlelogout and prevent infinite loops
-const handleLogout = ()=>{
-    const publicPaths =["/login", "/signup", "/forgot-password", "/"];
+const handleLogout = () => {
+    // 1. Always set loggedIn state to false effectively logging the user out in the client state
+    useAuthStore.getState().setLoggedIn(false);
+
+    const publicPaths = ["/login", "/signup", "/forgot-password", "/"];
 
     const currentPath = window.location.pathname;
-    if(!publicPaths.includes(currentPath)){
-        runRedirectToLogin()
-    }
+
+    // Check exact matches
+    if (publicPaths.includes(currentPath)) return;
+
+    // Check for public sections
+    if (currentPath.startsWith('/product') || currentPath.startsWith('/shops')) return;
+
+    runRedirectToLogin()
 }
 
 // handle adding a new access token to queued requests
-const subscribeTokenRefresh = (callback :()=> void )=> {
+const subscribeTokenRefresh = (callback: () => void) => {
     refreshSubscribers.push(callback);
 }
 
 // Exwecute queued requests after refresh
-const onRefreshSuccess =()=>{
-    refreshSubscribers.forEach((callback)=> callback());
-    refreshSubscribers= [];
+const onRefreshSuccess = () => {
+    refreshSubscribers.forEach((callback) => callback());
+    refreshSubscribers = [];
 };
 
 // Handling API request
@@ -37,39 +47,39 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-    (response)=> response,
-    async (error) =>{
+    (response) => response,
+    async (error) => {
         const originalRequest = error.config;
 
         const is401 = error?.response?.status == 401;
-        const isRetry =originalRequest?._retry;
+        const isRetry = originalRequest?._retry;
         const isAuthRequired = originalRequest?.requireAuth === true;
 
-        if(is401 && !isRetry && isAuthRequired){
-            if(isRefreshing){
-                return new Promise((resolve)=> {
-                    subscribeTokenRefresh(()=> resolve(axiosInstance(originalRequest)));
+        if (is401 && !isRetry && isAuthRequired) {
+            if (isRefreshing) {
+                return new Promise((resolve) => {
+                    subscribeTokenRefresh(() => resolve(axiosInstance(originalRequest)));
 
                 })
             }
 
-            originalRequest._retry =true;
-            isRefreshing= true;
+            originalRequest._retry = true;
+            isRefreshing = true;
             try {
                 await axios.post(
                     `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/refresh-token`,
                     {},
-                    { withCredentials:true }
+                    { withCredentials: true }
                 );
 
-                isRefreshing= false;
+                isRefreshing = false;
                 onRefreshSuccess();
 
                 return axiosInstance(originalRequest);
 
             } catch (error) {
-                isRefreshing =false;
-                refreshSubscribers =[];
+                isRefreshing = false;
+                refreshSubscribers = [];
                 handleLogout();
 
                 return Promise.reject(error);
@@ -77,7 +87,7 @@ axiosInstance.interceptors.response.use(
 
         }
 
-        
+
         return Promise.reject(error)
     }
 )
