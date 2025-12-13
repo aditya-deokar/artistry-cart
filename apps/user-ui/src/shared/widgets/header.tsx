@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { HeartIcon, ShoppingCart, User2, Menu, X, Search } from 'lucide-react';
+import Image from 'next/image';
+import { HeartIcon, ShoppingCart, User2, Menu, X } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import axiosInstance from '@/utils/axiosinstance';
 import { AnimatePresence, motion, useScroll, useMotionValueEvent } from 'framer-motion';
 
 // UI Components
@@ -120,6 +121,7 @@ const Header = ({ className, logoContainerClassName, navContainerClassName, icon
     const { user, isLoading } = useUser();
     const wishlist = useStore((state: any) => state.wishlist);
     const cart = useStore((state: any) => state.cart);
+    const clearAll = useStore((state: any) => state.actions.clearAll);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
@@ -152,13 +154,15 @@ const Header = ({ className, logoContainerClassName, navContainerClassName, icon
 
     const handleLogout = async () => {
         try {
-            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/logout-user`, {}, { withCredentials: true });
+            await axiosInstance.get('/auth/api/logout-user');
             setLoggedIn(false);
+            clearAll(); // Clear cart, wishlist, coupon, address
             queryClient.clear();
             router.push('/login');
         } catch (error) {
             console.error('Logout failed:', error);
             setLoggedIn(false);
+            clearAll(); // Clear even on error to ensure clean state
             queryClient.clear();
             router.push('/login');
         }
@@ -250,9 +254,15 @@ const Header = ({ className, logoContainerClassName, navContainerClassName, icon
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="icon" className="group">
-                                        <div className="h-8 w-8 rounded-full bg-secondary/50 flex items-center justify-center group-hover:bg-primary/20 transition-colors overflow-hidden border border-transparent group-hover:border-primary/20">
-                                            {user?.avatar ? (
-                                                <img src={user.avatar} alt="User" className="h-full w-full object-cover" />
+                                        <div className="h-8 w-8 rounded-full bg-secondary/50 flex items-center justify-center group-hover:bg-primary/20 transition-colors overflow-hidden border border-transparent group-hover:border-primary/20 relative">
+                                            {user?.avatar?.url ? (
+                                                <Image
+                                                    src={user.avatar.url}
+                                                    alt="User avatar"
+                                                    fill
+                                                    className="object-cover"
+                                                    sizes="32px"
+                                                />
                                             ) : (
                                                 <User2 className="h-5 w-5" />
                                             )}

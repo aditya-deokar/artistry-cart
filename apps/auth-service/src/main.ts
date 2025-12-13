@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorMiddleware } from "../../../packages/error-handler/error-middelware";
 import router from "./routes/auth.router";
+import { oauthRouter } from "./oauth";
 
 const host = process.env.HOST ?? "localhost";
 const port = process.env.PORT ? Number(process.env.PORT) : 6001;
@@ -34,13 +35,16 @@ app.get("/", (req, res) => {
 //  Auth routes
 app.use("/api", router);
 
+//  OAuth routes
+app.use("/api/oauth", oauthRouter);
+
 //  Global error handler
 app.use(errorMiddleware);
 
 //  Start server
 const server = app.listen(port, host, () => {
   console.log(`🚀 Auth Service running at http://${host}:${port}/api`);
- 
+
 });
 
 // ✅ Catch server-level errors

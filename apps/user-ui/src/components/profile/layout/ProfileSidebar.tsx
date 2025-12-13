@@ -3,8 +3,10 @@ import Image from 'next/image';
 import { ProfileNavLink } from './ProfileNavLink';
 import { User, ShoppingBag, MapPin, Shield, Store, LogOut } from 'lucide-react';
 import axiosInstance from '@/utils/axiosinstance';
-import {  useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { useStore } from '@/store';
+import { useAuthStore } from '@/store/authStore';
 
 
 // Define the shape of the user data this component needs
@@ -17,6 +19,8 @@ interface UserData {
 export const ProfileSidebar: React.FC<{ user: UserData }> = ({ user }) => {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const clearAll = useStore((state: any) => state.actions.clearAll);
+  const { setLoggedIn } = useAuthStore();
 
   const navLinks = [
     { href: '/profile', label: 'My Profile', icon: <User size={20} /> },
@@ -26,13 +30,20 @@ export const ProfileSidebar: React.FC<{ user: UserData }> = ({ user }) => {
   ];
 
 
-  const logOutHandler= async ()=>{
-    await axiosInstance.get("/auth/api/logout-user").then((res)=>{
-        queryClient.invalidateQueries({
-          queryKey: ['user']
-        })
-        router.push("/login")
-    })
+  const logOutHandler = async () => {
+    try {
+      await axiosInstance.get("/auth/api/logout-user");
+      setLoggedIn(false);
+      clearAll(); // Clear cart, wishlist, coupon, address
+      queryClient.clear();
+      router.push("/login");
+    } catch (error) {
+      console.error('Logout failed:', error);
+      setLoggedIn(false);
+      clearAll();
+      queryClient.clear();
+      router.push("/login");
+    }
   }
 
   return (
@@ -47,7 +58,7 @@ export const ProfileSidebar: React.FC<{ user: UserData }> = ({ user }) => {
           <h2 className="font-semibold text-xl">{user.name}</h2>
         </div>
       </div>
-      
+
       <nav className="mt-6 space-y-2">
         {navLinks.map(link => (
           <ProfileNavLink key={link.href} href={link.href} icon={link.icon}>
@@ -57,18 +68,18 @@ export const ProfileSidebar: React.FC<{ user: UserData }> = ({ user }) => {
 
         {/* Conditional link for sellers */}
         {user.role === 'SELLER' && (
-            <ProfileNavLink href="/seller/dashboard" icon={<Store size={20} />}>
-                Seller Dashboard
-            </ProfileNavLink>
+          <ProfileNavLink href="/seller/dashboard" icon={<Store size={20} />}>
+            Seller Dashboard
+          </ProfileNavLink>
         )}
       </nav>
 
       <div className="mt-6 pt-4 border-t border-neutral-800">
         <button
-        onClick={()=> logOutHandler()}
-        className="flex items-center gap-3 w-full p-3 rounded-md text-red-400 font-semibold hover:text-red-700 transition-colors">
-            <LogOut size={20} />
-            Logout
+          onClick={() => logOutHandler()}
+          className="flex items-center gap-3 w-full p-3 rounded-md text-red-400 font-semibold hover:text-red-700 transition-colors">
+          <LogOut size={20} />
+          Logout
         </button>
       </div>
     </div>

@@ -22,6 +22,10 @@ model users {
   avatar   Json? // Use Json type for consistency: { url, file_id }
   role     UserRole @default(USER)
 
+  // OAuth fields
+  oauthProvider String? // "google", "github", "microsoft", etc.
+  oauthId       String? // Provider-specific user ID
+
   // Relations
   orders        orders[]
   addresses     addresses[]

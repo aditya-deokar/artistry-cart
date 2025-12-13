@@ -18,6 +18,7 @@
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-node": "^4.22.0",
     "@types/body-parser": "^1.19.6",
+    "arctic": "^3.7.0",
     "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
@@ -59,6 +60,7 @@
     "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1",
     "ua-parser-js": "^2.0.4",
+    "undici": "^7.16.0",
     "zod": "^4.0.5",
     "zustand": "^5.0.7"
   },
