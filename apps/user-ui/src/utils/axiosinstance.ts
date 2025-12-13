@@ -10,11 +10,24 @@ const axiosInstance = axios.create({
 let isRefreshing = false;
 let refreshSubscribers: (() => void)[] = [];
 
+// Function to clear store data (cart, wishlist, etc.)
+const clearStoreData = () => {
+    // Clear localStorage directly since we can't use hooks here
+    const storageKey = 'artistry-cart-storage';
+    try {
+        localStorage.removeItem(storageKey);
+    } catch (e) {
+        console.error('Failed to clear store data:', e);
+    }
+};
 
 // handlelogout and prevent infinite loops
 const handleLogout = () => {
     // 1. Always set loggedIn state to false effectively logging the user out in the client state
     useAuthStore.getState().setLoggedIn(false);
+
+    // 2. Clear store data (cart, wishlist, etc.)
+    clearStoreData();
 
     const publicPaths = ["/login", "/signup", "/forgot-password", "/"];
 

@@ -32,7 +32,7 @@ export interface StoreState {
   cart: CartItem[];
   wishlist: CartItem[];
   appliedCoupon: DiscountCode | null;
-  address: Address | null;   
+  address: Address | null;
 }
 
 export interface StoreActions {
@@ -46,8 +46,12 @@ export interface StoreActions {
   applyCoupon: (coupon: DiscountCode) => void;
   removeCoupon: () => void;
 
-  setAddress: (address: Address) => void;   
-  clearAddress: () => void;                 
+  setAddress: (address: Address) => void;
+  clearAddress: () => void;
+
+  // Clear all state (for logout)
+  clearWishlist: () => void;
+  clearAll: () => void;
 }
 
 // ---------------- STORE ----------------
@@ -62,7 +66,7 @@ export const useStore = create<Store>()(
       cart: [],
       wishlist: [],
       appliedCoupon: null,
-      address: null, 
+      address: null,
 
       // --- ACTIONS ---
       actions: {
@@ -157,7 +161,7 @@ export const useStore = create<Store>()(
 
         updateQuantity: (productId, newQuantity) => {
           if (newQuantity <= 0) {
-           
+
             set((state) => ({
               cart: state.cart.filter((item) => item.id !== productId),
             }));
@@ -181,12 +185,26 @@ export const useStore = create<Store>()(
           set({ appliedCoupon: null });
         },
 
-        
+
         setAddress: (address) => {
           set({ address });
         },
         clearAddress: () => {
           set({ address: null });
+        },
+
+        clearWishlist: () => {
+          set({ wishlist: [] });
+        },
+
+        // Clear all store data (for logout)
+        clearAll: () => {
+          set({
+            cart: [],
+            wishlist: [],
+            appliedCoupon: null,
+            address: null,
+          });
         },
       },
     }),
@@ -197,7 +215,7 @@ export const useStore = create<Store>()(
         cart: state.cart,
         wishlist: state.wishlist,
         appliedCoupon: state.appliedCoupon,
-        address: state.address, 
+        address: state.address,
       }),
     }
   )
