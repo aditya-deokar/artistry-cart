@@ -633,64 +633,127 @@ export const searchShops = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// Get search suggestions
+// Get search suggestions (enhanced with popular searches and typeahead support)
 export const getSearchSuggestions = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const query = req.query.q as string;
 
-    if (!query || query.trim().length < 2) {
+    // Return popular searches when no query or query too short
+    if (!query || query.trim().length < 1) {
+      const [popularProducts, popularCategories] = await Promise.all([
+        prisma.products.findMany({
+          where: { isDeleted: false, status: 'Active', stock: { gt: 0 } },
+          select: { title: true, slug: true, category: true },
+          orderBy: { totalSales: 'desc' },
+          distinct: ['title'],
+          take: 5
+        }),
+        prisma.products.groupBy({
+          by: ['category'],
+          where: { isDeleted: false, status: 'Active' },
+          _count: { id: true },
+          orderBy: { _count: { id: 'desc' } },
+          take: 3
+        })
+      ]);
+
       return res.status(200).json({
         success: true,
-        data: { suggestions: [] }
+        data: {
+          suggestions: [],
+          popular: [
+            ...popularProducts.map(p => ({
+              type: 'popular' as const,
+              value: p.title,
+              slug: p.slug,
+              category: p.category
+            })),
+            ...popularCategories.map(c => ({
+              type: 'category' as const,
+              value: c.category,
+              count: c._count.id
+            }))
+          ]
+        }
       });
     }
 
-    // Get suggestions from multiple sources
+    // Get suggestions from multiple sources with improved matching
+    const searchTerm = query.trim();
+
     const [productSuggestions, categorySuggestions, shopSuggestions] = await Promise.all([
-      // Product title suggestions
+      // Product title suggestions - ordered by sales for better relevance
       prisma.products.findMany({
         where: {
-          title: { contains: query, mode: 'insensitive' },
+          OR: [
+            { title: { startsWith: searchTerm, mode: 'insensitive' } },
+            { title: { contains: searchTerm, mode: 'insensitive' } },
+          ],
           isDeleted: false,
-          status: 'Active'
+          status: 'Active',
+          stock: { gt: 0 }
         },
-        select: { title: true },
+        select: { title: true, slug: true, category: true, images: true },
         distinct: ['title'],
-        take: 5
+        orderBy: { totalSales: 'desc' },
+        take: 6
       }),
 
       // Category suggestions
-      prisma.products.findMany({
+      prisma.products.groupBy({
+        by: ['category'],
         where: {
-          category: { contains: query, mode: 'insensitive' },
+          category: { contains: searchTerm, mode: 'insensitive' },
           isDeleted: false,
           status: 'Active'
         },
-        select: { category: true },
-        distinct: ['category'],
+        _count: { id: true },
+        orderBy: { _count: { id: 'desc' } },
         take: 3
       }),
 
       // Shop name suggestions
       prisma.shops.findMany({
         where: {
-          name: { contains: query, mode: 'insensitive' }
+          OR: [
+            { name: { startsWith: searchTerm, mode: 'insensitive' } },
+            { name: { contains: searchTerm, mode: 'insensitive' } },
+          ]
         },
-        select: { name: true },
+        select: { name: true, slug: true, avatar: true },
+        orderBy: { ratings: 'desc' },
         distinct: ['name'],
         take: 3
       })
     ]);
 
     const suggestions = [
-      ...productSuggestions.map(p => ({ type: 'product', value: p.title })),
-      ...categorySuggestions.map(c => ({ type: 'category', value: c.category })),
-      ...shopSuggestions.map(s => ({ type: 'shop', value: s.name }))
+      ...productSuggestions.map(p => ({
+        type: 'product' as const,
+        value: p.title,
+        slug: p.slug,
+        category: p.category,
+        image: p.images?.[0]?.url || null
+      })),
+      ...categorySuggestions.map(c => ({
+        type: 'category' as const,
+        value: c.category,
+        count: c._count.id
+      })),
+      ...shopSuggestions.map(s => ({
+        type: 'shop' as const,
+        value: s.name,
+        slug: s.slug,
+        avatar: s.avatar?.url || null
+      }))
     ];
 
     return res.status(200).json({
       success: true,
-      data: { suggestions }
+      data: {
+        suggestions,
+        query: searchTerm
+      }
     });
   } catch (error) {
     return next(error);

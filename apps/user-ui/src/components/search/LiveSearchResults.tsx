@@ -1,11 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { User, Package, Loader2 } from 'lucide-react';
-import { formatPrice } from '@/lib/formatters';
+import { Package, Loader2, Store } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { UnifiedSearchCard } from './UnifiedSearchCard';
 
-// ... (Interface definitions remain the same) ...
 interface ProductResult {
   id?: string;
   slug: string;
@@ -14,6 +13,14 @@ interface ProductResult {
   sale_price?: number | null;
   current_price?: number;
   regular_price: number;
+  is_on_discount?: boolean;
+  category?: string;
+  ratings?: number;
+  Shop?: {
+    name: string;
+    slug: string;
+    avatar?: { url: string } | null;
+  } | null;
 }
 
 interface ShopResult {
@@ -22,6 +29,7 @@ interface ShopResult {
   name: string;
   avatar?: { url: string } | null;
   logo?: { url: string } | null;
+  ratings?: number;
 }
 
 type LiveSearchResultsProps = {
@@ -37,64 +45,56 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
-const ResultItem: React.FC<{
-  href: string;
-  imageUrl: string | null;
-  title: string;
-  subtitle?: string;
-  type: 'product' | 'shop';
+// Shop Result Item
+const ShopResultItem: React.FC<{
+  shop: ShopResult;
   onClick?: () => void;
   variant?: 'dropdown' | 'minimal';
   index: number;
-}> = ({ href, imageUrl, title, subtitle, type, onClick, variant = 'dropdown', index }) => (
+}> = ({ shop, onClick, variant = 'dropdown', index }) => (
   <motion.div
     variants={itemVariants}
-    custom={index}
     initial="hidden"
     animate="visible"
     transition={{ delay: index * 0.05 }}
   >
     <Link
-      href={href}
+      href={`/shops/${shop.slug}`}
       onClick={onClick}
       className={`flex items-center gap-4 p-4 rounded-xl transition-all group relative overflow-hidden ${variant === 'minimal'
-        ? 'hover:bg-white/5 border border-transparent'
-        : 'hover:bg-muted'
+        ? 'hover:bg-muted/50 dark:hover:bg-muted/30 border border-transparent hover:border-border/30'
+        : 'hover:bg-muted dark:hover:bg-muted/50'
         }`}
     >
       {/* Background Hover Effect for Minimal */}
       {variant === 'minimal' && (
-        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-primary/5 dark:bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       )}
 
-      <div className={`relative ${variant === 'minimal' ? 'w-20 h-20' : 'w-14 h-14'} rounded-xl overflow-hidden bg-muted flex-shrink-0 border border-white/10 group-hover:border-primary/50 transition-all duration-300 shadow-md group-hover:shadow-primary/20 group-hover:scale-105`}>
-        {imageUrl ? (
+      <div className={`relative ${variant === 'minimal' ? 'w-16 h-16' : 'w-12 h-12'} rounded-full overflow-hidden bg-muted dark:bg-muted/50 flex-shrink-0 border border-border/30 group-hover:border-primary/50 transition-all duration-300 shadow-md group-hover:shadow-primary/20 group-hover:scale-105`}>
+        {shop.avatar?.url || shop.logo?.url ? (
           <Image
-            src={imageUrl}
-            alt={title}
+            src={shop.avatar?.url || shop.logo?.url || ''}
+            alt={shop.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"
-            sizes="80px"
+            sizes="64px"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
-            {type === 'shop' ? <User size={24} /> : <Package size={24} />}
+            <Store size={variant === 'minimal' ? 24 : 20} />
           </div>
         )}
       </div>
 
       <div className="flex-1 min-w-0 z-10">
         <p className={`font-semibold truncate transition-colors duration-300 ${variant === 'minimal'
-          ? 'text-xl text-foreground/90 group-hover:text-primary group-hover:translate-x-1'
+          ? 'text-lg text-foreground/90 group-hover:text-primary'
           : 'text-foreground group-hover:text-primary'
           }`}>
-          {title}
+          {shop.name}
         </p>
-        {subtitle && (
-          <p className="text-sm text-muted-foreground truncate group-hover:text-muted-foreground/80 transition-colors">
-            {subtitle}
-          </p>
-        )}
+        <p className="text-sm text-muted-foreground">Shop</p>
       </div>
 
       {/* Arrow Icon for Minimal Variant */}
@@ -124,15 +124,18 @@ export const LiveSearchResults: React.FC<LiveSearchResultsProps> = ({
   };
 
   const containerClasses = variant === 'minimal'
-    ? 'w-full max-h-[60vh] overflow-hidden'
-    : 'bg-card border border-border rounded-xl shadow-2xl max-h-[70vh] overflow-hidden';
+    ? 'w-full'
+    : 'bg-card border border-border rounded-xl shadow-2xl';
+
+  // Map variant to UnifiedSearchCard variant
+  const cardVariant = variant === 'minimal' ? 'minimal' : 'compact';
 
   return (
     <div
       className={containerClasses}
       onWheel={handleWheel}
     >
-      <div className="max-h-[70vh] overflow-y-auto p-4 custom-scrollbar">
+      <div className="max-h-[55vh] overflow-y-auto p-4 custom-scrollbar" style={{ overscrollBehavior: 'contain' }}>
         {isLoading && (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -146,7 +149,7 @@ export const LiveSearchResults: React.FC<LiveSearchResultsProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-12"
           >
-            <div className="bg-muted/50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+            <div className="bg-muted/50 dark:bg-muted/30 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
               <Package className="h-10 w-10 text-muted-foreground/50" />
             </div>
             <p className="text-lg text-muted-foreground font-light">No results found for <span className="text-foreground">"{query}"</span></p>
@@ -155,28 +158,36 @@ export const LiveSearchResults: React.FC<LiveSearchResultsProps> = ({
         )}
 
         {!isLoading && hasResults && (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {results.products && results.products.length > 0 && (
               <motion.div
                 initial="hidden"
                 animate="visible"
                 variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
               >
-                <h3 className="font-semibold text-xs uppercase tracking-[0.2em] text-muted-foreground/70 px-4 mb-4">
+                <h3 className="font-semibold text-xs uppercase tracking-[0.2em] text-muted-foreground/70 px-2 mb-3">
                   Products ({results.products.length})
                 </h3>
                 <div className="space-y-1">
-                  {results.products.map((p, index) => (
-                    <ResultItem
-                      key={p.id || p.slug || index}
+                  {results.products.map((product, index) => (
+                    <UnifiedSearchCard
+                      key={product.id || product.slug || index}
+                      product={{
+                        id: product.id || product.slug,
+                        slug: product.slug,
+                        title: product.title,
+                        images: product.images,
+                        current_price: product.current_price,
+                        regular_price: product.regular_price,
+                        sale_price: product.sale_price ?? undefined,
+                        is_on_discount: product.is_on_discount,
+                        category: product.category,
+                        ratings: product.ratings,
+                        Shop: product.Shop,
+                      }}
+                      variant={cardVariant}
                       index={index}
-                      href={`/product/${p.slug}`}
-                      imageUrl={p.images?.[0]?.url || null}
-                      title={p.title}
-                      subtitle={formatPrice(p.sale_price ?? p.current_price ?? p.regular_price)}
-                      type="product"
                       onClick={onResultClick}
-                      variant={variant}
                     />
                   ))}
                 </div>
@@ -189,20 +200,17 @@ export const LiveSearchResults: React.FC<LiveSearchResultsProps> = ({
                 animate="visible"
                 variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
               >
-                <h3 className="font-semibold text-xs uppercase tracking-[0.2em] text-muted-foreground/70 px-4 mb-4">
+                <h3 className="font-semibold text-xs uppercase tracking-[0.2em] text-muted-foreground/70 px-2 mb-3">
                   Shops ({results.shops.length})
                 </h3>
                 <div className="space-y-1">
-                  {results.shops.map((s, index) => (
-                    <ResultItem
-                      key={s.id || s.slug || index}
-                      index={index}
-                      href={`/shops/${s.slug}`}
-                      imageUrl={s.avatar?.url || s.logo?.url || null}
-                      title={s.name}
-                      type="shop"
+                  {results.shops.map((shop, index) => (
+                    <ShopResultItem
+                      key={shop.id || shop.slug || index}
+                      shop={shop}
                       onClick={onResultClick}
                       variant={variant}
+                      index={index}
                     />
                   ))}
                 </div>
@@ -213,7 +221,7 @@ export const LiveSearchResults: React.FC<LiveSearchResultsProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="border-t border-white/5 pt-6 pb-2"
+              className="border-t border-border/50 pt-4 pb-2"
             >
               <Link
                 href={`/search?q=${encodeURIComponent(query)}`}
