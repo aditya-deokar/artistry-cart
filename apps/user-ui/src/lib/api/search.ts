@@ -32,7 +32,7 @@ export interface FullSearchParams {
 
 export const fullSearch = async (params: FullSearchParams) => {
   const searchParams = new URLSearchParams();
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
       searchParams.append(key, value.toString());
@@ -66,7 +66,7 @@ export interface SearchEventsParams {
 
 export const searchEvents = async (params: SearchEventsParams) => {
   const searchParams = new URLSearchParams();
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
       searchParams.append(key, value.toString());
@@ -90,7 +90,7 @@ export interface SearchShopsParams {
 
 export const searchShops = async (params: SearchShopsParams) => {
   const searchParams = new URLSearchParams();
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
       searchParams.append(key, value.toString());
@@ -176,7 +176,7 @@ export interface FullSearchResults {
   products: SearchProduct[];
   facets: {
     categories: Array<{ category: string; _count: { id: number } }>;
-    shops: Array<{ 
+    shops: Array<{
       shopId: string;
       _count: { id: number };
       shop?: SearchShop;
@@ -205,6 +205,18 @@ export interface FullSearchResults {
 }
 
 export interface SearchSuggestion {
-  type: 'product' | 'category' | 'shop';
+  type: 'product' | 'category' | 'shop' | 'popular';
   value: string;
+  slug?: string;
+  category?: string;
+  image?: string | null;
+  avatar?: string | null;
+  count?: number;
 }
+
+export interface SearchSuggestionsResponse {
+  suggestions: SearchSuggestion[];
+  popular?: SearchSuggestion[];
+  query?: string;
+}
+

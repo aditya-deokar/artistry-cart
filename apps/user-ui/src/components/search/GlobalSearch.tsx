@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import axiosInstance from '@/utils/axiosinstance';
@@ -8,91 +8,128 @@ import { useRouter } from 'next/navigation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Search, X } from 'lucide-react';
 import { LiveSearchResults } from './LiveSearchResults';
+import { SearchSuggestions, Suggestion } from './SearchSuggestions';
 import Fuse from 'fuse.js';
 import { useLenis } from 'lenis/react';
-
-
 import { AnimatePresence, motion } from 'framer-motion';
+
+// Constants
+const RECENT_SEARCHES_KEY = 'artistry-cart-recent-searches';
+const MAX_RECENT_SEARCHES = 5;
+
+// Helper functions for localStorage
+const getRecentSearches = (): string[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveRecentSearch = (search: string): string[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const searches = getRecentSearches();
+    const filtered = searches.filter(s => s.toLowerCase() !== search.toLowerCase());
+    const updated = [search, ...filtered].slice(0, MAX_RECENT_SEARCHES);
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+    return updated;
+  } catch {
+    return [];
+  }
+};
+
+const removeRecentSearch = (search: string): string[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const searches = getRecentSearches();
+    const updated = searches.filter(s => s !== search);
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+    return updated;
+  } catch {
+    return [];
+  }
+};
+
+const clearAllRecentSearches = (): string[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    localStorage.removeItem(RECENT_SEARCHES_KEY);
+    return [];
+  } catch {
+    return [];
+  }
+};
 
 export const GlobalSearch = () => {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const debouncedQuery = useDebounce(query, 300); // 300ms delay
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const debouncedQuery = useDebounce(query, 300);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const lenis = useLenis();
+  const [mounted, setMounted] = useState(false);
 
+  // Load recent searches on mount
+  useEffect(() => {
+    setMounted(true);
+    setRecentSearches(getRecentSearches());
+  }, []);
 
-  // ... (in GlobalSearch component)
+  // Reset selected index when query changes
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [debouncedQuery]);
 
-  // NOTE: Since the real fuzzy search should happen on the server/API for global data, 
-  // using Fuse.js on the client side is typically for filtering locally available lists. 
-  // However, to fulfill the request of "add fuzzy search into it" in the context of the search bar,
-  // we can either mock it or process 'results' if we had a large list.
-  // 
-  // Assuming the user wants 'fuzzy' behavior even if the API is strict, 
-  // OR the user implies the API should be fuzzy.
-  //
-  // Since I cannot change the API implementation easily without seeing the backend code for search,
-  // I will implement client-side fuzzy filtering on the *results returned from the API* 
-  // if they were a larger set, OR more likely, mis-interpreted the request. 
-  // 
-  // BUT, usually "add fuzzy search" means the search itself should be fuzzy.
-  // If the API returns a broad set, we can refine it with Fuse.
-  // 
-  // Let's modify the useQuery to use Fuse if we were searching a local static list.
-  // BUT here we are calling an API. 
-  //
-  // Strategy: Since I can't touch the backend easily in this step (it's in a different service I might not have full access to modify cleanly in one go),
-  // I will assume the user might want to search through a pre-fetched list or wants the UI to handle typos better.
-  //
-  // However, the best place for fuzzy search in a real app is the backend (Postgres ILIKE or vector search).
-  //
-  // For now, I will add Fuse.js to *re-rank* or *filter* the results IF we were doing local search.
-  // Since `GlobalSearch.tsx` calls `/product/api/search/live`, that's server side.
-  //
-  // IF the user effectively wants client-side search for demo purposes or small datasets:
-  // I will create a Fuse instance that *could* search a cached list of products.
-  //
-  // Let's stick to the most robust interpretation:
-  // The user likely wants to see fuzzy matches. 
-  // I'll update the component to fetch a "search index" (all products light version) and search THAT with Fuse.js
-  // This makes the search super fast and fuzzy.
-
+  // Search index for fuzzy fallback
   const { data: searchIndex } = useQuery({
     queryKey: ['searchIndex'],
     queryFn: async () => {
-      // Fetch a lightweight list of all products for client-side fuzzy search
-      // This is a common pattern for "instant" search
       try {
-        const res = await axiosInstance.get('/product/api/products?limit=100'); // limit 100 for demo
+        const res = await axiosInstance.get('/product/api/products?limit=100');
         return res.data.data.products || [];
       } catch (e) {
         return [];
       }
     },
-    staleTime: 1000 * 60 * 5 // 5 mins
+    staleTime: 1000 * 60 * 5
   });
 
   const fuse = React.useMemo(() => {
     if (!searchIndex) return null;
     return new Fuse(searchIndex, {
       keys: ['title', 'Shop.name'],
-      threshold: 0.3, // Fuzzy threshold
+      threshold: 0.3,
       location: 0,
       distance: 100,
     });
   }, [searchIndex]);
 
-  // Combined Results: API + Fuzzy Local
-  // We will prefer API results, but if empty, fall back to Fuzzy Local
-  // OR merge them.
+  // Fetch suggestions (for typeahead)
+  const { data: suggestionsData, isLoading: suggestionsLoading } = useQuery({
+    queryKey: ['searchSuggestions', debouncedQuery],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/product/api/search/suggestions?q=${encodeURIComponent(debouncedQuery)}`
+      );
+      return res.data.data;
+    },
+    enabled: isOpen, // Always fetch when modal is open (for popular searches)
+  });
 
-  const { data: apiData, isLoading } = useQuery({
+  // Fetch live results (for product cards)
+  const { data: apiData, isLoading: resultsLoading } = useQuery({
     queryKey: ['liveSearch', debouncedQuery],
     queryFn: async () => {
       if (!debouncedQuery) return null;
       try {
-        const res = await axiosInstance.get(`/product/api/search/live?q=${encodeURIComponent(debouncedQuery)}`);
+        const res = await axiosInstance.get(
+          `/product/api/search/live?q=${encodeURIComponent(debouncedQuery)}`
+        );
         return res.data.data || res.data;
       } catch (e) {
         return null;
@@ -101,39 +138,97 @@ export const GlobalSearch = () => {
     enabled: debouncedQuery.length > 1,
   });
 
-  // Derived state for display
+  // Combined display results with Fuse.js fallback
   const displayResults = React.useMemo(() => {
-    // 1. Start with API results
     let products = apiData?.products || [];
     let shops = apiData?.shops || [];
 
-    // 2. If API returns few results, augment with Fuse.js
     if (fuse && debouncedQuery.length > 1) {
       const fuseResults = fuse.search(debouncedQuery).map(result => result.item);
-
-      // Deduplicate based on ID
       const existingIds = new Set(products.map((p: any) => p.id));
       const newItems = fuseResults.filter((p: any) => !existingIds.has(p.id));
-
-      // Add top 5 fuzzy matches if not already present
       products = [...products, ...newItems.slice(0, 5)];
     }
 
     return { products, shops };
   }, [apiData, fuse, debouncedQuery]);
 
+  // Determine total items for keyboard navigation
+  const totalSuggestions = suggestionsData?.suggestions?.length || 0;
+  const totalPopular = suggestionsData?.popular?.length || 0;
+  const totalItems = query.length === 0 ? totalPopular : totalSuggestions;
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev < totalItems - 1 ? prev + 1 : 0));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev > 0 ? prev - 1 : totalItems - 1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+
+      if (selectedIndex >= 0) {
+        // Navigate to selected suggestion
+        const items = query.length === 0
+          ? suggestionsData?.popular || []
+          : suggestionsData?.suggestions || [];
+
+        if (items[selectedIndex]) {
+          handleSuggestionClick(items[selectedIndex]);
+          return;
+        }
+      }
+
+      // Submit search
+      if (query.trim()) {
+        handleSubmit(e as any);
+      }
+    } else if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  }, [selectedIndex, totalItems, query, suggestionsData]);
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
+      setRecentSearches(saveRecentSearch(query.trim()));
       router.push(`/search?q=${encodeURIComponent(query.trim())}`);
-      setIsOpen(false); // Close dropdown on navigation
-      setQuery(''); // Clear search after navigation
+      setIsOpen(false);
+      setQuery('');
     }
   };
 
-  // Handle escape key to close and auto-focus
+  // Handle suggestion click
+  const handleSuggestionClick = (suggestion: Suggestion) => {
+    setRecentSearches(saveRecentSearch(suggestion.value));
+    setIsOpen(false);
+    setQuery('');
+  };
+
+  // Handle recent search click
+  const handleRecentClick = (search: string) => {
+    setQuery(search);
+    // Optionally auto-submit
+    setRecentSearches(saveRecentSearch(search));
+    router.push(`/search?q=${encodeURIComponent(search)}`);
+    setIsOpen(false);
+    setQuery('');
+  };
+
+  // Handle remove recent search
+  const handleRemoveRecent = (search: string) => {
+    setRecentSearches(removeRecentSearch(search));
+  };
+
+  // Handle clear all recent searches
+  const handleClearAllRecent = () => {
+    setRecentSearches(clearAllRecentSearches());
+  };
+
+  // Handle escape key and auto-focus
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -141,7 +236,6 @@ export const GlobalSearch = () => {
       }
     };
 
-    // Auto-focus input when opened
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
@@ -151,7 +245,6 @@ export const GlobalSearch = () => {
   }, [isOpen]);
 
   // Prevent scrolling when overlay is open
-  const lenis = useLenis();
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -163,14 +256,12 @@ export const GlobalSearch = () => {
     return () => {
       document.body.style.overflow = '';
       lenis?.start();
-    }
+    };
   }, [isOpen, lenis]);
 
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Show suggestions when query is short, live results when longer
+  const showSuggestions = query.length <= 2 || (debouncedQuery.length <= 2 && !displayResults.products?.length);
+  const showLiveResults = query.length > 2 && (resultsLoading || displayResults.products?.length > 0 || displayResults.shops?.length > 0);
 
   return (
     <>
@@ -190,25 +281,26 @@ export const GlobalSearch = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[9999] bg-background flex flex-col items-center pt-[15vh] px-4 md:px-8"
+              className="fixed inset-0 z-[9999] bg-background flex flex-col items-center pt-[10vh] px-4 md:px-8"
             >
               <div className="w-full max-w-3xl relative">
                 {/* Close Button */}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="absolute -top-[10vh] right-0 p-2 hover:bg-muted rounded-full transition-colors"
+                  className="absolute -top-[6vh] right-0 p-2 hover:bg-muted rounded-full transition-colors"
                   aria-label="Close search"
                 >
                   <X size={32} />
                 </button>
 
                 {/* Main Search Input */}
-                <form onSubmit={handleSubmit} className="w-full mb-12 relative">
+                <form onSubmit={handleSubmit} className="w-full mb-8 relative">
                   <input
                     ref={inputRef}
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     placeholder="Search for art, collections, shops..."
                     className="w-full bg-transparent border-b-2 border-border focus:border-primary text-3xl md:text-5xl lg:text-6xl font-light py-4 outline-none placeholder:text-muted-foreground/30 transition-all text-center md:text-left"
                   />
@@ -221,17 +313,60 @@ export const GlobalSearch = () => {
                   </button>
                 </form>
 
+                {/* Keyboard navigation hint */}
+                {query.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-center gap-4 mb-4 text-xs text-muted-foreground"
+                  >
+                    <span className="flex items-center gap-1">
+                      <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">↑</kbd>
+                      <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">↓</kbd>
+                      <span>navigate</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">Enter</kbd>
+                      <span>select</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">Esc</kbd>
+                      <span>close</span>
+                    </span>
+                  </motion.div>
+                )}
+
                 {/* Results Container */}
-                <div className="w-full h-[60vh] overflow-y-auto px-2 custom-scrollbar">
-                  {query.length > 1 && (isLoading || displayResults) ? (
+                <div className="w-full max-h-[60vh] overflow-y-auto px-2 custom-scrollbar">
+                  {/* Typeahead Suggestions */}
+                  {showSuggestions && (
+                    <SearchSuggestions
+                      suggestions={suggestionsData?.suggestions || []}
+                      popular={suggestionsData?.popular || []}
+                      recentSearches={recentSearches}
+                      query={query}
+                      selectedIndex={selectedIndex}
+                      isLoading={suggestionsLoading && query.length > 0}
+                      onSuggestionClick={handleSuggestionClick}
+                      onRecentClick={handleRecentClick}
+                      onRemoveRecent={handleRemoveRecent}
+                      onClearAllRecent={handleClearAllRecent}
+                    />
+                  )}
+
+                  {/* Live Search Results */}
+                  {showLiveResults && (
                     <LiveSearchResults
                       results={displayResults}
-                      isLoading={isLoading}
+                      isLoading={resultsLoading}
                       query={debouncedQuery}
                       onResultClick={() => setIsOpen(false)}
                       variant="minimal"
                     />
-                  ) : (
+                  )}
+
+                  {/* Initial State - when no query and no suggestions yet */}
+                  {query.length === 0 && !suggestionsData && !suggestionsLoading && recentSearches.length === 0 && (
                     <div className="text-center text-muted-foreground/50 mt-12">
                       <p className="text-lg">Start typing to search...</p>
                     </div>
