@@ -13,7 +13,8 @@ This folder contains the complete brand strategy, implementation plan, and platf
 | [Technical Architecture](./TECHNICAL_ARCHITECTURE.md) | System design, tech stack, microservices |
 | [Implementation Plan](./IMPLEMENTATION_PLAN.md) | Development phases, milestones, roadmap |
 | [Revenue Model](./REVENUE_MODEL.md) | Monetization strategy, pricing, projections |
-| [**Landing Page Blueprint**](./LANDING_PAGE_BLUEPRINT.md) | **NEW** - Premium landing page sections and theme |
+| [Landing Page Blueprint](./LANDING_PAGE_BLUEPRINT.md) | Premium landing page sections and theme |
+| [**About Page Blueprint**](./ABOUT_PAGE_BLUEPRINT.md) | **NEW** - About page storytelling and sections |
 
 ## 🎯 Quick Overview
 
