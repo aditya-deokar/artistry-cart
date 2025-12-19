@@ -1,56 +1,64 @@
+/**
+ * Artistry Cart - Landing Page
+ * 
+ * Premium creative ecommerce platform landing page.
+ * Where Imagination Meets Craftsmanship.
+ * 
+ * @see docs/brand/LANDING_PAGE_BLUEPRINT.md for design specifications
+ */
 
-import { CallToAction } from '@/components/sections/CallToAction';
-import { Hero } from '@/components/sections/Hero';
-import { ProductFeature } from '@/components/sections/ProductFeature';
-import { ProductList } from '@/components/sections/ProductList';
-import { ScrollText } from '@/components/sections/ScrollText';
-import { products } from '@/lib/data';
-import { RecommendedProducts } from '@/components/products/RecommendedProducts';
 import Header from '@/shared/widgets/header';
+import {
+  Hero,
+  Manifesto,
+  FeaturedCategories,
+  CuratedCollection,
+  AIVisionTeaser,
+  ArtisanSpotlight,
+  Testimonials,
+  Philosophy,
+  FinalCTA,
+  Footer,
+} from '@/components/landing';
 
 export default function HomePage() {
-  const featuredProduct = products[0]; // Example: feature the first product
-
   return (
     <>
+      {/* Navigation */}
       <Header />
-      <Hero
-        heading="Crafted with Nature’s Touch"
-        body="Discover timeless handmade wooden creations that bring warmth, elegance, and artistry into your home."
-        buttonText="Shop the Collection"
-        buttonLink="/product"
-        imageUrl="/images/wooden-hero.jpg"
-      />
 
-      <ScrollText
-        eyebrow="The Philosophy"
-        text="We believe wood is more than just material — it’s a canvas of nature. Each grain tells a story, each creation a legacy of craftsmanship."
-      />
+      {/* Main Content */}
+      <main>
+        {/* 1. Hero - Full-viewport cinematic introduction */}
+        <Hero />
 
-      <RecommendedProducts limit={3} />
+        {/* 2. Manifesto - Scroll-reveal brand philosophy */}
+        <Manifesto />
 
-      <ProductList
-        eyebrow="Our Creations"
-        heading="Handmade Wooden Masterpieces"
-        body="Each product is meticulously crafted by skilled artisans, blending tradition with creativity to give you unique pieces that last a lifetime."
-        products={products}
-      />
-      <ProductFeature
-        heading="Featured Creation: Oak Harmony Bowl"
-        description="Hand-carved from sustainably sourced oak, this timeless piece brings a natural elegance to any space. Perfect as a centerpiece or a thoughtful gift."
-        product={featuredProduct}
-      />
+        {/* 3. Featured Categories - Three large category cards */}
+        <FeaturedCategories />
 
+        {/* 4. Curated Collection - Editorial product showcase */}
+        <CuratedCollection />
 
+        {/* 5. AI Vision Teaser - Unique feature showcase (dark section) */}
+        <AIVisionTeaser />
 
-      <CallToAction
-        eyebrow="Bring Art Home"
-        heading="Find Your Wooden Masterpiece"
-        body="Explore our curated collection of handmade wooden creations, crafted to add warmth, authenticity, and artistry to your everyday life."
-        buttonText="Shop Now"
-        buttonLink="/product"
-      />
+        {/* 6. Artisan Spotlight - Featured artist story */}
+        <ArtisanSpotlight />
 
+        {/* 7. Testimonials - Customer testimonials carousel */}
+        <Testimonials />
+
+        {/* 8. Philosophy - Brand values */}
+        <Philosophy />
+
+        {/* 9. Final CTA - Final call to action */}
+        <FinalCTA />
+      </main>
+
+      {/* Footer */}
+      <Footer />
     </>
   );
 }

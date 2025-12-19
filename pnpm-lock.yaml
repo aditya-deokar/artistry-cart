@@ -434,6 +434,9 @@ importers:
 
   apps/user-ui:
     dependencies:
+      '@gsap/react':
+        specifier: ^2.1.2
+        version: 2.1.2(gsap@3.13.0)(react@19.0.0)
       '@hookform/resolvers':
         specifier: ^5.1.1
         version: 5.1.1(react-hook-form@7.60.0(react@19.0.0))
@@ -485,6 +488,9 @@ importers:
       fuse.js:
         specifier: ^7.1.0
         version: 7.1.0
+      gsap:
+        specifier: ^3.13.0
+        version: 3.13.0
       lenis:
         specifier: ^1.3.8
         version: 1.3.8(react@19.0.0)

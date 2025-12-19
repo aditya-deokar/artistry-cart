@@ -6,6 +6,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @layer base {
+
   *,
   ::after,
   ::before,
@@ -63,82 +64,180 @@ body::-webkit-scrollbar {
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 }
-  
+
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(21.22% 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(21.22% 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(21.22% 0 0);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.776 0.168 81.9);;
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.015 286.067);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(21.22% 0 0);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.705 0.015 286.067);
+  --radius: 0.5rem;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     ARTISTRY CART - PREMIUM LUXURY THEME
+     Inspired by: Aesop, Apple, Diptyque, LE LABO, Cartier
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* ─── Brand Colors ─────────────────────────────────────────────────────── */
+  --ac-ivory: #FAF9F7;
+  /* Warm ivory - primary background */
+  --ac-cream: #F5F4F0;
+  /* Soft cream - secondary surfaces */
+  --ac-linen: #EDE9E3;
+  /* Warm linen - borders, dividers */
+  --ac-sand: #E5E0D8;
+  /* Soft sand - interactive states */
+
+  --ac-charcoal: #1A1A1A;
+  /* Deep charcoal - primary text */
+  --ac-graphite: #4A4A4A;
+  /* Soft graphite - secondary text */
+  --ac-stone: #8A8883;
+  /* Warm stone - muted text, captions */
+  --ac-ash: #B0ADA6;
+  /* Light ash - disabled states */
+
+  --ac-gold: #B8860B;
+  /* Refined gold - primary accent */
+  --ac-gold-light: #D4A84B;
+  /* Light gold - hover states */
+  --ac-copper: #A67C52;
+  /* Aged copper - secondary accent */
+  --ac-terracotta: #C67D5A;
+  /* Earth terracotta - warm highlights */
+
+  /* ─── Semantic Colors ──────────────────────────────────────────────────── */
+  --ac-success: #5A7D5A;
+  /* Muted sage green */
+  --ac-warning: #C4A35A;
+  /* Warm amber */
+  --ac-error: #A65D5D;
+  /* Muted burgundy */
+  --ac-info: #5A7D8A;
+  /* Muted teal */
+
+  /* ─── Shadcn/Theme Variables ───────────────────────────────────────────── */
+  --background: var(--ac-ivory);
+  --foreground: var(--ac-charcoal);
+
+  --card: var(--ac-cream);
+  --card-foreground: var(--ac-charcoal);
+
+  --popover: var(--ac-cream);
+  --popover-foreground: var(--ac-charcoal);
+
+  --primary: var(--ac-charcoal);
+  --primary-foreground: var(--ac-ivory);
+
+  --secondary: var(--ac-linen);
+  --secondary-foreground: var(--ac-charcoal);
+
+  --muted: var(--ac-sand);
+  --muted-foreground: var(--ac-stone);
+
+  --accent: var(--ac-gold);
+  --accent-foreground: var(--ac-ivory);
+
+  --destructive: var(--ac-error);
+
+  --border: var(--ac-linen);
+  --input: var(--ac-linen);
+  --ring: var(--ac-gold);
+
+  /* ─── Chart Colors (Premium palette) ───────────────────────────────────── */
+  --chart-1: var(--ac-gold);
+  --chart-2: var(--ac-copper);
+  --chart-3: var(--ac-terracotta);
+  --chart-4: var(--ac-stone);
+  --chart-5: var(--ac-graphite);
+
+  /* ─── Sidebar ──────────────────────────────────────────────────────────── */
+  --sidebar: var(--ac-cream);
+  --sidebar-foreground: var(--ac-charcoal);
+  --sidebar-primary: var(--ac-charcoal);
+  --sidebar-primary-foreground: var(--ac-ivory);
+  --sidebar-accent: var(--ac-linen);
+  --sidebar-accent-foreground: var(--ac-charcoal);
+  --sidebar-border: var(--ac-linen);
+  --sidebar-ring: var(--ac-gold);
 }
-   
+
 
 .dark {
-  --background: oklch(21.22% 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.92 0.004 286.32);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.776 0.168 81.9);;
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.016 285.938);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.552 0.016 285.938);
+  /* ═══════════════════════════════════════════════════════════════════════
+     ARTISTRY CART - DARK MODE (Premium)
+     Deep, sophisticated, gallery-like experience
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* ─── Brand Colors (Dark) ──────────────────────────────────────────────── */
+  --ac-obsidian: #0D0D0D;
+  /* Deep obsidian - primary background */
+  --ac-onyx: #1A1A1A;
+  /* Rich onyx - secondary background */
+  --ac-slate: #2A2A2A;
+  /* Dark slate - cards, surfaces */
+  --ac-graphite-dark: #3A3A3A;
+  /* Elevated surfaces */
+
+  --ac-pearl: #F5F4F0;
+  /* Soft pearl - primary text */
+  --ac-silver: #B0B0B0;
+  /* Muted silver - secondary text */
+  --ac-ash-dark: #6A6A6A;
+  /* Warm ash - muted text */
+
+  --ac-gold-dark: #D4A84B;
+  /* Brighter gold for contrast */
+  --ac-bronze: #C49A6C;
+  /* Warm bronze - secondary accent */
+
+  /* ─── Shadcn/Theme Variables (Dark) ────────────────────────────────────── */
+  --background: var(--ac-obsidian);
+  --foreground: var(--ac-pearl);
+
+  --card: var(--ac-onyx);
+  --card-foreground: var(--ac-pearl);
+
+  --popover: var(--ac-onyx);
+  --popover-foreground: var(--ac-pearl);
+
+  --primary: var(--ac-pearl);
+  --primary-foreground: var(--ac-obsidian);
+
+  --secondary: var(--ac-slate);
+  --secondary-foreground: var(--ac-pearl);
+
+  --muted: var(--ac-graphite-dark);
+  --muted-foreground: var(--ac-ash-dark);
+
+  --accent: var(--ac-gold-dark);
+  --accent-foreground: var(--ac-obsidian);
+
+  --destructive: #C97070;
+
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: var(--ac-gold-dark);
+
+  /* ─── Chart Colors (Dark) ──────────────────────────────────────────────── */
+  --chart-1: var(--ac-gold-dark);
+  --chart-2: var(--ac-bronze);
+  --chart-3: #C67D5A;
+  --chart-4: #8A8883;
+  --chart-5: #B0B0B0;
+
+  /* ─── Sidebar (Dark) ───────────────────────────────────────────────────── */
+  --sidebar: var(--ac-onyx);
+  --sidebar-foreground: var(--ac-pearl);
+  --sidebar-primary: var(--ac-pearl);
+  --sidebar-primary-foreground: var(--ac-obsidian);
+  --sidebar-accent: var(--ac-slate);
+  --sidebar-accent-foreground: var(--ac-pearl);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: var(--ac-gold-dark);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -146,8 +245,11 @@ body::-webkit-scrollbar {
 
 
 @theme inline {
-  --font-display: var(--font-gambarino);
-  --font-sans: var(--font-raleway);
+  /* ─── Premium Typography ───────────────────────────────────────────────── */
+  --font-display: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), 'Space Mono', monospace;
 }
 
 .top-header-element {
@@ -177,17 +279,20 @@ body::-webkit-scrollbar {
 /* --- NEW: Diagonal Reveal Transition --- */
 
 @keyframes diagonal-wipe-in {
-      from {
-        clip-path: polygon(0 0, 0 0, 0 0, 0 0);
-      }
-      to {
-        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-      }
-    }
-    
+  from {
+    clip-path: polygon(0 0, 0 0, 0 0, 0 0);
+  }
+
+  to {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
 @keyframes fade-out-only {
-        to { opacity: 0; }
-    }
+  to {
+    opacity: 0;
+  }
+}
 
 /* Fade In Up Animation */
 @keyframes fadeInUp {
@@ -195,6 +300,7 @@ body::-webkit-scrollbar {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -205,13 +311,13 @@ body::-webkit-scrollbar {
   animation: fadeInUp 0.6s ease-out;
 }
 
-    ::view-transition-old(root) {
-      animation: 0.4s ease-out both fade-out-only;
-    }
+::view-transition-old(root) {
+  animation: 0.4s ease-out both fade-out-only;
+}
 
-    ::view-transition-new(root) {
-      animation: 0.5s cubic-bezier(0.76, 0, 0.24, 1) both diagonal-wipe-in;
-    }
+::view-transition-new(root) {
+  animation: 0.5s cubic-bezier(0.76, 0, 0.24, 1) both diagonal-wipe-in;
+}
 
 .navbar {
   view-transition-name: navbar;
@@ -235,17 +341,274 @@ body::-webkit-scrollbar {
 ::view-transition-old(footer),
 ::view-transition-new(footer) {
   animation: none;
-  mix-blend-mode: normal; /* Ensure blend mode doesn't affect persistent elements */
+  mix-blend-mode: normal;
+  /* Ensure blend mode doesn't affect persistent elements */
 }
 
 
 /* --- Reduced Motion Preferences (Keep As Is) --- */
 @media (prefers-reduced-motion: reduce) {
+
   ::view-transition,
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*) {
-    animation-duration: 0.001s !important; /* Use !important to ensure override */
+    animation-duration: 0.001s !important;
+    /* Use !important to ensure override */
     animation-delay: 0s !important;
   }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ARTISTRY CART - PREMIUM UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Typography Utilities ──────────────────────────────────────────────── */
+.text-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.text-serif {
+  font-family: var(--font-serif);
+  letter-spacing: 0.01em;
+}
+
+.text-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ac-gold);
+}
+
+.text-eyebrow-dark {
+  color: var(--ac-gold-dark);
+}
+
+/* ─── Premium Button Styles ─────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  background-color: var(--ac-charcoal);
+  color: var(--ac-ivory);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover {
+  background-color: var(--ac-gold);
+  color: var(--ac-ivory);
+}
+
+.dark .btn-primary {
+  background-color: var(--ac-pearl);
+  color: var(--ac-obsidian);
+}
+
+.dark .btn-primary:hover {
+  background-color: var(--ac-gold-dark);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border: 1px solid var(--ac-charcoal);
+  color: var(--ac-charcoal);
+  background-color: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-outline:hover {
+  background-color: var(--ac-charcoal);
+  color: var(--ac-ivory);
+}
+
+.dark .btn-outline {
+  border-color: var(--ac-pearl);
+  color: var(--ac-pearl);
+}
+
+.dark .btn-outline:hover {
+  background-color: var(--ac-pearl);
+  color: var(--ac-obsidian);
+}
+
+/* ─── Card Hover Effects ────────────────────────────────────────────────── */
+.card-hover {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.15);
+}
+
+/* ─── Image Hover Zoom ──────────────────────────────────────────────────── */
+.img-zoom {
+  overflow: hidden;
+}
+
+.img-zoom img {
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.img-zoom:hover img {
+  transform: scale(1.05);
+}
+
+/* ─── Link Underline Animation ──────────────────────────────────────────── */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: currentColor;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.link-underline:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+/* ─── Scroll Reveal Animation ───────────────────────────────────────────── */
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal-up {
+  animation: revealUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ─── Stagger Animation Delays ──────────────────────────────────────────── */
+.stagger-1 {
+  animation-delay: 0.1s;
+}
+
+.stagger-2 {
+  animation-delay: 0.2s;
+}
+
+.stagger-3 {
+  animation-delay: 0.3s;
+}
+
+.stagger-4 {
+  animation-delay: 0.4s;
+}
+
+.stagger-5 {
+  animation-delay: 0.5s;
+}
+
+/* ─── Premium Scrollbar ─────────────────────────────────────────────────── */
+.scrollbar-premium::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-premium::-webkit-scrollbar-track {
+  background: var(--ac-linen);
+}
+
+.scrollbar-premium::-webkit-scrollbar-thumb {
+  background: var(--ac-stone);
+  border-radius: 3px;
+}
+
+.scrollbar-premium::-webkit-scrollbar-thumb:hover {
+  background: var(--ac-graphite);
+}
+
+.dark .scrollbar-premium::-webkit-scrollbar-track {
+  background: var(--ac-onyx);
+}
+
+.dark .scrollbar-premium::-webkit-scrollbar-thumb {
+  background: var(--ac-ash-dark);
+}
+
+/* ─── Selection Color ───────────────────────────────────────────────────── */
+::selection {
+  background-color: var(--ac-gold);
+  color: var(--ac-ivory);
+}
+
+.dark ::selection {
+  background-color: var(--ac-gold-dark);
+  color: var(--ac-obsidian);
+}
+
+/* ─── Custom Animations for Landing Page ────────────────────────────────── */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 30s linear infinite;
+}
+
+/* ─── Gradient Text ─────────────────────────────────────────────────────── */
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--ac-gold) 0%, var(--ac-copper) 50%, var(--ac-terracotta) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Glass Effect ──────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ─── Noise Texture Overlay ─────────────────────────────────────────────── */
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
 }

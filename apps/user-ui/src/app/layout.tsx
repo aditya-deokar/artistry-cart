@@ -2,7 +2,7 @@
 import './global.css';
 import localFont from "next/font/local";
 import { ViewTransitions } from "next-view-transitions";
-import { Poppins, Raleway, Roboto } from "next/font/google"
+import { Poppins, Raleway, Roboto, Playfair_Display, Cormorant_Garamond, Inter } from "next/font/google"
 import Providers from './Providers';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { ReactLenis } from 'lenis/react';
@@ -11,10 +11,33 @@ import { Toaster } from '@/components/ui/sonner';
 
 
 export const metadata = {
-  title: 'Artistry Cart',
-  description: 'Art Products',
+  title: 'Artistry Cart | Where Imagination Meets Craftsmanship',
+  description: 'Discover unique handcrafted creations by master artisans, or bring your vision to life with AI-powered custom orders.',
 }
 
+// Premium Luxury Fonts
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+// Legacy Fonts (keeping for backward compatibility)
 const roboto = Roboto({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -49,7 +72,7 @@ export default function RootLayout({
   return (
     <ViewTransitions>
       <html lang="en" suppressHydrationWarning>
-        <body className={`${roboto.variable} ${poppins.variable} ${raleway.variable} ${gambarino.variable} antialiased`} suppressHydrationWarning>
+        <body className={`${playfair.variable} ${cormorant.variable} ${inter.variable} ${roboto.variable} ${poppins.variable} ${raleway.variable} ${gambarino.variable} antialiased`} suppressHydrationWarning>
 
           <ReactLenis root>
             <ThemeProvider
@@ -60,7 +83,7 @@ export default function RootLayout({
             >
               <Providers>
                 <Toaster position='top-center' />
-                
+
                 {children}
               </Providers>
             </ThemeProvider>
