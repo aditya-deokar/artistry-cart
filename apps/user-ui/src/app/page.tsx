@@ -7,7 +7,7 @@
  * @see docs/brand/LANDING_PAGE_BLUEPRINT.md for design specifications
  */
 
-import Header from '@/shared/widgets/header';
+import { Navigation } from '@/components/navigation';
 import {
   Hero,
   Manifesto,
@@ -24,8 +24,8 @@ import {
 export default function HomePage() {
   return (
     <>
-      {/* Navigation */}
-      <Header />
+      {/* Premium Navigation - Transparent with floating pill */}
+      <Navigation transparent hideOnScroll />
 
       {/* Main Content */}
       <main>

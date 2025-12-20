@@ -7,7 +7,7 @@
  */
 
 import { Metadata } from 'next';
-import Header from '@/shared/widgets/header';
+import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/landing';
 import {
     AboutHero,
@@ -34,8 +34,8 @@ export const metadata: Metadata = {
 export default function AboutPage() {
     return (
         <>
-            {/* Navigation */}
-            <Header />
+            {/* Premium Navigation - Transparent with floating pill */}
+            <Navigation transparent hideOnScroll />
 
             {/* Main Content */}
             <main>

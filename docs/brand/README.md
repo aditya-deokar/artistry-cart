@@ -14,7 +14,8 @@ This folder contains the complete brand strategy, implementation plan, and platf
 | [Implementation Plan](./IMPLEMENTATION_PLAN.md) | Development phases, milestones, roadmap |
 | [Revenue Model](./REVENUE_MODEL.md) | Monetization strategy, pricing, projections |
 | [Landing Page Blueprint](./LANDING_PAGE_BLUEPRINT.md) | Premium landing page sections and theme |
-| [**About Page Blueprint**](./ABOUT_PAGE_BLUEPRINT.md) | **NEW** - About page storytelling and sections |
+| [About Page Blueprint](./ABOUT_PAGE_BLUEPRINT.md) | About page storytelling and sections |
+| [**Navigation Blueprint**](./NAVIGATION_BLUEPRINT.md) | **NEW** - Premium navbar design and micro-interactions |
 
 ## 🎯 Quick Overview
 
