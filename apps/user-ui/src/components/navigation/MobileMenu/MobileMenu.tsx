@@ -193,8 +193,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                 </span>
                                 <div
                                     className={`w-12 h-6 rounded-full transition-colors duration-300 ${theme === 'dark'
-                                            ? 'bg-[var(--ac-gold)]'
-                                            : 'bg-[var(--ac-linen)] dark:bg-[var(--ac-slate)]'
+                                        ? 'bg-[var(--ac-gold)]'
+                                        : 'bg-[var(--ac-linen)] dark:bg-[var(--ac-slate)]'
                                         } relative`}
                                 >
                                     <div

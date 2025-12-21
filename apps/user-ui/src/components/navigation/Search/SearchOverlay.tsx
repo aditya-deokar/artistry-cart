@@ -8,6 +8,10 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
+
+// Register GSAP with React
+gsap.registerPlugin(useGSAP);
 import {
     Search,
     X,
@@ -169,14 +173,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         };
     }, [isOpen]);
 
-    // GSAP animations
-    useEffect(() => {
-        if (!isOpen || !overlayRef.current) return;
+    // GSAP animations with useGSAP hook
+    useGSAP(() => {
+        if (!isOpen) return;
 
-        const ctx = gsap.context(() => {
-            // Staggered reveal for content
+        const elements = overlayRef.current?.querySelectorAll('.search-animate');
+        if (elements && elements.length > 0) {
             gsap.fromTo(
-                '.search-animate',
+                elements,
                 { opacity: 0, y: 20 },
                 {
                     opacity: 1,
@@ -184,13 +188,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     duration: 0.4,
                     stagger: 0.05,
                     ease: 'power3.out',
-                    delay: 0.1,
+                    delay: 0.1, // Small delay to ensure render
                 }
             );
-        }, overlayRef);
-
-        return () => ctx.revert();
-    }, [isOpen]);
+        }
+    }, {
+        dependencies: [isOpen],
+        scope: overlayRef
+    });
 
     // Fetch search index for fuzzy search
     const { data: searchIndex } = useQuery({
@@ -506,8 +511,8 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                                                 animate={{ opacity: 1, x: 0 }}
                                                 transition={{ delay: index * 0.05 }}
                                                 className={`${selectedIndex === index
-                                                        ? 'ring-2 ring-[var(--ac-gold)] ring-offset-2 ring-offset-[var(--ac-ivory)] dark:ring-offset-[var(--ac-obsidian)] rounded-lg'
-                                                        : ''
+                                                    ? 'ring-2 ring-[var(--ac-gold)] ring-offset-2 ring-offset-[var(--ac-ivory)] dark:ring-offset-[var(--ac-obsidian)] rounded-lg'
+                                                    : ''
                                                     }`}
                                             >
                                                 <ProductResultCard product={product} onClick={onClose} />

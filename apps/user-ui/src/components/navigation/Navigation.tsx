@@ -1,24 +1,26 @@
 'use client';
 
-import { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { useScroll, useMotionValueEvent, motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
+import { useGSAP } from '@gsap/react';
 
-import { NavLogo } from './NavLogo';
-import { NavLinks } from './NavLinks';
-import { NavActions } from './NavActions';
-import { MobileMenu } from './MobileMenu';
-import { NavMegaMenu } from './NavMegaMenu';
-import { CartDrawer } from './CartDrawer';
-import { WishlistDrawer } from './WishlistDrawer';
-import { SearchOverlay } from './SearchOverlay';
+// Components
+import { DesktopNav } from './_components/DesktopNav';
+import { Logo } from './_components/Logo';
+import { NavActions } from './_components/NavActions';
+
+// Features
+import { MegaMenu } from './MegaMenu/MegaMenu';
+import { MobileMenu } from './MobileMenu/MobileMenu';
+import { CartDrawer } from './Drawers/CartDrawer';
+import { WishlistDrawer } from './Drawers/WishlistDrawer';
+import { SearchOverlay } from './Search/SearchOverlay';
 
 // Register GSAP plugins
-if (typeof window !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger);
-}
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 interface NavigationProps {
     variant?: 'floating' | 'split' | 'minimal';
@@ -35,93 +37,93 @@ export function Navigation({
     showProgress = false,
     className = '',
 }: NavigationProps) {
+    // UI State
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isWishlistOpen, setIsWishlistOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+    // Navigation State
+    const [activeNavItem, setActiveNavItem] = useState<string | null>(null);
     const [scrolled, setScrolled] = useState(false);
     const [hidden, setHidden] = useState(false);
-    const [shopHovered, setShopHovered] = useState(false);
 
+    // Refs
     const headerRef = useRef<HTMLElement>(null);
     const progressRef = useRef<HTMLDivElement>(null);
-    const megaMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const navTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     const pathname = usePathname();
     const { scrollY } = useScroll();
 
-    // Close all overlays on route change
+    // Reset all on route change
     useEffect(() => {
         setIsMenuOpen(false);
         setIsCartOpen(false);
         setIsWishlistOpen(false);
         setIsSearchOpen(false);
-        setShopHovered(false);
+        setActiveNavItem(null);
     }, [pathname]);
 
-    // Handle shop hover with delay for better UX
-    const handleShopHover = (isHovered: boolean) => {
-        if (megaMenuTimeoutRef.current) {
-            clearTimeout(megaMenuTimeoutRef.current);
+    // Handle Hover Logic
+    const handleNavHover = (item: string | null) => {
+        if (navTimeoutRef.current) {
+            clearTimeout(navTimeoutRef.current);
+            navTimeoutRef.current = null;
         }
 
-        if (isHovered) {
-            setShopHovered(true);
+        if (item) {
+            setActiveNavItem(item);
         } else {
-            // Small delay before closing to allow moving to mega menu
-            megaMenuTimeoutRef.current = setTimeout(() => {
-                setShopHovered(false);
-            }, 150);
+            // Buffer time to allow moving between nav and menu
+            // Increased to 250ms to prevent accidental closing on gaps
+            navTimeoutRef.current = setTimeout(() => {
+                setActiveNavItem(null);
+            }, 250);
         }
     };
 
-    // Scroll detection using Framer Motion
+    // Scroll Logic
     useMotionValueEvent(scrollY, 'change', (latest) => {
         const previous = scrollY.getPrevious() || 0;
 
-        // Hide/show on scroll direction
+        // Hide/Show logic
         if (hideOnScroll) {
             if (latest > previous && latest > 150) {
                 setHidden(true);
-                setShopHovered(false); // Close mega menu on scroll
+                setActiveNavItem(null); // Close menu when scrolling down
             } else {
                 setHidden(false);
             }
         }
 
-        // Background change threshold
-        if (latest > 50) {
-            setScrolled(true);
-        } else {
-            setScrolled(false);
-        }
+        // Style logic
+        setScrolled(latest > 50);
     });
 
-    // Scroll progress animation
-    useLayoutEffect(() => {
+    // Scroll Progress with useGSAP
+    useGSAP(() => {
         if (!showProgress || !progressRef.current) return;
 
-        const ctx = gsap.context(() => {
-            gsap.to(progressRef.current, {
-                scaleX: 1,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: document.body,
-                    start: 'top top',
-                    end: 'bottom bottom',
-                    scrub: 0.3,
-                },
-            });
+        gsap.to(progressRef.current, {
+            scaleX: 1,
+            ease: 'none',
+            scrollTrigger: {
+                trigger: document.body,
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 0.3,
+            },
         });
+    }, {
+        dependencies: [showProgress],
+        scope: headerRef
+    });
 
-        return () => ctx.revert();
-    }, [showProgress]);
-
-    // Cleanup timeout on unmount
+    // Cleanup
     useEffect(() => {
         return () => {
-            if (megaMenuTimeoutRef.current) {
-                clearTimeout(megaMenuTimeoutRef.current);
-            }
+            if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
         };
     }, []);
 
@@ -135,7 +137,7 @@ export function Navigation({
                 }}
                 animate={hidden ? 'hidden' : 'visible'}
                 transition={{ duration: 0.35, ease: 'easeInOut' }}
-                className={`fixed top-0 inset-x-0 z-50 w-full transition-all duration-300 ${scrolled
+                className={`fixed top-0 inset-x-0 z-[60] w-full transition-all duration-300 ${scrolled
                     ? 'bg-[var(--ac-ivory)]/90 dark:bg-[var(--ac-obsidian)]/90 backdrop-blur-xl border-b border-[var(--ac-linen)]/50 dark:border-[var(--ac-slate)]/50 py-3 shadow-sm'
                     : transparent
                         ? 'bg-transparent py-5 lg:py-6'
@@ -145,12 +147,15 @@ export function Navigation({
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
                         {/* Logo */}
-                        <NavLogo scrolled={scrolled} />
+                        <Logo scrolled={scrolled} />
 
-                        {/* Desktop Navigation - Floating Pill */}
+                        {/* Desktop Navigation */}
                         {variant === 'floating' && (
                             <div className="hidden lg:flex flex-1 items-center justify-center px-8">
-                                <NavLinks onShopHover={handleShopHover} />
+                                <DesktopNav
+                                    activeItem={activeNavItem}
+                                    onNavHover={handleNavHover}
+                                />
                             </div>
                         )}
 
@@ -164,7 +169,7 @@ export function Navigation({
                     </div>
                 </div>
 
-                {/* Scroll Progress Bar */}
+                {/* Progress Bar */}
                 {showProgress && (
                     <div
                         ref={progressRef}
@@ -174,25 +179,32 @@ export function Navigation({
                 )}
             </motion.header>
 
-            {/* Mobile Menu */}
-            <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-
-            {/* Shop Mega Menu */}
-            <NavMegaMenu
-                isOpen={shopHovered}
-                onClose={() => setShopHovered(false)}
-                onMouseEnter={() => handleShopHover(true)}
+            {/* Overlays & Drawers */}
+            <MobileMenu
+                isOpen={isMenuOpen}
+                onClose={() => setIsMenuOpen(false)}
             />
 
-            {/* Cart Drawer */}
-            <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+            <MegaMenu
+                isOpen={activeNavItem === 'Shop'}
+                onClose={() => handleNavHover(null)}
+                onMouseEnter={() => handleNavHover('Shop')}
+            />
 
-            {/* Wishlist Drawer */}
-            <WishlistDrawer isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
+            <CartDrawer
+                isOpen={isCartOpen}
+                onClose={() => setIsCartOpen(false)}
+            />
 
-            {/* Search Overlay */}
-            <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+            <WishlistDrawer
+                isOpen={isWishlistOpen}
+                onClose={() => setIsWishlistOpen(false)}
+            />
+
+            <SearchOverlay
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+            />
         </>
     );
 }
-

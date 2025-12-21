@@ -3,36 +3,51 @@
 import { useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
 
-interface NavLogoProps {
+// Register GSAP with React
+gsap.registerPlugin(useGSAP);
+
+interface LogoProps {
     className?: string;
     scrolled?: boolean;
 }
 
-export function NavLogo({ className = '', scrolled = false }: NavLogoProps) {
+export function Logo({ className = '', scrolled = false }: LogoProps) {
     const logoRef = useRef<HTMLAnchorElement>(null);
+    const accentRef = useRef<HTMLSpanElement>(null);
     const [isHovered, setIsHovered] = useState(false);
 
-    const handleMouseEnter = useCallback(() => {
-        setIsHovered(true);
-        if (logoRef.current) {
-            gsap.to(logoRef.current.querySelector('.logo-accent'), {
+    // Use useGSAP for hover animation - reacts to isHovered state changes
+    useGSAP(() => {
+        if (!accentRef.current) return;
+
+        if (isHovered) {
+            gsap.to(accentRef.current, {
                 textShadow: '0 0 20px rgba(184, 134, 11, 0.5)',
                 duration: 0.3,
                 ease: 'power2.out',
+                overwrite: 'auto',
+            });
+        } else {
+            gsap.to(accentRef.current, {
+                textShadow: 'none',
+                duration: 0.3,
+                ease: 'power2.out',
+                overwrite: 'auto',
             });
         }
+    }, {
+        dependencies: [isHovered],
+        scope: logoRef
+    });
+
+    const handleMouseEnter = useCallback(() => {
+        setIsHovered(true);
     }, []);
 
     const handleMouseLeave = useCallback(() => {
         setIsHovered(false);
-        if (logoRef.current) {
-            gsap.to(logoRef.current.querySelector('.logo-accent'), {
-                textShadow: 'none',
-                duration: 0.3,
-                ease: 'power2.out',
-            });
-        }
     }, []);
 
     return (
@@ -49,7 +64,7 @@ export function NavLogo({ className = '', scrolled = false }: NavLogoProps) {
                     } text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)]`}
             >
                 Artistry
-                <span className="logo-accent text-[var(--ac-gold)] dark:text-[var(--ac-gold-dark)] italic transition-all duration-300">
+                <span ref={accentRef} className="logo-accent text-[var(--ac-gold)] dark:text-[var(--ac-gold-dark)] italic transition-all duration-300">
                     Cart
                 </span>
             </span>

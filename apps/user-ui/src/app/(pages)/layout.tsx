@@ -1,21 +1,17 @@
 
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import Header from '@/shared/widgets/header';
+import { Navigation } from '@/components/navigation';
 
-export default function RootLayout({
+export default function PagesLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-   <>
-   <Header />
-   <Breadcrumbs />
-   {children}
-   </>
-          
-          
-
-         
+    <>
+      <Navigation transparent={false} hideOnScroll />
+      <Breadcrumbs />
+      {children}
+    </>
   )
 }

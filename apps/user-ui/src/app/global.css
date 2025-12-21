@@ -101,6 +101,14 @@ body::-webkit-scrollbar {
   --ac-gold-dark: #D4A84B;
   /* Brighter gold for contrast on dark backgrounds */
 
+  /* ─── Dark Section Colors (for dark sections on light pages) ───────────────── */
+  --ac-obsidian: #0D0D0D;
+  /* Deep obsidian - dark section background */
+  --ac-onyx: #1A1A1A;
+  /* Rich onyx - dark secondary background */
+  --ac-slate: #2A2A2A;
+  /* Dark slate - dark cards, surfaces */
+
   --ac-gold: #B8860B;
   /* Refined gold - primary accent */
   --ac-gold-light: #D4A84B;
