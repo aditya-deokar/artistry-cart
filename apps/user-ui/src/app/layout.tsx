@@ -74,7 +74,17 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body className={`${playfair.variable} ${cormorant.variable} ${inter.variable} ${roboto.variable} ${poppins.variable} ${raleway.variable} ${gambarino.variable} antialiased`} suppressHydrationWarning>
 
-          <ReactLenis root>
+          <ReactLenis
+            root
+            options={{
+              lerp: 0.1,           // Lower = smoother (0.05-0.15 recommended)
+              duration: 1.2,       // Scroll animation duration
+              smoothWheel: true,   // Enable smooth wheel scrolling
+              wheelMultiplier: 1,  // Wheel scroll speed
+              touchMultiplier: 2,  // Touch scroll speed
+              infinite: false,     // No infinite scroll
+            }}
+          >
             <ThemeProvider
               attribute="class"
               defaultTheme="system"

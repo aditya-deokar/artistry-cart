@@ -93,6 +93,22 @@ body::-webkit-scrollbar {
   --ac-ash: #B0ADA6;
   /* Light ash - disabled states */
 
+  /* ─── Light Text Colors (for dark backgrounds like footer) ───────────────── */
+  --ac-pearl: #F5F4F0;
+  /* Soft pearl - text on dark backgrounds */
+  --ac-silver: #C8C8C8;
+  /* Light silver - secondary text on dark backgrounds */
+  --ac-gold-dark: #D4A84B;
+  /* Brighter gold for contrast on dark backgrounds */
+
+  /* ─── Dark Section Colors (for dark sections on light pages) ───────────────── */
+  --ac-obsidian: #0D0D0D;
+  /* Deep obsidian - dark section background */
+  --ac-onyx: #1A1A1A;
+  /* Rich onyx - dark secondary background */
+  --ac-slate: #2A2A2A;
+  /* Dark slate - dark cards, surfaces */
+
   --ac-gold: #B8860B;
   /* Refined gold - primary accent */
   --ac-gold-light: #D4A84B;

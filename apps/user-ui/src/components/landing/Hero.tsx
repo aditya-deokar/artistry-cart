@@ -99,27 +99,14 @@ export function Hero({
                     '-=0.4'
                 );
 
-            // Parallax effect on scroll
-            gsap.to(headlineRef.current, {
-                yPercent: 30,
+            // Parallax effect on scroll - subtle movement for all content
+            gsap.to(containerRef.current?.querySelector('.hero-content'), {
+                yPercent: 20,
                 ease: 'none',
                 scrollTrigger: {
                     trigger: containerRef.current,
                     start: 'top top',
                     end: 'bottom top',
-                    scrub: 1,
-                },
-            });
-
-            // Fade out content on scroll
-            gsap.to([eyebrowRef.current, subheadlineRef.current, ctaRef.current], {
-                opacity: 0,
-                y: -30,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top top',
-                    end: '40% top',
                     scrub: 1,
                 },
             });
@@ -176,7 +163,7 @@ export function Hero({
             </div>
 
             {/* Content */}
-            <div className="relative z-10 text-center max-w-5xl px-6 md:px-8">
+            <div className="hero-content relative z-10 text-center max-w-5xl px-6 md:px-8">
                 {/* Eyebrow */}
                 <p
                     ref={eyebrowRef}
