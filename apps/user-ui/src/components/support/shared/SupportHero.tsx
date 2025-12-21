@@ -3,22 +3,31 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { LucideIcon } from 'lucide-react';
+import { HelpCircle, Truck, RotateCcw, Mail, LucideIcon } from 'lucide-react';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
 }
 
+// Icon map to resolve string to component
+const iconMap: Record<string, LucideIcon> = {
+    'help-circle': HelpCircle,
+    'truck': Truck,
+    'rotate-ccw': RotateCcw,
+    'mail': Mail,
+};
+
 interface SupportHeroProps {
-    icon: LucideIcon;
+    iconName: 'help-circle' | 'truck' | 'rotate-ccw' | 'mail';
     title: string;
     subtitle: string;
     children?: React.ReactNode; // For search input or other elements
 }
 
-export function SupportHero({ icon: Icon, title, subtitle, children }: SupportHeroProps) {
+export function SupportHero({ iconName, title, subtitle, children }: SupportHeroProps) {
     const heroRef = useRef<HTMLElement>(null);
+    const Icon = iconMap[iconName] || HelpCircle;
 
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
@@ -72,3 +81,4 @@ export function SupportHero({ icon: Icon, title, subtitle, children }: SupportHe
         </section>
     );
 }
+

@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
-import { HelpCircle } from 'lucide-react';
+import { useState, useCallback } from 'react';
 import {
     SupportHero,
     SupportBreadcrumb,
@@ -70,7 +69,7 @@ export function FAQPageClient() {
 
             {/* Hero */}
             <SupportHero
-                icon={HelpCircle}
+                iconName="help-circle"
                 title="Frequently Asked Questions"
                 subtitle="Find quick answers to common questions about orders, shipping, returns, and more."
             >

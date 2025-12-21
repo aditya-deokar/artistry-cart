@@ -17,7 +17,7 @@ export function SupportBreadcrumb({ items, className = '' }: SupportBreadcrumbPr
     return (
         <nav
             aria-label="Breadcrumb"
-            className={`py-4 bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] border-b border-[var(--ac-linen)] dark:border-[var(--ac-slate)] ${className}`}
+            className={`mt-20 py-4 bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] border-b border-[var(--ac-linen)] dark:border-[var(--ac-slate)] ${className}`}
         >
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
                 <ol className="flex items-center gap-2 text-sm">

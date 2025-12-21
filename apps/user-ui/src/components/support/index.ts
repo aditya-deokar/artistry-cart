@@ -12,10 +12,10 @@ export * from './shared';
 export * from './faq';
 
 // Shipping Components (Phase 3)
-// export * from './shipping';
+export * from './shipping';
 
 // Returns Components (Phase 4)
-// export * from './returns';
+export * from './returns';
 
 // Contact Components (Phase 5)
-// export * from './contact';
+export * from './contact';

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { HelpCircle, Truck, RotateCcw, Mail, ArrowRight, Search } from 'lucide-react';
 import { Navigation } from '@/components/navigation/Navigation';
-import { Footer } from '@/components/common/Footer';
+import { Footer } from '@/components/landing/Footer';
 
 export const metadata: Metadata = {
     title: 'Support | Artistry Cart - Help Center',
@@ -61,7 +61,7 @@ export default function SupportPage() {
             <Navigation />
 
             {/* Hero Section */}
-            <section className="relative py-20 md:py-28 bg-[var(--ac-cream)] dark:bg-[var(--ac-onyx)]">
+            <section className="relative mt-20 py-20 md:py-28 bg-[var(--ac-cream)] dark:bg-[var(--ac-onyx)]">
                 {/* Background decoration */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute top-0 right-1/4 w-64 h-64 bg-[var(--ac-gold)]/5 rounded-full blur-3xl" />

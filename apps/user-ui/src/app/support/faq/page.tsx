@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Navigation } from '@/components/navigation/Navigation';
-import { Footer } from '@/components/common/Footer';
+import { Footer } from '@/components/landing/Footer';
 import { FAQPageClient } from './FAQPageClient';
 
 export const metadata: Metadata = {
