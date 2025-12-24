@@ -87,175 +87,193 @@ const defaultValues: Value[] = [
     },
 ];
 
-// Magnetic hover effect hook
-function useMagneticHover(strength: number = 0.3) {
-    const elementRef = useRef<HTMLDivElement>(null);
-    const [isHovering, setIsHovering] = useState(false);
-
-    const handleMouseMove = useCallback((e: MouseEvent) => {
-        if (!elementRef.current) return;
-
-        const rect = elementRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-
-        const deltaX = (e.clientX - centerX) * strength;
-        const deltaY = (e.clientY - centerY) * strength;
-
-        gsap.to(elementRef.current, {
-            x: deltaX,
-            y: deltaY,
-            duration: 0.3,
-            ease: 'power2.out',
-        });
-    }, [strength]);
-
-    const handleMouseLeave = useCallback(() => {
-        if (!elementRef.current) return;
-
-        gsap.to(elementRef.current, {
-            x: 0,
-            y: 0,
-            duration: 0.5,
-            ease: 'elastic.out(1, 0.5)',
-        });
-        setIsHovering(false);
-    }, []);
-
-    const handleMouseEnter = useCallback(() => {
-        setIsHovering(true);
-    }, []);
-
-    return { elementRef, isHovering, handleMouseMove, handleMouseLeave, handleMouseEnter };
-}
-
-// Individual value card component
+// Individual value card component with content-only mouse tracking
 function ValueCard({ value, index }: { value: Value; index: number }) {
     const cardRef = useRef<HTMLDivElement>(null);
     const iconRef = useRef<HTMLDivElement>(null);
-    const borderRef = useRef<SVGRectElement>(null);
-    const glowRef = useRef<HTMLDivElement>(null);
+    const iconGlowRef = useRef<HTMLDivElement>(null);
     const titleRef = useRef<HTMLHeadingElement>(null);
-    const { elementRef: magnetRef, handleMouseMove, handleMouseLeave, handleMouseEnter, isHovering } = useMagneticHover(0.15);
+    const descriptionRef = useRef<HTMLParagraphElement>(null);
+    const shimmerRef = useRef<HTMLDivElement>(null);
+    const accentLineRef = useRef<HTMLDivElement>(null);
+    const numberRef = useRef<HTMLSpanElement>(null);
+    const [isHovered, setIsHovered] = useState(false);
 
-    useLayoutEffect(() => {
+    // Mouse tracking for content elements (title, description, icon)
+    const handleMouseMove = useCallback((e: React.MouseEvent) => {
         if (!cardRef.current) return;
 
-        const card = cardRef.current;
-
-        const handleEnter = () => {
-            // Animate icon
-            if (iconRef.current) {
-                gsap.to(iconRef.current, {
-                    scale: 1.1,
-                    rotate: 5,
-                    duration: 0.4,
-                    ease: 'back.out(2)',
-                });
-            }
-
-            // Animate border stroke
-            if (borderRef.current) {
-                gsap.to(borderRef.current, {
-                    strokeDashoffset: 0,
-                    duration: 0.8,
-                    ease: 'power2.out',
-                });
-            }
-
-            // Animate glow
-            if (glowRef.current) {
-                gsap.to(glowRef.current, {
-                    opacity: 1,
-                    scale: 1.2,
-                    duration: 0.5,
-                    ease: 'power2.out',
-                });
-            }
-
-            // Animate title letters
-            if (titleRef.current) {
-                const chars = titleRef.current.querySelectorAll('.char');
-                gsap.to(chars, {
-                    y: -4,
-                    color: value.accent,
-                    duration: 0.3,
-                    stagger: 0.02,
-                    ease: 'power2.out',
-                });
-            }
-        };
-
-        const handleLeave = () => {
-            // Reset icon
-            if (iconRef.current) {
-                gsap.to(iconRef.current, {
-                    scale: 1,
-                    rotate: 0,
-                    duration: 0.4,
-                    ease: 'power2.out',
-                });
-            }
-
-            // Reset border
-            if (borderRef.current) {
-                gsap.to(borderRef.current, {
-                    strokeDashoffset: 1000,
-                    duration: 0.5,
-                    ease: 'power2.in',
-                });
-            }
-
-            // Reset glow
-            if (glowRef.current) {
-                gsap.to(glowRef.current, {
-                    opacity: 0,
-                    scale: 1,
-                    duration: 0.3,
-                    ease: 'power2.out',
-                });
-            }
-
-            // Reset title letters
-            if (titleRef.current) {
-                const chars = titleRef.current.querySelectorAll('.char');
-                gsap.to(chars, {
-                    y: 0,
-                    color: '',
-                    duration: 0.3,
-                    stagger: 0.01,
-                    ease: 'power2.out',
-                });
-            }
-        };
-
-        card.addEventListener('mouseenter', handleEnter);
-        card.addEventListener('mouseleave', handleLeave);
-
-        return () => {
-            card.removeEventListener('mouseenter', handleEnter);
-            card.removeEventListener('mouseleave', handleLeave);
-        };
-    }, [value.accent]);
-
-    // Mouse move handler for glow effect
-    const handleMouseMoveGlow = (e: React.MouseEvent) => {
-        if (!cardRef.current || !glowRef.current) return;
-
         const rect = cardRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
 
-        gsap.to(glowRef.current, {
-            left: x,
-            top: y,
-            duration: 0.2,
+        // Calculate offset from center (normalized from -1 to 1)
+        const offsetX = ((e.clientX - centerX) / (rect.width / 2)) * 0.5;
+        const offsetY = ((e.clientY - centerY) / (rect.height / 2)) * 0.5;
+
+        // Different movement strengths for parallax depth effect
+        const iconStrength = 12;
+        const titleStrength = 8;
+        const descStrength = 5;
+
+        // Animate icon - follows mouse with more movement
+        if (iconRef.current) {
+            gsap.to(iconRef.current, {
+                x: offsetX * iconStrength,
+                y: offsetY * iconStrength,
+                duration: 0.4,
+                ease: 'power2.out',
+            });
+        }
+
+        // Animate title - follows with medium movement
+        if (titleRef.current) {
+            gsap.to(titleRef.current, {
+                x: offsetX * titleStrength,
+                y: offsetY * titleStrength,
+                duration: 0.5,
+                ease: 'power2.out',
+            });
+        }
+
+        // Animate description - follows with subtle movement
+        if (descriptionRef.current) {
+            gsap.to(descriptionRef.current, {
+                x: offsetX * descStrength,
+                y: offsetY * descStrength,
+                duration: 0.6,
+                ease: 'power2.out',
+            });
+        }
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+        setIsHovered(false);
+
+        // Reset all content positions with elastic ease
+        if (iconRef.current) {
+            gsap.to(iconRef.current, {
+                x: 0,
+                y: 0,
+                scale: 1,
+                rotate: 0,
+                duration: 0.6,
+                ease: 'elastic.out(1, 0.5)',
+            });
+        }
+
+        if (titleRef.current) {
+            gsap.to(titleRef.current, {
+                x: 0,
+                y: 0,
+                duration: 0.6,
+                ease: 'elastic.out(1, 0.5)',
+            });
+            // Reset character animations
+            const chars = titleRef.current.querySelectorAll('.char');
+            gsap.to(chars, {
+                y: 0,
+                duration: 0.3,
+                stagger: 0.015,
+                ease: 'power2.out',
+            });
+        }
+
+        if (descriptionRef.current) {
+            gsap.to(descriptionRef.current, {
+                x: 0,
+                y: 0,
+                opacity: 0.85,
+                duration: 0.6,
+                ease: 'elastic.out(1, 0.5)',
+            });
+        }
+
+        // Reset other hover effects
+        if (iconGlowRef.current) {
+            gsap.to(iconGlowRef.current, {
+                opacity: 0,
+                scale: 1,
+                duration: 0.3,
+                ease: 'power2.out',
+            });
+        }
+
+
+        // Accent line retract
+        gsap.to(accentLineRef.current, {
+            scaleX: 0,
+            duration: 0.4,
+            ease: 'power2.in',
+        });
+
+        // Number reset
+        gsap.to(numberRef.current, {
+            scale: 1,
+            opacity: 0.08,
+            duration: 0.4,
+            ease: 'power2.out',
+        });
+    }, []);
+
+    const handleMouseEnter = useCallback(() => {
+        setIsHovered(true);
+
+        // Icon glow pulse
+        gsap.to(iconGlowRef.current, {
+            opacity: 0.6,
+            scale: 1.5,
+            duration: 0.4,
             ease: 'power2.out',
         });
 
-        // Also call magnetic effect
-        handleMouseMove(e.nativeEvent);
-    };
+        // Title character wave animation
+        if (titleRef.current) {
+            const chars = titleRef.current.querySelectorAll('.char');
+            gsap.to(chars, {
+                y: -6,
+                duration: 0.4,
+                stagger: {
+                    each: 0.025,
+                    ease: 'power2.out',
+                },
+                ease: 'back.out(2)',
+            });
+        }
+
+        // Description fade up slightly
+        gsap.to(descriptionRef.current, {
+            opacity: 1,
+            duration: 0.4,
+            ease: 'power2.out',
+        });
+
+        // Shimmer sweep effect
+        gsap.fromTo(shimmerRef.current, {
+            x: '-100%',
+            opacity: 0,
+        }, {
+            x: '200%',
+            opacity: 0.5,
+            duration: 0.8,
+            ease: 'power2.inOut',
+        });
+
+        // Accent line expansion
+        gsap.to(accentLineRef.current, {
+            scaleX: 1,
+            duration: 0.6,
+            ease: 'power3.out',
+        });
+
+        // Background number animation
+        gsap.to(numberRef.current, {
+            scale: 1.1,
+            opacity: 0.15,
+            duration: 0.5,
+            ease: 'power2.out',
+        });
+    }, []);
 
     // Get grid classes based on size
     const getGridClasses = () => {
@@ -274,49 +292,36 @@ function ValueCard({ value, index }: { value: Value; index: number }) {
     return (
         <div
             ref={cardRef}
-            className={`value-card group relative overflow-hidden cursor-pointer ${getGridClasses()}`}
-            onMouseMove={handleMouseMoveGlow}
+            className={`value-card group relative cursor-pointer ${getGridClasses()}`}
+            onMouseMove={handleMouseMove}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
             <div
-                ref={magnetRef}
-                className="relative h-full p-6 md:p-8 lg:p-10 bg-[var(--ac-cream)] dark:bg-[var(--ac-onyx)] border border-[var(--ac-linen)] dark:border-[var(--ac-slate)] transition-shadow duration-500 hover:shadow-2xl hover:shadow-black/5"
+                className="relative h-full p-6 md:p-8 lg:p-10 bg-[var(--ac-cream)] dark:bg-[var(--ac-onyx)] rounded-lg overflow-hidden"
+                style={{
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                }}
             >
-                {/* Animated border SVG */}
-                <svg
-                    className="absolute inset-0 w-full h-full pointer-events-none"
-                    preserveAspectRatio="none"
-                >
-                    <rect
-                        ref={borderRef}
-                        x="0"
-                        y="0"
-                        width="100%"
-                        height="100%"
-                        fill="none"
-                        stroke={value.accent}
-                        strokeWidth="2"
-                        strokeDasharray="1000"
-                        strokeDashoffset="1000"
-                        className="transition-all"
-                    />
-                </svg>
 
-                {/* Cursor-following glow */}
+                {/* Shimmer effect overlay */}
                 <div
-                    ref={glowRef}
-                    className="absolute w-32 h-32 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none opacity-0"
+                    ref={shimmerRef}
+                    className="absolute inset-0 pointer-events-none opacity-0"
                     style={{
-                        background: `radial-gradient(circle, ${value.accent}20 0%, transparent 70%)`,
+                        background: `linear-gradient(120deg, transparent 30%, ${value.accent}15 50%, transparent 70%)`,
+                        transform: 'translateX(-100%)',
                     }}
                 />
 
-                {/* Background number */}
+                {/* Background number with fade effect */}
                 <span
-                    className="absolute top-4 right-4 font-[family-name:var(--font-playfair)] text-6xl md:text-8xl lg:text-9xl text-[var(--ac-linen)] dark:text-[var(--ac-slate)] font-light select-none transition-all duration-500 group-hover:opacity-30"
+                    ref={numberRef}
+                    className="absolute top-4 right-4 font-[family-name:var(--font-playfair)] text-6xl md:text-8xl lg:text-9xl font-light select-none"
                     style={{
-                        WebkitTextStroke: `1px ${value.accent}20`,
+                        color: value.accent,
+                        opacity: 0.08,
+                        transition: 'color 0.3s ease',
                     }}
                 >
                     {value.number}
@@ -324,48 +329,72 @@ function ValueCard({ value, index }: { value: Value; index: number }) {
 
                 {/* Content wrapper */}
                 <div className="relative z-10 h-full flex flex-col">
-                    {/* Icon */}
-                    <div
-                        ref={iconRef}
-                        className={`w-12 h-12 md:w-14 md:h-14 ${value.size === 'large' ? 'lg:w-16 lg:h-16' : ''} mb-6 transition-colors duration-300`}
-                        style={{ color: value.accent }}
-                    >
-                        {value.icon}
+                    {/* Icon with glow effect - mouse tracked */}
+                    <div className="relative mb-6">
+                        {/* Icon glow */}
+                        <div
+                            ref={iconGlowRef}
+                            className="absolute inset-0 rounded-full blur-xl opacity-0"
+                            style={{ backgroundColor: value.accent }}
+                        />
+                        <div
+                            ref={iconRef}
+                            className={`relative w-12 h-12 md:w-14 md:h-14 ${value.size === 'large' ? 'lg:w-16 lg:h-16' : ''} will-change-transform`}
+                            style={{ color: value.accent }}
+                        >
+                            {value.icon}
+                        </div>
                     </div>
 
-                    {/* Title with character animation */}
+                    {/* Title with character animation - mouse tracked */}
                     <h3
                         ref={titleRef}
                         className={`font-[family-name:var(--font-playfair)] ${value.size === 'large' ? 'text-2xl md:text-3xl lg:text-4xl' : 'text-xl md:text-2xl'
-                            } text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)] mb-4 transition-colors duration-300`}
+                            } text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)] mb-4 will-change-transform`}
                     >
                         {value.title.split('').map((char, i) => (
-                            <span key={i} className="char inline-block" style={{ transitionDelay: `${i * 20}ms` }}>
+                            <span
+                                key={i}
+                                className="char inline-block"
+                                style={{
+                                    color: isHovered ? value.accent : undefined,
+                                    transition: `color 0.3s ease ${i * 0.02}s`,
+                                }}
+                            >
                                 {char === ' ' ? '\u00A0' : char}
                             </span>
                         ))}
                     </h3>
 
-                    {/* Description */}
-                    <p className={`text-[var(--ac-graphite)] dark:text-[var(--ac-silver)] leading-relaxed font-light ${value.size === 'large' ? 'text-base md:text-lg' : 'text-sm md:text-base'
-                        } ${value.size === 'small' ? 'line-clamp-3' : ''}`}>
+                    {/* Description - mouse tracked */}
+                    <p
+                        ref={descriptionRef}
+                        className={`text-[var(--ac-graphite)] dark:text-[var(--ac-silver)] leading-relaxed font-light will-change-transform ${value.size === 'large' ? 'text-base md:text-lg' : 'text-sm md:text-base'
+                            } ${value.size === 'small' ? 'line-clamp-3' : ''}`}
+                        style={{ opacity: 0.85 }}
+                    >
                         {value.description}
                     </p>
 
-                    {/* Bottom accent line */}
+                    {/* Bottom accent line with scale animation */}
                     <div className="mt-auto pt-6">
                         <div
-                            className="h-0.5 w-0 group-hover:w-full transition-all duration-700 ease-out"
-                            style={{ backgroundColor: value.accent }}
+                            ref={accentLineRef}
+                            className="h-[2px] w-full origin-left"
+                            style={{
+                                backgroundColor: value.accent,
+                                transform: 'scaleX(0)',
+                            }}
                         />
                     </div>
                 </div>
 
-                {/* Decorative corner */}
+                {/* Corner gradient accent */}
                 <div
-                    className="absolute bottom-0 right-0 w-16 h-16 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    className="absolute bottom-0 right-0 w-24 h-24 pointer-events-none transition-opacity duration-500"
                     style={{
-                        background: `linear-gradient(135deg, transparent 50%, ${value.accent}10 50%)`,
+                        background: `radial-gradient(circle at bottom right, ${value.accent}08 0%, transparent 70%)`,
+                        opacity: isHovered ? 1 : 0,
                     }}
                 />
             </div>
@@ -381,6 +410,7 @@ export function CoreValues({
     const containerRef = useRef<HTMLElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
+    const headlineRef = useRef<HTMLHeadingElement>(null);
 
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
@@ -392,21 +422,41 @@ export function CoreValues({
                 gsap.set(cards, { opacity: 0, y: 60, scale: 0.95 });
             }
 
-            // Header animation
+            // Header animation with enhanced reveal
             ScrollTrigger.create({
                 trigger: containerRef.current,
                 start: 'top 80%',
                 onEnter: () => {
-                    gsap.to(headerRef.current, {
+                    const tl = gsap.timeline();
+
+                    // Fade in header container
+                    tl.to(headerRef.current, {
                         opacity: 1,
                         y: 0,
                         duration: 0.8,
                         ease: 'power3.out',
                     });
+
+                    // Headline character reveal
+                    if (headlineRef.current) {
+                        const chars = headlineRef.current.querySelectorAll('.headline-char');
+                        tl.fromTo(chars, {
+                            opacity: 0,
+                            y: 30,
+                            rotateX: -45,
+                        }, {
+                            opacity: 1,
+                            y: 0,
+                            rotateX: 0,
+                            duration: 0.6,
+                            stagger: 0.03,
+                            ease: 'power3.out',
+                        }, '-=0.4');
+                    }
                 },
             });
 
-            // Staggered card animations
+            // Staggered card animations with enhanced entrance
             if (cards) {
                 ScrollTrigger.create({
                     trigger: gridRef.current,
@@ -418,7 +468,7 @@ export function CoreValues({
                             scale: 1,
                             duration: 0.8,
                             stagger: {
-                                each: 0.1,
+                                each: 0.12,
                                 from: 'start',
                             },
                             ease: 'power3.out',
@@ -436,10 +486,20 @@ export function CoreValues({
             ref={containerRef}
             className="relative py-24 md:py-32 lg:py-40 px-6 md:px-8 bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] overflow-hidden"
         >
-            {/* Background decoration */}
+            {/* Premium background decoration */}
             <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+                {/* Top gradient line */}
                 <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[var(--ac-gold)]/20 to-transparent" />
+                {/* Bottom gradient line */}
                 <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[var(--ac-gold)]/20 to-transparent" />
+                {/* Subtle radial gradient background */}
+                <div
+                    className="absolute inset-0 opacity-30 dark:opacity-20"
+                    style={{
+                        background: 'radial-gradient(ellipse at 50% 0%, var(--ac-gold) 0%, transparent 50%)',
+                        opacity: 0.03,
+                    }}
+                />
             </div>
 
             <div className="max-w-7xl mx-auto">
@@ -448,8 +508,20 @@ export function CoreValues({
                     <p className="text-xs md:text-sm tracking-[0.3em] uppercase text-[var(--ac-gold)] dark:text-[var(--ac-gold-dark)] mb-4 font-medium">
                         {eyebrow}
                     </p>
-                    <h2 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)] tracking-tight">
-                        {headline}
+                    <h2
+                        ref={headlineRef}
+                        className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)] tracking-tight"
+                        style={{ perspective: '1000px' }}
+                    >
+                        {headline.split('').map((char, i) => (
+                            <span
+                                key={i}
+                                className="headline-char inline-block"
+                                style={{ display: 'inline-block' }}
+                            >
+                                {char === ' ' ? '\u00A0' : char}
+                            </span>
+                        ))}
                     </h2>
                 </div>
 
