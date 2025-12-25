@@ -77,7 +77,7 @@ export default function RootLayout({
           <ReactLenis
             root
             options={{
-              lerp: 0.1,           // Lower = smoother (0.05-0.15 recommended)
+              lerp: 0.05,           // Lower = smoother (0.05-0.15 recommended)
               duration: 1.2,       // Scroll animation duration
               smoothWheel: true,   // Enable smooth wheel scrolling
               wheelMultiplier: 1,  // Wheel scroll speed
