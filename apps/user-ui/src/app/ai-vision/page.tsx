@@ -3,6 +3,12 @@ import { AIGenerator } from '@/components/ai-vision/generator/AIGenerator';
 import { VisualSearchShowcase } from '@/components/ai-vision/sections/VisualSearchShowcase';
 import { ConceptGallery } from '@/components/ai-vision/sections/ConceptGallery';
 import { SuccessStories } from '@/components/ai-vision/sections/SuccessStories';
+import { ArtisanCollaboration } from '@/components/ai-vision/artisan-collaboration/ArtisanCollaboration';
+import { TestimonialsCarousel } from '@/components/ai-vision/sections/TestimonialsCarousel';
+import { FAQAccordion } from '@/components/ai-vision/sections/FAQAccordion';
+import { FinalCTA } from '@/components/ai-vision/sections/FinalCTA';
+import { StickyActionBar } from '@/components/ai-vision/ui/StickyActionBar';
+import { ScrollProgressIndicator } from '@/components/ai-vision/ui/ScrollProgressIndicator';
 import { fontVariables } from '@/lib/fonts-ai-vision';
 import '@/styles/ai-vision-theme.css';
 
@@ -19,6 +25,9 @@ export const metadata = {
 export default function AIVisionPage() {
     return (
         <main className={fontVariables}>
+            <ScrollProgressIndicator />
+            <StickyActionBar />
+
             {/* Phase 1: Hero Section */}
             <AIVisionHero />
 
@@ -34,7 +43,13 @@ export default function AIVisionPage() {
             {/* Phase 3: Concept Gallery with Masonry Layout */}
             <ConceptGallery />
 
-            {/* Phase 4 & 5 sections will be added in future phases */}
+            {/* Phase 4: Artisan Collaboration & Matching */}
+            <ArtisanCollaboration />
+
+            {/* Phase 5: Polish & Launch Sections */}
+            <TestimonialsCarousel />
+            <FAQAccordion />
+            <FinalCTA />
         </main>
     );
 }
