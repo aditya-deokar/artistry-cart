@@ -116,10 +116,14 @@ export function FAQAccordion() {
                     >
                         <button
                             onClick={() => toggleAccordion(i)}
-                            className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
+                            className="w-full flex items-center justify-between p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--av-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111] rounded-xl"
+                            aria-expanded={openIndex === i}
+                            aria-controls={`faq-answer-${i}`}
+                            id={`faq-question-${i}`}
                         >
                             <span className={cn(
                                 "font-medium text-lg transition-colors",
+                                "group-hover:text-[var(--av-pearl)]", // Fallback for interaction
                                 openIndex === i ? "text-[var(--av-gold)]" : "text-[var(--av-pearl)]"
                             )}>
                                 {faq.question}
@@ -128,7 +132,7 @@ export function FAQAccordion() {
                                 "w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300",
                                 openIndex === i
                                     ? "bg-[var(--av-gold)] border-[var(--av-gold)] text-black rotate-180"
-                                    : "bg-white/5 border-white/10 text-[var(--av-silver)] group-hover:bg-white/10"
+                                    : "bg-white/5 border-white/10 text-[var(--av-silver)]"
                             )}>
                                 {openIndex === i ? <Minus size={16} /> : <Plus size={16} />}
                             </div>
@@ -137,6 +141,9 @@ export function FAQAccordion() {
                         <div
                             ref={el => { answerRefs.current[i] = el }}
                             className="h-0 opacity-0 overflow-hidden"
+                            id={`faq-answer-${i}`}
+                            role="region"
+                            aria-labelledby={`faq-question-${i}`}
                         >
                             <div className="p-6 pt-0 text-[var(--av-silver)] leading-relaxed max-w-3xl">
                                 {faq.answer}

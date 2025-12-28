@@ -20,9 +20,9 @@ app.use(cors({
 
 app.use(morgan('dev'));
 
-app.use(express.json({ limit:'30mb' }));
+app.use(express.json({ limit: '30mb' }));
 
-app.use(express.urlencoded({ limit:'30mb' , extended:true}));
+app.use(express.urlencoded({ limit: '30mb', extended: true }));
 
 app.use(cookieParser());
 
@@ -37,9 +37,9 @@ const limiter = rateLimit({
   message: {
     error: "Too many Reqeusts, please try again later!"
   },
-  standardHeaders:true,
-  legacyHeaders:true,
-  keyGenerator: (req:any) => (req.ip),
+  standardHeaders: true,
+  legacyHeaders: true,
+  keyGenerator: (req: any) => (req.ip),
 });
 
 app.use(limiter);
@@ -51,10 +51,11 @@ app.get('/gateway-health', (req, res) => {
   res.send({ message: 'Welcome to api-gateway!' });
 });
 
-app.use("/auth", proxy("http://localhost:6001") );
-app.use("/product", proxy("http://localhost:6002") );
+app.use("/auth", proxy("http://localhost:6001"));
+app.use("/product", proxy("http://localhost:6002"));
 app.use("/order", proxy("http://localhost:6004"))
 app.use("/recommendation", proxy("http://localhost:6005"))
+app.use("/ai-vision", proxy("http://localhost:6006"))
 
 const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
@@ -64,7 +65,7 @@ const server = app.listen(port, () => {
     initializeConfig();
     console.log("Site config initailized successfully!")
   } catch (error) {
-    console.error("Failed to initailize site config:" ,error)
+    console.error("Failed to initailize site config:", error)
   }
 });
 server.on('error', console.error);

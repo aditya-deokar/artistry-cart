@@ -254,7 +254,7 @@ export function ConceptGallery() {
 
                 {/* Results Count */}
                 <div className="flex items-center justify-between mb-6 px-4">
-                    <p className="text-sm text-[var(--av-silver)] flex items-center gap-2">
+                    <p className="text-sm text-[var(--av-silver)] flex items-center gap-2" aria-live="polite">
                         Showing <span className="font-bold text-[var(--av-pearl)] bg-white/10 px-2 py-0.5 rounded-full">{filteredConcepts.length}</span> items
                     </p>
                 </div>
