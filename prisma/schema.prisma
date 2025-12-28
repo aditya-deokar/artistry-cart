@@ -500,6 +500,237 @@ model discount_usage {
   @@index([userId])
 }
 
+// ============================================
+// AI VISION MODELS
+// ============================================
+
+// Vision Session - Tracks user generation sessions
+model VisionSession {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String?       @db.ObjectId
+  sessionToken String        @unique
+  mode         VisionMode
+  status       SessionStatus @default(ACTIVE)
+
+  prompt           String?
+  baseProductId    String? @db.ObjectId
+  uploadedImageUrl String?
+  settings         Json?
+
+  concepts  Concept[]
+  requestId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
+
+  @@index([userId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+// Concept - Individual AI-generated concept
+model Concept {
+  id               String              @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId        String              @db.ObjectId
+  session          VisionSession       @relation(fields: [sessionId], references: [id])
+  generationPrompt String
+  enhancedPrompt   String?
+  images           ConceptImage[]
+  primaryImageUrl  String
+  thumbnailUrl     String?
+  analyzedFeatures Json?
+  estimatedPrice   Json?
+  isSaved          Boolean             @default(false)
+  isFavorite       Boolean             @default(false)
+  viewCount        Int                 @default(0)
+  artisanMatches   ArtisanMatch[]
+  sentToArtisans   String[]            @db.ObjectId
+  generatedProduct AIGeneratedProduct?
+  status           ConceptStatus       @default(GENERATED)
+  generationError  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([status])
+  @@index([isSaved])
+}
+
+// Concept Image with embedding
+model ConceptImage {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  conceptId       String   @db.ObjectId
+  concept         Concept  @relation(fields: [conceptId], references: [id])
+  originalUrl     String
+  thumbnailUrl    String
+  fileId          String
+  filePath        String
+  fileSize        Int
+  mimeType        String
+  dimensions      Json
+  embedding       Float[]
+  embeddingModel  String?  @default("clip-vit-large-patch14")
+  dominantColors  String[]
+  detectedObjects String[]
+  styleKeywords   String[]
+  position        Int      @default(0)
+  isPrimary       Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([conceptId])
+}
+
+// AI Generated Product data from LLM
+model AIGeneratedProduct {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  conceptId            String   @unique @db.ObjectId
+  concept              Concept  @relation(fields: [conceptId], references: [id])
+  title                String
+  description          String
+  detailedDescription  String
+  category             String
+  subCategory          String
+  tags                 String[]
+  colors               String[]
+  sizes                String[]
+  materials            String[]
+  customSpecifications Json?
+  estimatedPriceMin    Float
+  estimatedPriceMax    Float
+  priceConfidence      Float
+  pricingRationale     String?
+  requiredSkills       String[]
+  estimatedDuration    String?
+  complexityLevel      String
+  styleKeywords        String[]
+  designNotes          String?
+  feasibilityScore     Float
+  feasibilityNotes     String?
+  llmModel             String   @default("gemini-2.5-pro")
+  promptUsed           String
+  generationVersion    Int      @default(1)
+  isValidated          Boolean  @default(false)
+  validationErrors     String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([feasibilityScore])
+}
+
+// Artisan Match - Concept to Artisan matching
+model ArtisanMatch {
+  id               String      @id @default(auto()) @map("_id") @db.ObjectId
+  conceptId        String      @db.ObjectId
+  concept          Concept     @relation(fields: [conceptId], references: [id])
+  sellerId         String      @db.ObjectId
+  overallScore     Float
+  scores           Json
+  matchReasons     String[]
+  status           MatchStatus @default(PENDING)
+  responseMessage  String?
+  proposedPrice    Float?
+  proposedTimeline String?
+
+  createdAt   DateTime  @default(now())
+  respondedAt DateTime?
+
+  @@unique([conceptId, sellerId])
+  @@index([conceptId])
+  @@index([sellerId])
+  @@index([status])
+}
+
+// Rate Limiting (MongoDB-based, no Redis)
+model RateLimitEntry {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  key         String   @unique
+  count       Int      @default(1)
+  windowStart DateTime @default(now())
+
+  @@index([windowStart])
+}
+
+// Product Embeddings for visual search
+model ProductEmbedding {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  productId      String  @unique @db.ObjectId
+  embedding      Float[]
+  embeddingModel String  @default("clip-vit-large-patch14")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// API Usage Logging
+model APIUsageLog {
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String? @db.ObjectId
+  sessionToken    String?
+  requestId       String?
+  endpoint        String
+  service         String
+  inputTokens     Int?
+  outputTokens    Int?
+  imagesGenerated Int?
+  estimatedCost   Float?
+  success         Boolean
+  errorMessage    String?
+  durationMs      Int
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([service])
+}
+
+// ============================================
+// AI VISION ENUMS
+// ============================================
+
+enum VisionMode {
+  TEXT_TO_IMAGE
+  PRODUCT_VARIATION
+  VISUAL_SEARCH
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum ConceptStatus {
+  GENERATING
+  GENERATED
+  PARTIALLY_GENERATED
+  SAVED
+  SENT_TO_ARTISANS
+  IN_PROGRESS
+  REALIZED
+  ARCHIVED
+  FAILED
+}
+
+enum MatchStatus {
+  PENDING
+  VIEWED
+  INTERESTED
+  QUOTED
+  DECLINED
+  ACCEPTED
+}
+
+// ============================================
+// EXISTING ENUMS
+// ============================================
+
 enum UserRole {
   USER
   SELLER

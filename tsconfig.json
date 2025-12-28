@@ -45,6 +45,9 @@
     },
     {
       "path": "./apps/recommendation-service"
+    },
+    {
+      "path": "./apps/ai-vision"
     }
   ]
 }
