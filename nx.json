@@ -44,7 +44,8 @@
         "apps/api-gateway-e2e/**/*",
         "apps/product-service-e2e/**/*",
         "apps/kafka-service-e2e/**/*",
-        "apps/recommendation-service-e2e/**/*"
+        "apps/recommendation-service-e2e/**/*",
+        "apps/aivision-service-e2e/**/*"
       ]
     },
     {

@@ -47,7 +47,10 @@
       "path": "./apps/recommendation-service"
     },
     {
-      "path": "./apps/ai-vision"
+      "path": "./apps/aivision-service-e2e"
+    },
+    {
+      "path": "./apps/aivision-service"
     }
   ]
 }
