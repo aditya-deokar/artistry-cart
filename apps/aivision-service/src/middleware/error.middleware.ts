@@ -1,21 +1,26 @@
-import { AppError } from "./index"; 
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
+import { logger } from '../utils/logger';
+import { AppError } from '../../../../packages/error-handler';
 
+/**
+ * Express error handling middleware with Winston logging
+ * Extends the shared error handler with Winston integration
+ */
 export const errorMiddleware = (
     err: Error,
     req: Request,
     res: Response,
-    next: NextFunction
+    _next: NextFunction
 ): void => {
-    // Log error details
-    console.error('Error caught by middleware:', {
+    // Enhanced logging with Winston
+    logger.error('Error caught by middleware', {
         message: err.message,
         name: err.name,
         path: req.path,
         method: req.method,
+        stack: err.stack,
     });
 
-    // Handle custom AppError instances
     if (err instanceof AppError) {
         res.status(err.statusCode).json({
             success: false,
@@ -29,22 +34,20 @@ export const errorMiddleware = (
     }
 
     // Handle database connection errors (AggregateError from MongoDB)
-    if (
-        err.name === 'AggregateError' ||
+    if (err.name === 'AggregateError' ||
         err.message?.includes('ECONNREFUSED') ||
-        err.message?.includes('connect ECONNREFUSED')
-    ) {
+        err.message?.includes('connect ECONNREFUSED')) {
         res.status(503).json({
             success: false,
             error: {
                 code: 'DATABASE_UNAVAILABLE',
-                message: 'Database connection failed. Please check if the database is running.',
+                message: 'Database connection failed. Please check if MongoDB is running and DATABASE_URL is correct.',
             },
         });
         return;
     }
 
-    // Handle Prisma client initialization errors
+    // Handle Prisma client initialization errors  
     if (err.name === 'PrismaClientInitializationError') {
         res.status(503).json({
             success: false,
@@ -78,7 +81,7 @@ export const errorMiddleware = (
         return;
     }
 
-    // Handle Zod validation errors
+    // Handle validation errors
     if (err.name === 'ZodError') {
         const zodError = err as any;
         const details = zodError.errors?.map((e: any) => ({
@@ -97,16 +100,14 @@ export const errorMiddleware = (
         return;
     }
 
-    // Default error response for unhandled errors
+    // Default error response
     res.status(500).json({
         success: false,
         error: {
             code: 'INTERNAL_ERROR',
-            message:
-                process.env.NODE_ENV === 'production'
-                    ? 'An unexpected error occurred'
-                    : err.message,
+            message: process.env.NODE_ENV === 'production'
+                ? 'An unexpected error occurred'
+                : err.message,
         },
     });
 };
-
