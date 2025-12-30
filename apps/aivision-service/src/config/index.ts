@@ -38,7 +38,7 @@ export const config = {
     models: {
         text: 'gemini-2.5-pro',
         flash: 'gemini-2.5-flash',
-        image: 'gemini-2.0-flash-exp',
+        image: 'gemini-2.5-flash-image',
     },
 };
 

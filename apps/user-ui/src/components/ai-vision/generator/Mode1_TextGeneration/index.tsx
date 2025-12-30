@@ -4,16 +4,30 @@ import { useState, useRef } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { PremiumButton } from '../../ui/PremiumButton';
-import { Sparkles, Upload } from 'lucide-react';
+import { Sparkles, Upload, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { TextToImageParams } from '@/types/aivision';
 
 interface TextGenerationModeProps {
-    onGenerate: (data: { prompt: string; category?: string }) => void;
+    onGenerate: (data: TextToImageParams) => void;
+    categories?: string[];
+    materials?: string[];
+    styles?: string[];
+    isSchemaLoaded?: boolean;
 }
 
-export function TextGenerationMode({ onGenerate }: TextGenerationModeProps) {
+export function TextGenerationMode({
+    onGenerate,
+    categories = [],
+    materials = [],
+    styles = [],
+    isSchemaLoaded = false,
+}: TextGenerationModeProps) {
     const [prompt, setPrompt] = useState('');
     const [category, setCategory] = useState('');
+    const [style, setStyle] = useState('');
+    const [material, setMaterial] = useState('');
+    const [imageCount, setImageCount] = useState(4);
     const [charCount, setCharCount] = useState(0);
 
     const formRef = useRef<HTMLFormElement>(null);
@@ -39,7 +53,18 @@ export function TextGenerationMode({ onGenerate }: TextGenerationModeProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onGenerate({ prompt, category });
+
+        const params: TextToImageParams = {
+            prompt,
+            count: imageCount,
+        };
+
+        // Only add optional params if they have values
+        if (category) params.category = category;
+        if (style) params.style = style;
+        if (material) params.material = material;
+
+        onGenerate(params);
     };
 
     const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -49,6 +74,36 @@ export function TextGenerationMode({ onGenerate }: TextGenerationModeProps) {
             setCharCount(text.length);
         }
     };
+
+    // Fallback categories if schema not loaded
+    const displayCategories = categories.length > 0 ? categories : [
+        'Art & Prints',
+        'Jewelry',
+        'Home Decor',
+        'Furniture',
+        'Pottery',
+        'Textiles',
+    ];
+
+    // Fallback styles if schema not loaded
+    const displayStyles = styles.length > 0 ? styles : [
+        'Modern',
+        'Rustic',
+        'Minimalist',
+        'Traditional',
+        'Bohemian',
+        'Contemporary',
+    ];
+
+    // Fallback materials if schema not loaded
+    const displayMaterials = materials.length > 0 ? materials : [
+        'Wood',
+        'Ceramic',
+        'Metal',
+        'Glass',
+        'Leather',
+        'Fabric',
+    ];
 
     return (
         <form
@@ -84,41 +139,63 @@ export function TextGenerationMode({ onGenerate }: TextGenerationModeProps) {
             {/* Optional Filters */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 {/* Category */}
-                <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="bg-[var(--av-slate)] text-[var(--av-pearl)] rounded-lg p-3 border-2 border-[var(--av-silver)]/20 focus:border-[var(--av-gold)] outline-none"
-                >
-                    <option value="">Category</option>
-                    <option value="art">Art & Prints</option>
-                    <option value="jewelry">Jewelry</option>
-                    <option value="home-decor">Home Decor</option>
-                    <option value="furniture">Furniture</option>
-                </select>
+                <div className="relative">
+                    <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full bg-[var(--av-slate)] text-[var(--av-pearl)] rounded-lg p-3 border-2 border-[var(--av-silver)]/20 focus:border-[var(--av-gold)] outline-none appearance-none cursor-pointer"
+                    >
+                        <option value="">Category</option>
+                        {displayCategories.map((cat) => (
+                            <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                    </select>
+                    {!isSchemaLoaded && categories.length === 0 && (
+                        <Loader2 className="absolute right-8 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--av-silver)] animate-spin" />
+                    )}
+                </div>
 
                 {/* Style */}
-                <select className="bg-[var(--av-slate)] text-[var(--av-pearl)] rounded-lg p-3 border-2 border-[var(--av-silver)]/20 focus:border-[var(--av-gold)] outline-none">
-                    <option value="">Style</option>
-                    <option value="modern">Modern</option>
-                    <option value="rustic">Rustic</option>
-                    <option value="minimalist">Minimalist</option>
-                </select>
+                <div className="relative">
+                    <select
+                        value={style}
+                        onChange={(e) => setStyle(e.target.value)}
+                        className="w-full bg-[var(--av-slate)] text-[var(--av-pearl)] rounded-lg p-3 border-2 border-[var(--av-silver)]/20 focus:border-[var(--av-gold)] outline-none appearance-none cursor-pointer"
+                    >
+                        <option value="">Style</option>
+                        {displayStyles.map((s) => (
+                            <option key={s} value={s}>{s}</option>
+                        ))}
+                    </select>
+                </div>
 
                 {/* Material */}
-                <select className="bg-[var(--av-slate)] text-[var(--av-pearl)] rounded-lg p-3 border-2 border-[var(--av-silver)]/20 focus:border-[var(--av-gold)] outline-none">
-                    <option value="">Material</option>
-                    <option value="wood">Wood</option>
-                    <option value="ceramic">Ceramic</option>
-                    <option value="metal">Metal</option>
-                </select>
+                <div className="relative">
+                    <select
+                        value={material}
+                        onChange={(e) => setMaterial(e.target.value)}
+                        className="w-full bg-[var(--av-slate)] text-[var(--av-pearl)] rounded-lg p-3 border-2 border-[var(--av-silver)]/20 focus:border-[var(--av-gold)] outline-none appearance-none cursor-pointer"
+                    >
+                        <option value="">Material</option>
+                        {displayMaterials.map((m) => (
+                            <option key={m} value={m}>{m}</option>
+                        ))}
+                    </select>
+                </div>
 
-                {/* Price Range */}
-                <select className="bg-[var(--av-slate)] text-[var(--av-pearl)] rounded-lg p-3 border-2 border-[var(--av-silver)]/20 focus:border-[var(--av-gold)] outline-none">
-                    <option value="">Price Range</option>
-                    <option value="0-100">Under $100</option>
-                    <option value="100-250">$100 - $250</option>
-                    <option value="250+">$250+</option>
-                </select>
+                {/* Image Count */}
+                <div className="relative">
+                    <select
+                        value={imageCount}
+                        onChange={(e) => setImageCount(Number(e.target.value))}
+                        className="w-full bg-[var(--av-slate)] text-[var(--av-pearl)] rounded-lg p-3 border-2 border-[var(--av-silver)]/20 focus:border-[var(--av-gold)] outline-none appearance-none cursor-pointer"
+                    >
+                        <option value={2}>2 Concepts</option>
+                        <option value={4}>4 Concepts</option>
+                        <option value={6}>6 Concepts</option>
+                        <option value={8}>8 Concepts</option>
+                    </select>
+                </div>
             </div>
 
             {/* Reference Image Upload (Optional) */}
@@ -149,6 +226,9 @@ export function TextGenerationMode({ onGenerate }: TextGenerationModeProps) {
                 >
                     Generate Concepts
                 </PremiumButton>
+                <p className="text-xs text-[var(--av-silver)] mt-3">
+                    AI will generate {imageCount} unique concept{imageCount > 1 ? 's' : ''} based on your description
+                </p>
             </div>
         </form>
     );

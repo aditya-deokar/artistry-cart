@@ -8,14 +8,35 @@ import { ProductVariationMode } from './Mode2_ProductVariation';
 import { VisualSearchMode } from './Mode3_VisualSearch';
 import { ConceptResults } from './Results';
 import { LoadingState } from './LoadingState';
-import { Concept } from './Results/ConceptCard';
+import { SendToArtisansModal } from '../artisan-collaboration/SendToArtisansModal';
 import { gsap } from 'gsap';
+import { useAIGeneration, useSchemaData, useConceptActions } from '@/hooks/useAIVision';
+import type { TextToImageParams, ProductVariationParams } from '@/types/aivision';
 
 export function AIGenerator() {
     const [activeMode, setActiveMode] = useState<GenerationMode>('text');
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [generatedConcepts, setGeneratedConcepts] = useState<Concept[]>([]);
+    const [sendModalOpen, setSendModalOpen] = useState(false);
+    const [selectedConceptId, setSelectedConceptId] = useState<string | null>(null);
     const contentRef = useRef<HTMLDivElement>(null);
+
+    // Use the AI Vision hooks
+    const {
+        isGenerating,
+        progress,
+        concepts,
+        currentConceptId,
+        error,
+        setMode,
+        generateFromText,
+        generateVariation,
+        clear,
+    } = useAIGeneration();
+
+    // Load schema data on mount
+    const { categories, materials, styles, isLoaded: schemaLoaded } = useSchemaData();
+
+    // Concept actions
+    const { save, findSimilar, isLoading: actionLoading } = useConceptActions();
 
     const handleModeChange = (mode: GenerationMode) => {
         if (isGenerating) return;
@@ -28,7 +49,8 @@ export function AIGenerator() {
                 duration: 0.2,
                 onComplete: () => {
                     setActiveMode(mode);
-                    setGeneratedConcepts([]); // Clear results on mode switch
+                    setMode(mode);
+                    clear(); // Clear results on mode switch
                     gsap.to(contentRef.current, {
                         opacity: 1,
                         y: 0,
@@ -39,68 +61,79 @@ export function AIGenerator() {
             });
         } else {
             setActiveMode(mode);
+            setMode(mode);
         }
     };
 
-    const handleGenerate = async (data: any) => {
-        setIsGenerating(true);
-        setGeneratedConcepts([]);
+    const handleTextGenerate = async (data: TextToImageParams) => {
+        const success = await generateFromText(data);
 
-        // Simulate API call
-        console.log('Generating with data:', data);
-
-        setTimeout(() => {
-            // Mock results
-            const mockResults: Concept[] = [
-                {
-                    id: 'c1',
-                    title: activeMode === 'text' ? 'Ethereal Vase' : 'Variation A',
-                    description: 'A stunning handcrafted piece utilizing matte finishes and gold leaf accents.',
-                    imageUrl: '', // Will show fallback icon
-                    category: 'Home Decor',
-                },
-                {
-                    id: 'c2',
-                    title: activeMode === 'text' ? 'Ethereal Vase II' : 'Variation B',
-                    description: 'Alternative design with a more elongated form and darker tones.',
-                    imageUrl: '',
-                    category: 'Home Decor',
-                },
-                {
-                    id: 'c3',
-                    title: activeMode === 'text' ? 'Ethereal Vase III' : 'Variation C',
-                    description: 'Minimalist approach focusing on organic curves and negative space.',
-                    imageUrl: '',
-                    category: 'Home Decor',
-                },
-                {
-                    id: 'c4',
-                    title: activeMode === 'text' ? 'Ethereal Vase IV' : 'Variation D',
-                    description: 'Geometric interpretation with sharp angles and high-contrast glazing.',
-                    imageUrl: '',
-                    category: 'Home Decor',
-                },
-            ];
-
-            setGeneratedConcepts(mockResults);
-            setIsGenerating(false);
-
+        if (success) {
             // Scroll to results
             setTimeout(() => {
                 const resultsElement = document.getElementById('results-section');
                 resultsElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
-
-        }, 2500);
+        }
     };
 
-    const handleConceptAction = (action: string, id: string) => {
-        console.log(`Action: ${action} on concept: ${id}`);
+    const handleProductVariation = async (data: { productId: string; modifications: string; adjustments?: ProductVariationParams['adjustments'] }) => {
+        const success = await generateVariation({
+            productId: data.productId,
+            modifications: data.modifications,
+            adjustments: data.adjustments,
+        });
+
+        if (success) {
+            setTimeout(() => {
+                const resultsElement = document.getElementById('results-section');
+                resultsElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    };
+
+    const handleVisualSearch = async (data: { image: File | string; action: 'search' | 'generate' }) => {
+        // For visual search, we'll use a different flow
+        // This will be implemented when we connect to the search API
+        console.log('Visual search:', data);
+        // TODO: Implement visual search integration
+    };
+
+    const handleConceptAction = async (action: string, id: string) => {
+        switch (action) {
+            case 'save':
+                const saved = await save(id);
+                if (saved) {
+                    // Show success toast
+                    console.log('Concept saved successfully');
+                }
+                break;
+            case 'refine':
+                // TODO: Open refine modal
+                console.log('Refine concept:', id);
+                break;
+            case 'find_similar':
+                const concept = concepts.find(c => c.id === id);
+                if (concept?.imageUrl) {
+                    const similar = await findSimilar(concept.imageUrl);
+                    console.log('Similar concepts:', similar);
+                    // TODO: Show similar concepts modal
+                }
+                break;
+            default:
+                console.log(`Action: ${action} on concept: ${id}`);
+        }
     };
 
     const handleSendToArtisans = (ids: string[]) => {
-        console.log('Sending to artisans:', ids);
-        alert('Concepts sent to matched artisans!');
+        if (ids.length > 0) {
+            setSelectedConceptId(currentConceptId);
+            setSendModalOpen(true);
+        }
+    };
+
+    const handleNewGeneration = () => {
+        clear();
     };
 
     return (
@@ -118,40 +151,68 @@ export function AIGenerator() {
             <ModeSelector activeMode={activeMode} onChange={handleModeChange} />
 
             <div ref={contentRef} className="min-h-[400px]">
-                {!isGenerating && generatedConcepts.length === 0 && (
+                {/* Error Display */}
+                {error && (
+                    <div className="max-w-2xl mx-auto mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                        <p className="text-red-400 text-sm">{error}</p>
+                        <button
+                            onClick={handleNewGeneration}
+                            className="text-sm text-[var(--av-gold)] hover:underline mt-2"
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                )}
+
+                {!isGenerating && concepts.length === 0 && (
                     <>
                         {activeMode === 'text' && (
-                            <TextGenerationMode onGenerate={handleGenerate} />
+                            <TextGenerationMode
+                                onGenerate={handleTextGenerate}
+                                categories={categories}
+                                materials={materials}
+                                styles={styles}
+                                isSchemaLoaded={schemaLoaded}
+                            />
                         )}
                         {activeMode === 'product-variation' && (
-                            <ProductVariationMode onGenerate={handleGenerate} />
+                            <ProductVariationMode onGenerate={handleProductVariation} />
                         )}
                         {activeMode === 'visual-search' && (
-                            <VisualSearchMode onGenerate={handleGenerate} />
+                            <VisualSearchMode onGenerate={handleVisualSearch} />
                         )}
                     </>
                 )}
 
-                {isGenerating && <LoadingState />}
+                {isGenerating && <LoadingState progress={progress} />}
 
-                {!isGenerating && generatedConcepts.length > 0 && (
+                {!isGenerating && concepts.length > 0 && (
                     <div id="results-section">
                         <div className="flex justify-center mb-8">
                             <button
-                                onClick={() => setGeneratedConcepts([])}
+                                onClick={handleNewGeneration}
                                 className="text-sm text-[var(--av-gold)] hover:underline flex items-center gap-2"
                             >
                                 ← Start New Generation
                             </button>
                         </div>
                         <ConceptResults
-                            concepts={generatedConcepts}
+                            concepts={concepts}
                             onAction={handleConceptAction}
                             onSendToArtisans={handleSendToArtisans}
+                            isActionLoading={actionLoading}
                         />
                     </div>
                 )}
             </div>
+
+            {/* Send to Artisans Modal */}
+            <SendToArtisansModal
+                isOpen={sendModalOpen}
+                onClose={() => setSendModalOpen(false)}
+                conceptId={selectedConceptId}
+                conceptTitle={concepts[0]?.title || 'Your Concept'}
+            />
         </SectionContainer>
     );
 }

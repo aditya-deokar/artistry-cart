@@ -3,9 +3,12 @@
 import { useState, useRef } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { Heart, Eye, Check, Clock, Loader2, ArrowUpRight } from 'lucide-react';
+import { Heart, Eye, Check, Clock, Loader2, ArrowUpRight, Send, DollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { GalleryItem as GalleryItemType, ConceptStatus } from '@/types/aivision';
+import Image from 'next/image';
 
+// Legacy interface for backward compatibility
 export interface Concept {
     id: string;
     imageUrl: string;
@@ -20,14 +23,30 @@ export interface Concept {
 }
 
 interface GalleryItemProps {
-    concept: Concept;
+    item: GalleryItemType;
     onClick: () => void;
+    onFavoriteToggle?: () => void;
     isNew?: boolean;
 }
 
-export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProps) {
+// Map API status to display status
+function mapStatus(status: ConceptStatus): 'realized' | 'in-progress' | 'awaiting' {
+    switch (status) {
+        case 'REALIZED':
+            return 'realized';
+        case 'SENT_TO_ARTISANS':
+            return 'in-progress';
+        case 'SAVED':
+        case 'GENERATED':
+        default:
+            return 'awaiting';
+    }
+}
+
+export function GalleryItem({ item, onClick, onFavoriteToggle, isNew = false }: GalleryItemProps) {
     const [isHovered, setIsHovered] = useState(false);
-    const [isLiked, setIsLiked] = useState(false);
+    const [isLiked, setIsLiked] = useState(item.isFavorite || false);
+    const [isLiking, setIsLiking] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
     const overlayRef = useRef<HTMLDivElement>(null);
     const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -38,7 +57,6 @@ export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProp
             if (!overlayRef.current || !infoRef.current) return;
 
             if (isHovered) {
-                // Reveal Overlay Button
                 gsap.to(overlayRef.current, {
                     opacity: 1,
                     y: 0,
@@ -46,7 +64,6 @@ export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProp
                     ease: 'power2.out',
                 });
 
-                // Slide up info slightly
                 gsap.to(infoRef.current, {
                     y: -5,
                     duration: 0.4,
@@ -66,7 +83,6 @@ export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProp
                     ease: 'power2.out'
                 });
 
-                // Reset tilt
                 if (imageContainerRef.current) {
                     gsap.to(imageContainerRef.current, {
                         rotationX: 0,
@@ -96,6 +112,22 @@ export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProp
         });
     };
 
+    const handleFavorite = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (isLiking) return;
+
+        setIsLiking(true);
+        setIsLiked(!isLiked); // Optimistic update
+
+        if (onFavoriteToggle) {
+            await onFavoriteToggle();
+        }
+
+        setIsLiking(false);
+    };
+
+    const displayStatus = mapStatus(item.status);
+
     const statusConfig = {
         realized: {
             icon: Check,
@@ -105,8 +137,8 @@ export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProp
             border: 'border-emerald-500/20'
         },
         'in-progress': {
-            icon: Loader2,
-            label: 'In Progress',
+            icon: Send,
+            label: 'With Artisans',
             color: 'text-amber-400',
             bg: 'bg-amber-950/50',
             border: 'border-amber-500/20'
@@ -120,25 +152,29 @@ export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProp
         },
     };
 
-    const status = statusConfig[concept.status];
+    const status = statusConfig[displayStatus];
     const StatusIcon = status.icon;
 
-    // Determine aspect ratio class
-    const aspectClass = concept.aspectRatio === 'landscape'
-        ? 'aspect-[4/3]'
-        : concept.aspectRatio === 'portrait'
-            ? 'aspect-[3/4]'
-            : 'aspect-square';
+    // Determine aspect ratio based on image or default
+    const aspectClass = 'aspect-[3/4]'; // Default portrait for gallery
 
     // Emoji based on category for placeholder
     const categoryEmojis: Record<string, string> = {
         'Art': '🎨',
+        'Art & Prints': '🎨',
         'Jewelry': '💎',
         'Home Decor': '🏠',
         'Furniture': '🪑',
         'Ceramics': '🏺',
+        'Pottery': '🏺',
+        'Textiles': '🧵',
     };
-    const emoji = categoryEmojis[concept.category] || '✨';
+    const emoji = categoryEmojis[item.category] || '✨';
+
+    // Format price range
+    const priceDisplay = item.priceRange
+        ? `$${item.priceRange.min} - $${item.priceRange.max}`
+        : null;
 
     return (
         <div
@@ -168,12 +204,25 @@ export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProp
                     {/* Placeholder gradient background */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#1F1F1F] via-[#151515] to-[#0A0A0A] z-[-1]" />
 
-                    {/* Emoji "Image" */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-6xl opacity-80 transform transition-transform duration-700 drop-shadow-2xl select-none filter saturate-0 group-hover:saturate-100 group-hover:scale-110" style={{ transform: isHovered ? 'scale(1.1) translateZ(30px)' : 'scale(1)' }}>
-                            {emoji}
+                    {/* Image or Emoji Placeholder */}
+                    {item.thumbnailUrl || item.imageUrl ? (
+                        <Image
+                            src={item.thumbnailUrl || item.imageUrl}
+                            alt={item.title}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                    ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div
+                                className="text-6xl opacity-80 transform transition-transform duration-700 drop-shadow-2xl select-none filter saturate-0 group-hover:saturate-100 group-hover:scale-110"
+                                style={{ transform: isHovered ? 'scale(1.1) translateZ(30px)' : 'scale(1)' }}
+                            >
+                                {emoji}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Gradient Overlay for Text Readability */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-90" />
@@ -184,15 +233,13 @@ export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProp
                             'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold backdrop-blur-md border uppercase tracking-wider',
                             status.bg, status.color, status.border
                         )}>
-                            <StatusIcon size={10} className={concept.status === 'in-progress' ? 'animate-spin' : ''} />
+                            <StatusIcon size={10} />
                             {status.label}
                         </div>
 
                         <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsLiked(!isLiked);
-                            }}
+                            onClick={handleFavorite}
+                            disabled={isLiking}
                             className={cn(
                                 'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300',
                                 'backdrop-blur-md border border-white/5 hover:border-white/20',
@@ -201,7 +248,11 @@ export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProp
                                     : 'bg-black/20 text-white/40 hover:text-white'
                             )}
                         >
-                            <Heart size={14} className={isLiked ? 'fill-current' : ''} />
+                            {isLiking ? (
+                                <Loader2 size={14} className="animate-spin" />
+                            ) : (
+                                <Heart size={14} className={isLiked ? 'fill-current' : ''} />
+                            )}
                         </button>
                     </div>
 
@@ -213,30 +264,34 @@ export function GalleryItem({ concept, onClick, isNew = false }: GalleryItemProp
                     >
                         {/* Category */}
                         <div className="text-[10px] text-[var(--av-gold)] font-bold uppercase tracking-widest mb-2 opacity-80">
-                            {concept.category}
+                            {item.category}
                         </div>
 
                         {/* Title */}
-                        <h4 className="font-bold text-[var(--av-pearl)] text-lg leading-snug mb-2 font-serif group-hover:text-white transition-colors">
-                            {concept.title}
+                        <h4 className="font-bold text-[var(--av-pearl)] text-lg leading-snug mb-2 font-serif group-hover:text-white transition-colors line-clamp-2">
+                            {item.title}
                         </h4>
 
-                        {/* Footer (Author & Stats) */}
+                        {/* Footer (Price & Stats) */}
                         <div className="flex items-center justify-between">
-                            <p className="text-xs text-[var(--av-silver)] font-medium flex items-center gap-2">
-                                <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px]">
-                                    {concept.author[1].toUpperCase()}
-                                </span>
-                                {concept.author}
-                            </p>
+                            {/* Price Range */}
+                            {priceDisplay && (
+                                <p className="text-xs text-[var(--av-gold)] font-mono flex items-center gap-1">
+                                    <DollarSign size={10} />
+                                    {priceDisplay}
+                                </p>
+                            )}
 
+                            {/* Stats - show on hover */}
                             <div className="flex items-center gap-3 text-[10px] text-[var(--av-ash)] font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0 delay-75">
                                 <span className="flex items-center gap-1">
-                                    <Heart size={10} /> {concept.likes}
+                                    <Eye size={10} /> {item.viewCount > 1000 ? (item.viewCount / 1000).toFixed(1) + 'k' : item.viewCount}
                                 </span>
-                                <span className="flex items-center gap-1">
-                                    <Eye size={10} /> {concept.views > 1000 ? (concept.views / 1000).toFixed(1) + 'k' : concept.views}
-                                </span>
+                                {item.matchCount > 0 && (
+                                    <span className="flex items-center gap-1">
+                                        <Send size={10} /> {item.matchCount} artisans
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
