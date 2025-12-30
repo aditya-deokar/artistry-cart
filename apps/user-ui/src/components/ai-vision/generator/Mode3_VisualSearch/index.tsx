@@ -4,9 +4,10 @@ import { useState, useRef, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { PremiumButton } from '../../ui/PremiumButton';
-import { Upload, Search, Sparkles, Image as ImageIcon, X } from 'lucide-react';
+import { Upload, Search, Sparkles, Image as ImageIcon, X, Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { cn } from '@/lib/utils';
+import { useVisualSearch } from '@/hooks/useAIVision';
 
 interface VisualSearchModeProps {
     onGenerate: (data: { image: File | string; action: 'search' | 'generate' }) => void;
@@ -16,18 +17,27 @@ export function VisualSearchMode({ onGenerate }: VisualSearchModeProps) {
     const [uploadedImage, setUploadedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string>('');
     const [imageUrl, setImageUrl] = useState('');
+    const [imageBase64, setImageBase64] = useState<string>('');
 
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // Use visual search hook
+    const { results, isSearching, error, searchByImage, hybridSearch, clear } = useVisualSearch();
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
             const file = acceptedFiles[0];
             setUploadedImage(file);
+            setImageUrl(''); // Clear URL if file is uploaded
 
-            // Create preview
+            // Create preview and base64
             const reader = new FileReader();
             reader.onload = (e) => {
-                setImagePreview(e.target?.result as string);
+                const result = e.target?.result as string;
+                setImagePreview(result);
+                // Extract base64 data (remove data:image/xxx;base64, prefix)
+                const base64Data = result.split(',')[1];
+                setImageBase64(base64Data);
             };
             reader.readAsDataURL(file);
         }
@@ -48,6 +58,46 @@ export function VisualSearchMode({ onGenerate }: VisualSearchModeProps) {
         e.stopPropagation();
         setUploadedImage(null);
         setImagePreview('');
+        setImageBase64('');
+        clear();
+    };
+
+    const loadImageFromUrl = async () => {
+        if (!imageUrl) return;
+
+        try {
+            // Just set the URL - the API will fetch it
+            setImagePreview(imageUrl);
+            setUploadedImage(null);
+            setImageBase64('');
+        } catch (err) {
+            console.error('Failed to load image from URL:', err);
+        }
+    };
+
+    const handleSearch = async () => {
+        if (imageBase64) {
+            await searchByImage({ imageBase64 });
+        } else if (imageUrl) {
+            await searchByImage({ imageUrl });
+        }
+        onGenerate({ image: uploadedImage || imageUrl, action: 'search' });
+    };
+
+    const handleGenerateSimilar = async () => {
+        // For generate similar, we might use hybrid search or similar concepts
+        if (imageBase64) {
+            await hybridSearch({
+                imageUrl: imagePreview,
+                query: 'similar products',
+            });
+        } else if (imageUrl) {
+            await hybridSearch({
+                imageUrl,
+                query: 'similar products',
+            });
+        }
+        onGenerate({ image: uploadedImage || imageUrl, action: 'generate' });
     };
 
     useGSAP(
@@ -68,6 +118,8 @@ export function VisualSearchMode({ onGenerate }: VisualSearchModeProps) {
         },
         { scope: containerRef }
     );
+
+    const hasImage = uploadedImage || imageUrl;
 
     return (
         <div ref={containerRef} className="max-w-4xl mx-auto space-y-8">
@@ -103,7 +155,7 @@ export function VisualSearchMode({ onGenerate }: VisualSearchModeProps) {
                         />
                         <button
                             onClick={clearImage}
-                            className="absolute -top-2 -right-2 bg-[var(--av-error)] text-white rounded-full p-1 opacity-0 group-hover/preview:opacity-100 transition-opacity"
+                            className="absolute -top-2 -right-2 bg-[var(--av-error)] text-white rounded-full p-1 opacity-0 group-hover/preview:opacity-100 transition-opacity hover:scale-110"
                         >
                             <X size={14} />
                         </button>
@@ -152,38 +204,81 @@ export function VisualSearchMode({ onGenerate }: VisualSearchModeProps) {
                     <input
                         type="url"
                         value={imageUrl}
-                        onChange={(e) => setImageUrl(e.target.value)}
+                        onChange={(e) => {
+                            setImageUrl(e.target.value);
+                            setUploadedImage(null);
+                            setImagePreview('');
+                            setImageBase64('');
+                        }}
                         placeholder="https://example.com/image.jpg"
                         className="flex-1 px-4 py-3 bg-[var(--av-slate)] text-[var(--av-pearl)] rounded-lg border-2 border-[var(--av-silver)]/20 focus:border-[var(--av-gold)] outline-none transition-colors"
                     />
-                    <PremiumButton variant="secondary" size="md">
+                    <PremiumButton
+                        variant="secondary"
+                        size="md"
+                        onClick={loadImageFromUrl}
+                        disabled={!imageUrl}
+                    >
                         Load
                     </PremiumButton>
                 </div>
             </div>
 
+            {/* Error Display */}
+            {error && (
+                <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                    <p className="text-red-400 text-sm">{error}</p>
+                </div>
+            )}
+
+            {/* Search Results Preview */}
+            {results.length > 0 && (
+                <div className="bg-[var(--av-slate)] rounded-lg p-6">
+                    <h4 className="text-lg font-semibold text-[var(--av-pearl)] mb-4">
+                        Found {results.length} Similar Products
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {results.slice(0, 4).map((result) => (
+                            <div key={result.id} className="bg-[var(--av-onyx)] rounded-lg p-3">
+                                <div className="aspect-square bg-[var(--av-slate)] rounded mb-2 flex items-center justify-center">
+                                    {result.thumbnail ? (
+                                        <img
+                                            src={result.thumbnail}
+                                            alt={result.title}
+                                            className="w-full h-full object-cover rounded"
+                                        />
+                                    ) : (
+                                        <ImageIcon className="text-[var(--av-silver)]" size={24} />
+                                    )}
+                                </div>
+                                <p className="text-xs text-[var(--av-pearl)] truncate">{result.title}</p>
+                                <p className="text-xs text-[var(--av-gold)] font-mono">${result.price}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Action Buttons */}
-            {(uploadedImage || imageUrl) && (
+            {hasImage && (
                 <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in pt-4">
                     <PremiumButton
                         variant="primary"
                         size="lg"
                         glow
-                        icon={<Search size={20} />}
-                        onClick={() =>
-                            onGenerate({ image: uploadedImage || imageUrl, action: 'search' })
-                        }
+                        icon={isSearching ? <Loader2 size={20} className="animate-spin" /> : <Search size={20} />}
+                        onClick={handleSearch}
+                        disabled={isSearching}
                     >
-                        🔍 Search Our Products
+                        {isSearching ? 'Searching...' : '🔍 Search Our Products'}
                     </PremiumButton>
 
                     <PremiumButton
                         variant="secondary"
                         size="lg"
                         icon={<Sparkles size={20} />}
-                        onClick={() =>
-                            onGenerate({ image: uploadedImage || imageUrl, action: 'generate' })
-                        }
+                        onClick={handleGenerateSimilar}
+                        disabled={isSearching}
                     >
                         ✨ Generate Similar
                     </PremiumButton>

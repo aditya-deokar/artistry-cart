@@ -15,14 +15,21 @@ const nextConfig = {
     domains: ['plus.unsplash.com', 'images.unsplash.com', 'plus.unsplash.com', 'ik.imagekit.io', 'placehold.co', 'lh3.googleusercontent.com']
   },
   async rewrites() {
+    const serverUri = process.env.NEXT_PUBLIC_SERVER_URI || 'http://localhost:8080';
+
     return [
       {
         source: '/auth/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/:path*`,
+        destination: `${serverUri}/auth/api/:path*`,
       },
       {
         source: '/product/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_SERVER_URI}/product/api/:path*`,
+        destination: `${serverUri}/product/api/:path*`,
+      },
+      // AI Vision Service proxy
+      {
+        source: '/ai-vision/api/:path*',
+        destination: `${serverUri}/ai-vision/api/:path*`,
       },
     ]
   }

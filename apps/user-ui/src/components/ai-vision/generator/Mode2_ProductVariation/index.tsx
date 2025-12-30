@@ -6,9 +6,14 @@ import { useGSAP } from '@gsap/react';
 import { PremiumButton } from '../../ui/PremiumButton';
 import { Search, Package, Wand2 } from 'lucide-react';
 import { ProductSelector, Product } from './ProductSelector';
+import type { ProductVariationParams } from '@/types/aivision';
 
 interface ProductVariationModeProps {
-    onGenerate: (data: { productId: string; modifications: string }) => void;
+    onGenerate: (data: {
+        productId: string;
+        modifications: string;
+        adjustments?: ProductVariationParams['adjustments'];
+    }) => void;
 }
 
 export function ProductVariationMode({ onGenerate }: ProductVariationModeProps) {
@@ -48,11 +53,40 @@ export function ProductVariationMode({ onGenerate }: ProductVariationModeProps) 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (selectedProduct) {
+            // Build adjustments object from checkboxes
+            const adjustments: ProductVariationParams['adjustments'] = {};
+
+            if (quickAdjustments.changeColor) {
+                adjustments.color = ['varied']; // Will be interpreted by AI
+            }
+            if (quickAdjustments.adjustSize) {
+                adjustments.size = 'varied';
+            }
+            if (quickAdjustments.differentMaterial) {
+                adjustments.material = ['varied'];
+            }
+            if (quickAdjustments.styleVariation) {
+                adjustments.style = 'varied';
+            }
+
             onGenerate({
                 productId: selectedProduct.id,
                 modifications,
+                adjustments: Object.keys(adjustments).length > 0 ? adjustments : undefined,
             });
         }
+    };
+
+    const handleClearProduct = () => {
+        setSelectedProduct(null);
+        setSearchQuery('');
+        setModifications('');
+        setQuickAdjustments({
+            changeColor: false,
+            adjustSize: false,
+            differentMaterial: false,
+            styleVariation: false,
+        });
     };
 
     return (
@@ -74,16 +108,17 @@ export function ProductVariationMode({ onGenerate }: ProductVariationModeProps) 
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search our catalog..."
+                            placeholder="Search products by name, category..."
                             className="w-full pl-12 pr-4 py-3 bg-[var(--av-onyx)] text-[var(--av-pearl)] rounded-lg border-2 border-[var(--av-silver)]/20 focus:border-[var(--av-gold)] outline-none transition-colors"
                         />
                     </div>
 
-                    {/* Category Filters */}
-                    <div className="flex flex-wrap gap-2">
-                        {['Jewelry', 'Furniture', 'Art', 'Home Decor', 'Pottery'].map((cat) => (
+                    {/* Category Quick Filters */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {['Jewelry', 'Furniture', 'Art', 'Home Decor', 'Pottery', 'Textiles'].map((cat) => (
                             <button
                                 key={cat}
+                                type="button"
                                 onClick={() => setSearchQuery(cat)}
                                 className="px-4 py-2 bg-[var(--av-onyx)] text-[var(--av-silver)] rounded-full text-sm hover:bg-[var(--av-gold)]/20 hover:text-[var(--av-gold)] transition-colors"
                             >
@@ -93,13 +128,11 @@ export function ProductVariationMode({ onGenerate }: ProductVariationModeProps) 
                     </div>
 
                     {/* Product Selector Component */}
-                    {searchQuery && (
-                        <ProductSelector
-                            searchQuery={searchQuery}
-                            onSelect={setSelectedProduct}
-                            selected={selectedProduct}
-                        />
-                    )}
+                    <ProductSelector
+                        searchQuery={searchQuery}
+                        onSelect={setSelectedProduct}
+                        selected={selectedProduct}
+                    />
                 </div>
             </div>
 
@@ -108,23 +141,50 @@ export function ProductVariationMode({ onGenerate }: ProductVariationModeProps) 
                 <div className="animate-in space-y-8">
                     {/* Selected Product Summary */}
                     <div className="bg-[var(--av-slate)] rounded-lg p-6 border-2 border-[var(--av-gold)]/30">
-                        <div className="flex items-center gap-4">
-                            <div className="w-24 h-24 bg-[var(--av-onyx)] rounded-lg flex items-center justify-center">
-                                <Package className="text-[var(--av-gold)]" size={32} />
-                            </div>
-                            <div className="flex-1">
-                                <h4 className="text-lg font-semibold text-[var(--av-pearl)]">
-                                    {selectedProduct.name}
-                                </h4>
-                                <p className="text-sm text-[var(--av-silver)]">
-                                    by {selectedProduct.artisan}
-                                </p>
-                                <div className="flex gap-4 mt-2 text-xs text-[var(--av-silver)]">
-                                    <span className="bg-[var(--av-onyx)] px-2 py-1 rounded">Style: {selectedProduct.category}</span>
-                                    <span className="bg-[var(--av-onyx)] px-2 py-1 rounded">Material: {selectedProduct.material}</span>
-                                    <span className="bg-[var(--av-onyx)] px-2 py-1 rounded font-mono text-[var(--av-gold)]">${selectedProduct.price}</span>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-24 h-24 bg-[var(--av-onyx)] rounded-lg flex items-center justify-center overflow-hidden">
+                                    {selectedProduct.imageUrl ? (
+                                        <img
+                                            src={selectedProduct.imageUrl}
+                                            alt={selectedProduct.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <Package className="text-[var(--av-gold)]" size={32} />
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="text-lg font-semibold text-[var(--av-pearl)]">
+                                        {selectedProduct.name}
+                                    </h4>
+                                    {selectedProduct.artisan && (
+                                        <p className="text-sm text-[var(--av-silver)]">
+                                            by {selectedProduct.artisan}
+                                        </p>
+                                    )}
+                                    <div className="flex gap-4 mt-2 text-xs text-[var(--av-silver)]">
+                                        <span className="bg-[var(--av-onyx)] px-2 py-1 rounded">
+                                            {selectedProduct.category}
+                                        </span>
+                                        {selectedProduct.material && (
+                                            <span className="bg-[var(--av-onyx)] px-2 py-1 rounded">
+                                                {selectedProduct.material}
+                                            </span>
+                                        )}
+                                        <span className="bg-[var(--av-onyx)] px-2 py-1 rounded font-mono text-[var(--av-gold)]">
+                                            ${selectedProduct.price.toLocaleString()}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
+                            <button
+                                type="button"
+                                onClick={handleClearProduct}
+                                className="text-sm text-[var(--av-silver)] hover:text-[var(--av-pearl)] transition-colors"
+                            >
+                                Change
+                            </button>
                         </div>
                     </div>
 
@@ -198,7 +258,7 @@ export function ProductVariationMode({ onGenerate }: ProductVariationModeProps) 
                                     Generate Variations
                                 </PremiumButton>
                                 <p className="text-xs text-[var(--av-silver)] mt-3">
-                                    Uses product schema + AI to create realistic variations
+                                    AI will create unique variations based on your specifications
                                 </p>
                             </div>
                         </div>

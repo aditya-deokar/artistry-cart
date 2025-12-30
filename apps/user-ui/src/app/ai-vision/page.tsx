@@ -1,55 +1,63 @@
-import { AIVisionHero } from '@/components/ai-vision/sections/AIVisionHero';
-import { AIGenerator } from '@/components/ai-vision/generator/AIGenerator';
-import { VisualSearchShowcase } from '@/components/ai-vision/sections/VisualSearchShowcase';
-import { ConceptGallery } from '@/components/ai-vision/sections/ConceptGallery';
-import { SuccessStories } from '@/components/ai-vision/sections/SuccessStories';
-import { ArtisanCollaboration } from '@/components/ai-vision/artisan-collaboration/ArtisanCollaboration';
-import { TestimonialsCarousel } from '@/components/ai-vision/sections/TestimonialsCarousel';
-import { FAQAccordion } from '@/components/ai-vision/sections/FAQAccordion';
-import { FinalCTA } from '@/components/ai-vision/sections/FinalCTA';
-import { StickyActionBar } from '@/components/ai-vision/ui/StickyActionBar';
-import { ScrollProgressIndicator } from '@/components/ai-vision/ui/ScrollProgressIndicator';
-import { fontVariables } from '@/lib/fonts-ai-vision';
-import '@/styles/ai-vision-theme.css';
+import { Suspense } from 'react';
+import { Metadata } from 'next';
+import { Navigation } from '@/components/navigation';
+import { Footer } from '@/components/landing';
+import AIVisionDiscovery from './_components/AIVisionDiscovery';
 
-export const metadata = {
-    title: 'AI Vision Studio | Artistry Cart',
-    description: 'Describe your vision. See it visualized by AI. Connect with artisans who bring it to life.',
-    openGraph: {
-        title: 'AI Vision Studio | Artistry Cart',
-        description: 'Transform your imagination into reality with AI-powered custom art creation.',
-        type: 'website',
-    },
+export const metadata: Metadata = {
+  title: 'AI Vision Discovery | Artistry Cart',
+  description:
+    'Generate custom designs with AI. Browse inspiring concepts from thousands of AI-generated artworks. Connect with artisans who bring your vision to life.',
+  openGraph: {
+    title: 'AI Vision Discovery | Artistry Cart',
+    description: 'Transform your imagination into reality with AI-powered custom art creation.',
+    type: 'website',
+    images: ['/images/og-ai-vision.jpg'],
+  },
+  keywords: [
+    'AI art generation',
+    'custom design',
+    'AI vision',
+    'artisan collaboration',
+    'concept design',
+    'AI artwork',
+    'custom commissions',
+  ],
 };
 
 export default function AIVisionPage() {
-    return (
-        <main className={fontVariables}>
-            <ScrollProgressIndicator />
-            <StickyActionBar />
+  return (
+    <>
+      <Navigation />
 
-            {/* Phase 1: Hero Section */}
-            <AIVisionHero />
+      <main>
+        <Suspense fallback={<AIVisionSkeleton />}>
+          <AIVisionDiscovery />
+        </Suspense>
+      </main>
 
-            {/* Phase 2: AI Generator with 3 Modes */}
-            <AIGenerator />
+      <Footer />
+    </>
+  );
+}
 
-            {/* Phase 3: Visual Search Showcase */}
-            <VisualSearchShowcase />
-
-            {/* Phase 3: Success Stories (Before/After) */}
-            <SuccessStories />
-
-            {/* Phase 3: Concept Gallery with Masonry Layout */}
-            <ConceptGallery />
-
-            {/* Phase 4: Artisan Collaboration & Matching */}
-            <ArtisanCollaboration />
-
-            {/* Phase 5: Polish & Launch Sections */}
-            <TestimonialsCarousel />
-            <FAQAccordion />
-            <FinalCTA />
-        </main>
-    );
+function AIVisionSkeleton() {
+  return (
+    <div className="min-h-screen bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)]">
+      {/* Hero Skeleton */}
+      <div className="min-h-[60vh] flex items-center pt-24 pb-16">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full">
+          <div className="text-center space-y-6 animate-pulse">
+            <div className="h-4 w-32 bg-[var(--ac-linen)] dark:bg-[var(--ac-slate)] mx-auto" />
+            <div className="space-y-3">
+              <div className="h-12 w-3/4 bg-[var(--ac-linen)] dark:bg-[var(--ac-slate)] mx-auto" />
+              <div className="h-12 w-1/2 bg-[var(--ac-linen)] dark:bg-[var(--ac-slate)] mx-auto" />
+            </div>
+            <div className="h-24 w-2/3 bg-[var(--ac-linen)] dark:bg-[var(--ac-slate)] mx-auto" />
+            <div className="h-14 w-64 bg-[var(--ac-linen)] dark:bg-[var(--ac-slate)] mx-auto" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

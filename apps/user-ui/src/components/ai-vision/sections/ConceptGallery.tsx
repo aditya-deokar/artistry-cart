@@ -1,109 +1,49 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { SectionContainer } from '../ui/SectionContainer';
-import { GalleryFilters, type FilterCategory, type FilterStatus } from './GalleryFilters';
-import { GalleryItem, type Concept } from './GalleryItem';
+import { GalleryFilters } from './GalleryFilters';
+import { GalleryItem } from './GalleryItem';
 import { ConceptLightbox } from './ConceptLightbox';
-import { Sparkles, ImageIcon, CheckCircle, RefreshCcw } from 'lucide-react';
+import { Sparkles, ImageIcon, CheckCircle, RefreshCcw, Loader2 } from 'lucide-react';
+import { useConceptGallery, useSchemaData } from '@/hooks/useAIVision';
+import type { GalleryItem as GalleryItemType } from '@/types/aivision';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Generate mock concepts with variety
-const generateMockConcepts = (count: number, startId: number = 1): Concept[] => {
-    const categories = ['Art', 'Jewelry', 'Home Decor', 'Furniture', 'Ceramics'];
-    const statuses: Array<'realized' | 'in-progress' | 'awaiting'> = ['realized', 'in-progress', 'awaiting'];
-    const aspectRatios: Array<'portrait' | 'landscape' | 'square'> = ['portrait', 'landscape', 'square'];
-
-    const titles = [
-        'Minimalist Terrarium Vase',
-        'Hammered Gold Ring Set',
-        'Live Edge Coffee Table',
-        'Abstract Canvas Collection',
-        'Hand-Thrown Ceramic Bowl',
-        'Sterling Silver Pendant',
-        'Mid-Century Bookshelf',
-        'Woven Wall Hanging',
-        'Copper Wire Sculpture',
-        'Stoneware Dinner Set',
-        'Botanical Art Print',
-        'Artisan Leather Bag',
-        'Mosaic Mirror Frame',
-        'Hand-Painted Tiles',
-        'Geometric Planter Set',
-    ];
-
-    const authors = [
-        '@green_thumb',
-        '@silver_moon',
-        '@woodland_crafts',
-        '@color_theory',
-        '@earth_and_fire',
-        '@metal_arts',
-        '@modern_makers',
-        '@rustic_revival',
-        '@forge_and_flame',
-        '@bold_strokes',
-    ];
-
-    return Array.from({ length: count }, (_, i) => ({
-        id: `concept-${startId + i}`,
-        imageUrl: `/concepts/placeholder-${(i % 10) + 1}.jpg`,
-        category: categories[i % categories.length],
-        title: titles[i % titles.length],
-        author: authors[i % authors.length],
-        likes: Math.floor(Math.random() * 500) + 50,
-        views: Math.floor(Math.random() * 5000) + 500,
-        status: statuses[i % statuses.length],
-        prompt: 'Create a stunning handcrafted piece with organic forms and natural materials. Combine modern minimalist aesthetics with traditional artisan techniques.',
-        aspectRatio: aspectRatios[i % aspectRatios.length],
-    }));
-};
-
 export function ConceptGallery() {
-    const [concepts, setConcepts] = useState<Concept[]>(() => generateMockConcepts(12));
-    const [filteredConcepts, setFilteredConcepts] = useState<Concept[]>(concepts);
-    const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
-    const [selectedStatus, setSelectedStatus] = useState<FilterStatus>('all');
-    const [lightboxConcept, setLightboxConcept] = useState<Concept | null>(null);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
+    const {
+        items,
+        pagination,
+        filters,
+        isLoading,
+        error,
+        loadGallery,
+        loadMore,
+        setFilters,
+        toggleFavorite,
+        hasMore,
+    } = useConceptGallery();
+
+    // Schema auto-loads on hook mount
+    const { categories, isLoaded: schemaLoaded } = useSchemaData();
+
+    const [lightboxItem, setLightboxItem] = useState<GalleryItemType | null>(null);
 
     const galleryRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
     const sentinelRef = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
 
-    // Filter concepts
+    // Load gallery on mount
     useEffect(() => {
-        let filtered = [...concepts];
+        loadGallery();
+    }, [loadGallery]);
 
-        if (selectedCategory !== 'all') {
-            const categoryMap: Record<FilterCategory, string> = {
-                all: '',
-                art: 'Art',
-                jewelry: 'Jewelry',
-                'home-decor': 'Home Decor',
-                furniture: 'Furniture',
-                ceramics: 'Ceramics',
-            };
-            filtered = filtered.filter(
-                (c) => c.category === categoryMap[selectedCategory]
-            );
-        }
-
-        if (selectedStatus !== 'all') {
-            filtered = filtered.filter((c) => c.status === selectedStatus);
-        }
-
-        setFilteredConcepts(filtered);
-    }, [selectedCategory, selectedStatus, concepts]);
-
-    // Infinite scroll
+    // Infinite scroll observer
     useEffect(() => {
         if (!sentinelRef.current) return;
 
@@ -119,27 +59,7 @@ export function ConceptGallery() {
         observer.observe(sentinelRef.current);
 
         return () => observer.disconnect();
-    }, [hasMore, isLoading]);
-
-    const loadMore = () => {
-        if (isLoading) return;
-
-        setIsLoading(true);
-
-        // Simulate loading more concepts
-        setTimeout(() => {
-            const newConcepts = generateMockConcepts(8, concepts.length + 1);
-
-            setConcepts((prev) => [...prev, ...newConcepts]);
-            setPage((p) => p + 1);
-
-            if (page >= 4) {
-                setHasMore(false);
-            }
-
-            setIsLoading(false);
-        }, 800);
-    };
+    }, [hasMore, isLoading, loadMore]);
 
     // Header animation
     useGSAP(
@@ -164,17 +84,16 @@ export function ConceptGallery() {
         { scope: galleryRef }
     );
 
-    // Animate new items on filter or load
+    // Animate new items on load
     useGSAP(
         () => {
             if (!gridRef.current) return;
 
-            const items = gridRef.current.querySelectorAll('[data-new="true"]');
+            const itemElements = gridRef.current.querySelectorAll('[data-new="true"]');
 
-            if (items.length > 0) {
-                // Macro Interaction: Wave-like entry effect
+            if (itemElements.length > 0) {
                 gsap.fromTo(
-                    items,
+                    itemElements,
                     { opacity: 0, scale: 0.8, y: 50, rotation: 2 },
                     {
                         opacity: 1,
@@ -190,14 +109,30 @@ export function ConceptGallery() {
                         ease: 'back.out(1.2)',
                         overwrite: 'auto',
                         onComplete: () => {
-                            items.forEach((item) => item.removeAttribute('data-new'));
+                            itemElements.forEach((item) => item.removeAttribute('data-new'));
                         },
                     }
                 );
             }
         },
-        { dependencies: [filteredConcepts], scope: gridRef }
+        { dependencies: [items], scope: gridRef }
     );
+
+    const handleCategoryChange = (category: string) => {
+        setFilters({ category });
+    };
+
+    const handleSortChange = (sortBy: 'recent' | 'popular' | 'favorites') => {
+        setFilters({ sortBy });
+    };
+
+    const handleItemClick = (item: GalleryItemType) => {
+        setLightboxItem(item);
+    };
+
+    const handleFavoriteToggle = async (id: string) => {
+        await toggleFavorite(id);
+    };
 
     return (
         <SectionContainer
@@ -206,7 +141,7 @@ export function ConceptGallery() {
             maxWidth="xl"
             className="bg-gradient-to-b from-[#111] via-[#1A1A1A] to-[#0D0D0D] relative overflow-hidden"
         >
-            {/* Background Texture - Macro Detail */}
+            {/* Background Texture */}
             <div className="absolute top-0 left-0 w-full h-[300px] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none fade-out-bottom"></div>
 
             {/* Header */}
@@ -230,11 +165,11 @@ export function ConceptGallery() {
                     <div className="flex gap-4 flex-wrap justify-center">
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg border border-white/5 text-xs text-[var(--av-silver)]">
                             <CheckCircle size={14} className="text-emerald-500" />
-                            <span className="font-bold text-white">128</span> Projects Realized Today
+                            <span className="font-bold text-white">{pagination?.total || 0}</span> Total Concepts
                         </div>
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg border border-white/5 text-xs text-[var(--av-silver)]">
                             <RefreshCcw size={14} className="text-blue-500" />
-                            <span className="font-bold text-white">1.2k</span> Concepts Generated
+                            <span className="font-bold text-white">Page {pagination?.page || 1}</span> of {pagination?.pages || 1}
                         </div>
                     </div>
                 </div>
@@ -245,37 +180,53 @@ export function ConceptGallery() {
                 {/* Filters */}
                 <div className="mb-10 sticky top-20 z-40 bg-[#111]/80 backdrop-blur-xl py-4 rounded-2xl border border-white/5 shadow-2xl mx-4 lg:mx-0">
                     <GalleryFilters
-                        selectedCategory={selectedCategory}
-                        selectedStatus={selectedStatus}
-                        onCategoryChange={setSelectedCategory}
-                        onStatusChange={setSelectedStatus}
+                        selectedCategory={filters.category}
+                        selectedSort={filters.sortBy}
+                        categories={categories}
+                        onCategoryChange={handleCategoryChange}
+                        onSortChange={handleSortChange}
+                        isLoading={!schemaLoaded}
                     />
                 </div>
 
                 {/* Results Count */}
                 <div className="flex items-center justify-between mb-6 px-4">
                     <p className="text-sm text-[var(--av-silver)] flex items-center gap-2" aria-live="polite">
-                        Showing <span className="font-bold text-[var(--av-pearl)] bg-white/10 px-2 py-0.5 rounded-full">{filteredConcepts.length}</span> items
+                        Showing <span className="font-bold text-[var(--av-pearl)] bg-white/10 px-2 py-0.5 rounded-full">{items.length}</span> of {pagination?.total || 0} items
                     </p>
                 </div>
 
-                {/* Masonry Grid with Macro Interactions */}
+                {/* Error State */}
+                {error && (
+                    <div className="mx-4 mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                        <p className="text-red-400 text-sm">{error}</p>
+                        <button
+                            onClick={() => loadGallery()}
+                            className="text-sm text-[var(--av-gold)] hover:underline mt-2"
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                )}
+
+                {/* Masonry Grid */}
                 <div
                     ref={gridRef}
                     className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 px-4"
                 >
-                    {filteredConcepts.map((concept, index) => (
+                    {items.map((item, index) => (
                         <GalleryItem
-                            key={concept.id}
-                            concept={concept}
-                            onClick={() => setLightboxConcept(concept)}
-                            isNew={index >= filteredConcepts.length - 8}
+                            key={item.id}
+                            item={item}
+                            onClick={() => handleItemClick(item)}
+                            onFavoriteToggle={() => handleFavoriteToggle(item.id)}
+                            isNew={index >= items.length - 8 && pagination && pagination.page > 1}
                         />
                     ))}
                 </div>
 
                 {/* Empty State */}
-                {filteredConcepts.length === 0 && (
+                {items.length === 0 && !isLoading && (
                     <div className="text-center py-32 flex flex-col items-center">
                         <div className="w-24 h-24 mb-6 rounded-full bg-[var(--av-gold)]/5 flex items-center justify-center border border-[var(--av-gold)]/10 shadow-[0_0_50px_rgba(212,168,75,0.1)]">
                             <Sparkles size={40} className="text-[var(--av-gold)] opacity-50" />
@@ -293,11 +244,11 @@ export function ConceptGallery() {
                 <div ref={sentinelRef} className="h-32 flex items-center justify-center mt-12 mb-20">
                     {isLoading && (
                         <div className="flex flex-col items-center gap-3 text-[var(--av-silver)]">
-                            <div className="w-10 h-10 rounded-full border-2 border-[var(--av-gold)] border-t-transparent animate-spin" />
+                            <Loader2 className="w-10 h-10 animate-spin text-[var(--av-gold)]" />
                             <span className="font-medium text-xs tracking-widest uppercase opacity-70">Fetching Inspiration...</span>
                         </div>
                     )}
-                    {!hasMore && filteredConcepts.length > 0 && (
+                    {!hasMore && items.length > 0 && (
                         <div className="flex flex-col items-center gap-2">
                             <div className="w-16 h-1 bg-white/10 rounded-full mb-2" />
                             <p className="text-[var(--av-ash)] text-sm italic">
@@ -309,12 +260,12 @@ export function ConceptGallery() {
             </div>
 
             {/* Lightbox */}
-            {lightboxConcept && (
+            {lightboxItem && (
                 <ConceptLightbox
-                    concept={lightboxConcept}
-                    onClose={() => setLightboxConcept(null)}
+                    itemId={lightboxItem.id}
+                    onClose={() => setLightboxItem(null)}
                     onTrySimilar={() => {
-                        setLightboxConcept(null);
+                        setLightboxItem(null);
                         // Could scroll to generator or trigger navigation
                     }}
                 />
