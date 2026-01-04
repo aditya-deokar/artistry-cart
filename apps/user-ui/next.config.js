@@ -26,6 +26,11 @@ const nextConfig = {
         source: '/product/api/:path*',
         destination: `${serverUri}/product/api/:path*`,
       },
+      // Order Service proxy
+      {
+        source: '/order/api/:path*',
+        destination: `${serverUri}/order/api/:path*`,
+      },
       // AI Vision Service proxy
       {
         source: '/ai-vision/api/:path*',
