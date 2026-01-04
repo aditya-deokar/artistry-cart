@@ -25,6 +25,10 @@ import ArtisanMatchingModal from '../../_components/ArtisanMatchingModal';
 import AuthPromptModal from '../../_components/AuthPromptModal';
 import SimilarConcepts from '../../_components/SimilarConcepts';
 import ConceptRefinement from '../../_components/ConceptRefinement';
+import ConceptCarousel from '../../_components/ConceptCarousel';
+import ImageZoom from '../../_components/ImageZoom';
+import CommentSection from '../../_components/CommentSection';
+
 
 export default function ConceptDetailPage() {
   const params = useParams();
@@ -49,7 +53,7 @@ export default function ConceptDetailPage() {
       // Fetch from user's concepts or use gallery as fallback
       const userConcepts = await aiVisionClient.getUserConcepts({ limit: 100 });
       const foundConcept = userConcepts.concepts.find(c => c.id === conceptId);
-      
+
       if (foundConcept) {
         setConcept(foundConcept);
       } else {
@@ -216,16 +220,29 @@ export default function ConceptDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Image */}
+            {/* Image Carousel with Zoom */}
             <Card className="overflow-hidden">
-              <div className="relative aspect-video">
-                <Image
+              {concept.images && concept.images.length > 1 ? (
+                <ConceptCarousel
+                  images={concept.images}
+                  aspectRatio="video"
+                />
+              ) : (
+                <ImageZoom
                   src={concept.primaryImageUrl || concept.thumbnailUrl || '/placeholder-concept.jpg'}
                   alt={concept.generatedProduct?.title || 'Concept'}
-                  fill
-                  className="object-cover"
+                  trigger={
+                    <div className="relative aspect-video cursor-pointer">
+                      <Image
+                        src={concept.primaryImageUrl || concept.thumbnailUrl || '/placeholder-concept.jpg'}
+                        alt={concept.generatedProduct?.title || 'Concept'}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  }
                 />
-              </div>
+              )}
             </Card>
 
             {/* Description */}
@@ -319,6 +336,11 @@ export default function ConceptDetailPage() {
 
             {/* Similar Concepts */}
             <SimilarConcepts conceptId={concept.id} title="You might also like" />
+
+            {/* Comments Section */}
+            <Card className="p-6">
+              <CommentSection conceptId={concept.id} />
+            </Card>
           </div>
 
           {/* Sidebar Actions */}

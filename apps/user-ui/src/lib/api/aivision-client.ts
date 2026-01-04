@@ -572,6 +572,199 @@ class AIVisionClient {
       return { categories: [], materials: [], styles: [] };
     }
   }
+
+  // ─── Collections ──────────────────────────────────────────────────────────
+
+  async createCollection(data: {
+    name: string;
+    description?: string;
+    isPublic?: boolean;
+    conceptIds?: string[];
+  }): Promise<any> {
+    try {
+      const response = await this.client.post('/collections', data);
+      return response.data.data;
+    } catch (error: any) {
+      console.error('Failed to create collection:', error);
+      throw error;
+    }
+  }
+
+  async listCollections(params?: { includeShared?: boolean }): Promise<any[]> {
+    try {
+      const response = await this.client.get('/collections', { params });
+      return response.data.data || [];
+    } catch (error) {
+      console.error('Failed to list collections:', error);
+      return [];
+    }
+  }
+
+  async getCollection(id: string): Promise<any> {
+    try {
+      const response = await this.client.get(`/collections/${id}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to get collection:', error);
+      throw error;
+    }
+  }
+
+  async updateCollection(
+    id: string,
+    data: {
+      name?: string;
+      description?: string;
+      isPublic?: boolean;
+      coverImage?: string;
+      sortOrder?: number;
+    }
+  ): Promise<any> {
+    try {
+      const response = await this.client.put(`/collections/${id}`, data);
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to update collection:', error);
+      throw error;
+    }
+  }
+
+  async deleteCollection(id: string): Promise<void> {
+    try {
+      await this.client.delete(`/collections/${id}`);
+    } catch (error) {
+      console.error('Failed to delete collection:', error);
+      throw error;
+    }
+  }
+
+  async addToCollection(collectionId: string, conceptIds: string[]): Promise<any> {
+    try {
+      const response = await this.client.post(`/collections/${collectionId}/concepts`, {
+        conceptIds,
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to add to collection:', error);
+      throw error;
+    }
+  }
+
+  async removeFromCollection(collectionId: string, conceptId: string): Promise<any> {
+    try {
+      const response = await this.client.delete(
+        `/collections/${collectionId}/concepts/${conceptId}`
+      );
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to remove from collection:', error);
+      throw error;
+    }
+  }
+
+  async inviteCollaborator(
+    collectionId: string,
+    userId: string,
+    permission: 'view' | 'edit' | 'admin'
+  ): Promise<any> {
+    try {
+      const response = await this.client.post(`/collections/${collectionId}/collaborators`, {
+        userId,
+        permission,
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to invite collaborator:', error);
+      throw error;
+    }
+  }
+
+  async removeCollaborator(collectionId: string, collaboratorId: string): Promise<void> {
+    try {
+      await this.client.delete(`/collections/${collectionId}/collaborators/${collaboratorId}`);
+    } catch (error) {
+      console.error('Failed to remove collaborator:', error);
+      throw error;
+    }
+  }
+
+  // ─── Comment Methods ───────────────────────────────────────────────────
+
+  /**
+   * Create a new comment on a concept
+   */
+  async createComment(data: {
+    conceptId: string;
+    content: string;
+    parentId?: string;
+  }): Promise<any> {
+    try {
+      const response = await this.client.post('/comments', data);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to create comment:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all comments for a concept (with nested replies)
+   */
+  async getConceptComments(conceptId: string, sortBy: 'recent' | 'oldest' = 'recent'): Promise<{
+    comments: any[];
+    total: number;
+  }> {
+    try {
+      const response = await this.client.get(`/comments/concept/${conceptId}`, {
+        params: { sortBy },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch comments:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get user's recent comments
+   */
+  async getUserComments(params?: {
+    limit?: number;
+    page?: number;
+  }): Promise<any> {
+    try {
+      const response = await this.client.get('/comments/my-comments', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch user comments:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update a comment
+   */
+  async updateComment(commentId: string, content: string): Promise<any> {
+    try {
+      const response = await this.client.put(`/comments/${commentId}`, { content });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update comment:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a comment
+   */
+  async deleteComment(commentId: string): Promise<void> {
+    try {
+      await this.client.delete(`/comments/${commentId}`);
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+      throw error;
+    }
+  }
 }
 
 // Export singleton instance
