@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import Stripe from "stripe";
+import Redis from "ioredis";
 import { ValidationError } from "../../../../packages/error-handler";
-import redis from "../../../../packages/libs/redis";
 import prisma from "../../../../packages/libs/prisma";
 import crypto from "crypto";
 import { Prisma } from "@prisma/client";
@@ -9,6 +9,9 @@ import { sendEmail } from "../utils/send-email";
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY!, {
   apiVersion: "2025-06-30.basil",
 });
+
+// Initialize Redis client once
+const redisClient = new Redis(process.env.REDIS_URL as string);
 
 // create payment intent
 export const createPaymentIntent = async (
@@ -70,10 +73,10 @@ export const createPaymentSession = async (
         .sort((a, b) => a.id.localCompare(b.id))
     );
 
-    const keys = await redis.keys("payment-session:*");
+    const keys = await redisClient.keys("payment-session:*");
 
     for (const key of keys) {
-      const data = await redis.get(key);
+      const data = await redisClient.get(key);
       if (data) {
         const session = JSON.parse(data);
         if (session.userId === userId) {
@@ -94,7 +97,7 @@ export const createPaymentSession = async (
               sessionId: key.split(":")[1],
             });
           } else {
-            await redis.del(key);
+            await redisClient.del(key);
           }
         }
       }
@@ -143,7 +146,7 @@ export const createPaymentSession = async (
       coupon: coupon || null,
     };
 
-    await redis.setex(
+    await redisClient.setex(
       `payment-session:${sessionId}`,
       600,
       JSON.stringify(sessionData)
@@ -173,7 +176,7 @@ export const verifyingPaymentSession = async (
 
     // fetch session from redis
     const sessionKey = `payment-session:${sessionId}`;
-    const sessionData = await redis.get(sessionKey);
+    const sessionData = await redisClient.get(sessionKey);
 
     if (!sessionData) {
       return res.status(404).json({
@@ -224,7 +227,7 @@ export const createOrder = async (
       const userId = paymentIntent.metadata.userId;
 
       const sessionKey = `payment-session:${sessionId}`;
-      const sessionData = await redis.get(sessionKey);
+      const sessionData = await redisClient.get(sessionKey);
 
       if (!sessionData) {
         console.warn("Session data expired or missing for ", sessionId);
@@ -459,7 +462,7 @@ export const createOrder = async (
           }
         })
 
-        await redis.del(sessionKey)
+        await redisClient.del(sessionKey)
 
 
       }
@@ -492,7 +495,7 @@ export const verifySessionAndCreateIntent = async (
 
     // Fetch session from redis
     const sessionKey = `payment-session:${sessionId}`;
-    const sessionData = await redis.get(sessionKey);
+    const sessionData = await redisClient.get(sessionKey);
 
     if (!sessionData) {
       return res.status(404).json({
@@ -515,21 +518,27 @@ export const verifySessionAndCreateIntent = async (
     const customerAmount = Math.round(totalAmount * 100);
     const platformFee = Math.floor(customerAmount * 0.1); // 10% admin margin
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntentConfig: Stripe.PaymentIntentCreateParams = {
       amount: customerAmount,
       currency: "usd",
       payment_method_types: ["card"],
-      application_fee_amount: platformFee,
-      transfer_data: {
-        destination: firstSeller.stripeAccountId,
-      },
       metadata: {
         sessionId,
         userId: req.user.id,
         shopId: firstSeller.shopId,
         sellerId: firstSeller.sellerId,
       },
-    });
+    };
+
+    // Only add transfer_data if the account ID is valid (not a seed test ID)
+    if (firstSeller.stripeAccountId && !firstSeller.stripeAccountId.startsWith('acct_test_')) {
+      paymentIntentConfig.transfer_data = {
+        destination: firstSeller.stripeAccountId,
+      };
+      paymentIntentConfig.application_fee_amount = platformFee;
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create(paymentIntentConfig);
 
     return res.status(200).json({
       clientSecret: paymentIntent.client_secret,

@@ -15,6 +15,12 @@ import {
     getSellerPayouts,
     requestSellerPayout
 } from '../controllers/order.controller';
+import {
+    getSellerOrders,
+    updateOrderStatus,
+    getSellerAnalytics,
+    getSellerOrderDetails
+} from '../controllers/seller-order.controller';
 
 const router: Router = express.Router();
 
@@ -41,5 +47,13 @@ router.post("/refunds/request", isAuthenticated, requestRefund);
 router.get("/seller/earnings", isAuthenticated, isSeller, getSellerEarnings);
 router.get("/seller/payouts", isAuthenticated, isSeller, getSellerPayouts);
 router.post("/seller/payouts/request", isAuthenticated, isSeller, requestSellerPayout);
+
+// ============================================
+// SELLER ORDER MANAGEMENT
+// ============================================
+router.get("/seller/orders", isAuthenticated, isSeller, getSellerOrders);
+router.get("/seller/orders/:orderId", isAuthenticated, isSeller, getSellerOrderDetails);
+router.put("/seller/orders/:orderId/status", isAuthenticated, isSeller, updateOrderStatus);
+router.get("/seller/analytics", isAuthenticated, isSeller, getSellerAnalytics);
 
 export default router;
