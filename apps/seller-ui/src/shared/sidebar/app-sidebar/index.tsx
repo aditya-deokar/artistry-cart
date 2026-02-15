@@ -15,7 +15,7 @@ import {
 
 import { NavMain } from "./nav-main";
 import Link from "next/link";
-import { BookTemplate, Home, SquarePlus, HandCoins, PackageSearch, CalendarPlus, Calendar, Mail, BellRing, TicketPercent, LogOut, Store, Settings, User, ChevronRight, Sparkles} from "lucide-react";
+import { BookTemplate, Home, SquarePlus, HandCoins, PackageSearch, CalendarPlus, Calendar, Mail, BellRing, TicketPercent, LogOut, Store, Settings, User, ChevronRight, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import useSeller from "@/hooks/useSeller";
@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function AppSidebar({
   ...props
-}:  React.ComponentProps<typeof Sidebar>) {
+}: React.ComponentProps<typeof Sidebar>) {
 
   const { seller, isLoading } = useSeller();
 
@@ -57,8 +57,8 @@ export function AppSidebar({
           ) : seller?.shop?.logo?.url ? (
             <>
               <div className="flex aspect-square size-10 items-center justify-center rounded-xl overflow-hidden bg-muted shadow-lg group-hover:shadow-primary/25 transition-all">
-                <img 
-                  src={seller.shop.logo.url} 
+                <img
+                  src={seller.shop.logo.url}
                   alt={seller.shop.name}
                   className="w-full h-full object-cover"
                 />
@@ -124,7 +124,17 @@ export function AppSidebar({
             <NavMain items={data.communications} />
           </SidebarGroupContent>
         </SidebarGroup>
-        
+
+        {/* Configuration Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+            Configuration
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <NavMain items={data.configuration} />
+          </SidebarGroupContent>
+        </SidebarGroup>
+
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border/40 p-3">
@@ -139,14 +149,14 @@ export function AppSidebar({
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <SidebarMenuButton 
-                size="lg" 
+              <SidebarMenuButton
+                size="lg"
                 className="w-full hover:bg-accent/50 data-[state=open]:bg-accent transition-colors"
               >
                 <Avatar className="size-8 rounded-lg border-2 border-primary/20">
-                  <AvatarImage 
-                    src={seller?.avatar?.url || seller?.shop?.logo?.url} 
-                    alt={seller?.name || "Seller"} 
+                  <AvatarImage
+                    src={seller?.avatar?.url || seller?.shop?.logo?.url}
+                    alt={seller?.name || "Seller"}
                   />
                   <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-semibold">
                     {getInitials(seller?.name)}
@@ -163,9 +173,9 @@ export function AppSidebar({
                 <ChevronRight className="ml-auto size-4 text-muted-foreground" />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              side="top" 
-              align="end" 
+            <DropdownMenuContent
+              side="top"
+              align="end"
               className="w-56 mb-2"
             >
               <DropdownMenuLabel className="font-normal">
@@ -257,7 +267,7 @@ export const data = {
       url: "/dashboard/discounts",
       icon: TicketPercent,
     },
-    
+
   ],
   communications: [
     {
@@ -270,5 +280,22 @@ export const data = {
       url: "/dashboard/notifications",
       icon: BellRing,
     },
+    {
+      title: "Reviews",
+      url: "/dashboard/reviews",
+      icon: Sparkles,
+    },
   ],
+  configuration: [
+    {
+      title: "Analytics",
+      url: "/dashboard/analytics",
+      icon: BookTemplate, // Placeholder icon
+    },
+    {
+      title: "Settings",
+      url: "/dashboard/settings",
+      icon: Settings,
+    },
+  ]
 };

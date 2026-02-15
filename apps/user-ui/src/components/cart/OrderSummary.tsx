@@ -28,7 +28,7 @@ type OrderSummaryProps = {
 export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
   const router = useRouter();
   const [isLoadingCheckout, setIsLoadingCheckout] = useState<boolean>(false);
-  
+
   // 1. --- State to manage the selected address ---
   const [selectedAddress, setSelectedAddress] = useState<AddressData | null>(null);
 
@@ -36,21 +36,21 @@ export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
   const removeCoupon = useStore((state) => state.actions.removeCoupon);
 
   // 2. --- Fetch user addresses ---
-  const { data: addresses, isLoading: isLoadingAddresses ,isSuccess } = useQuery<AddressData[]>({
+  const { data: addresses, isLoading: isLoadingAddresses, isSuccess } = useQuery<AddressData[]>({
     queryKey: ['userAddresses'],
     // <-- FIXED: Correct API endpoint
     queryFn: async () => (await axiosInstance.get('/auth/api/me/addresses')).data.addresses,
-    
+
   });
 
-    useEffect(() => {
+  useEffect(() => {
     // This effect runs only when the query is successful and the data is available
     if (isSuccess && addresses && addresses.length > 0) {
-        // Find the default address, or fall back to the first one
-        const defaultAddress = addresses.find(addr => addr.isDefault) || addresses[0];
-        setSelectedAddress(defaultAddress);
+      // Find the default address, or fall back to the first one
+      const defaultAddress = addresses.find(addr => addr.isDefault) || addresses[0];
+      setSelectedAddress(defaultAddress);
     }
-  }, [isSuccess, addresses]); 
+  }, [isSuccess, addresses]);
 
 
   // 3. --- Checkout session creation logic ---
@@ -63,21 +63,20 @@ export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
     try {
       const res = await axiosInstance.post('/order/api/create-payment-session', {
         cart,
-        selectedAddress,
-        // <-- FIXED: Send the applied coupon details
+        selectedAddressId: selectedAddress.id, // Send address ID, not full object
         coupon: appliedCoupon ? {
-            code: appliedCoupon.discountCode,
-            type: appliedCoupon.discountType,
-            value: appliedCoupon.discountValue,
+          code: appliedCoupon.discountCode,
+          type: appliedCoupon.discountType,
+          value: appliedCoupon.discountValue,
         } : null,
       });
 
-      // Assuming the API returns a URL to redirect to (e.g., Stripe Checkout)
-      const redirectUrl = res.data.url;
-      if (redirectUrl) {
-          window.location.href = redirectUrl; // Redirect to external payment page
+      // Backend returns sessionId, redirect to checkout page
+      const sessionId = res.data.sessionId;
+      if (sessionId) {
+        router.push(`/checkout?sessionId=${sessionId}`);
       } else {
-          toast.error("Could not initiate payment session.");
+        toast.error("Could not initiate payment session.");
       }
 
     } catch (error) {
@@ -88,7 +87,7 @@ export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
   };
 
   // 4. --- Calculate final price ---
-  
+
   // Calculate event discounts already applied (difference between regular_price and pricing.finalPrice)
   const eventDiscountsAlreadyApplied = cart.reduce((total, item) => {
     if (item.pricing) {
@@ -123,12 +122,12 @@ export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
 
   // Calculate total discount (both event and coupon)
   let shippingCost = subtotal > 0 ? 50 : 0;
-  
+
   // Apply free shipping if coupon type is FREE_SHIPPING
   if (appliedCoupon && appliedCoupon.discountType === 'FREE_SHIPPING') {
     shippingCost = 0;
   }
-  
+
   const taxes = subtotal * 0.05; // Example: 5% tax
   const total = subtotal - couponDiscountAmount + shippingCost + taxes;
 
@@ -144,10 +143,10 @@ export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
           </h3>
 
           {isLoadingAddresses && <p className="text-sm text-muted-foreground">Loading addresses...</p>}
-          
+
           {!isLoadingAddresses && addresses && addresses.length > 0 ? (
             <Select
-              
+
               value={selectedAddress?.id}
               onValueChange={(id) => setSelectedAddress(addresses.find(addr => addr.id === id) || null)}
             >
@@ -201,21 +200,21 @@ export const OrderSummary = ({ subtotal, cart }: OrderSummaryProps) => {
         )}
 
         <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Shipping</span>
-            <span className={`font-medium ${shippingCost === 0 && appliedCoupon?.discountType === 'FREE_SHIPPING' ? 'text-green-500 line-through' : ''}`}>
-              {shippingCost === 0 && appliedCoupon?.discountType === 'FREE_SHIPPING' ? (
-                <span className="flex items-center gap-1">
-                  <span className="line-through text-muted-foreground">{formatPrice(50)}</span>
-                  <span className="text-green-500 font-semibold">FREE</span>
-                </span>
-              ) : (
-                formatPrice(shippingCost)
-              )}
-            </span>
+          <span className="text-muted-foreground">Shipping</span>
+          <span className={`font-medium ${shippingCost === 0 && appliedCoupon?.discountType === 'FREE_SHIPPING' ? 'text-green-500 line-through' : ''}`}>
+            {shippingCost === 0 && appliedCoupon?.discountType === 'FREE_SHIPPING' ? (
+              <span className="flex items-center gap-1">
+                <span className="line-through text-muted-foreground">{formatPrice(50)}</span>
+                <span className="text-green-500 font-semibold">FREE</span>
+              </span>
+            ) : (
+              formatPrice(shippingCost)
+            )}
+          </span>
         </div>
         <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Taxes</span>
-            <span className="font-medium">{formatPrice(taxes)}</span>
+          <span className="text-muted-foreground">Taxes</span>
+          <span className="font-medium">{formatPrice(taxes)}</span>
         </div>
       </div>
 

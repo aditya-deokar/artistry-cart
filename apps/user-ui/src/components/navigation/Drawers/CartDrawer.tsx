@@ -1,14 +1,18 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingBag, Minus, Plus, Trash2, ArrowRight, Tag } from 'lucide-react';
+import { X, ShoppingBag, Minus, Plus, Trash2, ArrowRight, Tag, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { useStore, type CartItem, type DiscountCode } from '@/store';
 import { formatPrice } from '@/lib/formatters';
+import axiosInstance from '@/utils/axiosinstance';
+import { toast } from 'sonner';
+import { useAuthStore } from '@/store/authStore';
 
 interface CartDrawerProps {
     isOpen: boolean;
@@ -165,6 +169,46 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     const updateQuantity = useStore((state) => state.actions.updateQuantity);
     const removeFromCart = useStore((state) => state.actions.removeFromCart);
 
+    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+
+    const handleCheckout = async () => {
+        if (!isLoggedIn) {
+            toast.error("Please login to continue to checkout");
+            router.push("/login?redirect=/checkout");
+            onClose();
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            // 1. Create Checkout Session
+            const response = await axiosInstance.post('/order/api/create-payment-session', {
+                cart,
+                couponCode: appliedCoupon?.code,
+            });
+
+            const { sessionId } = response.data;
+
+            // 2. Redirect to Checkout with Session ID
+            onClose();
+            router.push(`/checkout?sessionId=${sessionId}`);
+        } catch (error: any) {
+            console.error("Checkout initialization failed:", error);
+
+            if (error?.response?.status === 401) {
+                toast.error("Session expired. Please login again.");
+                router.push("/login?redirect=/checkout");
+                onClose();
+            } else {
+                toast.error("Failed to start checkout. Please try again.");
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     // Prevent body scroll when drawer is open
     useEffect(() => {
         if (isOpen) {
@@ -317,12 +361,17 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
                                     {/* Actions */}
                                     <div className="space-y-3">
-                                        <Link href="/checkout" onClick={onClose} className="block">
-                                            <Button className="w-full h-12 group bg-[var(--ac-charcoal)] dark:bg-[var(--ac-pearl)] text-[var(--ac-pearl)] dark:text-[var(--ac-charcoal)] hover:bg-[var(--ac-gold)] text-sm font-medium tracking-wide transition-all duration-300">
-                                                <span>Proceed to Checkout</span>
-                                                <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-                                            </Button>
-                                        </Link>
+                                        <Button
+                                            onClick={handleCheckout}
+                                            disabled={isLoading}
+                                            className="w-full h-12 group bg-[var(--ac-charcoal)] dark:bg-[var(--ac-pearl)] text-[var(--ac-pearl)] dark:text-[var(--ac-charcoal)] hover:bg-[var(--ac-gold)] text-sm font-medium tracking-wide transition-all duration-300"
+                                        >
+                                            {isLoading ? (
+                                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                            ) : null}
+                                            <span>Proceed to Checkout</span>
+                                            {!isLoading && <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />}
+                                        </Button>
                                         <Link href="/cart" onClick={onClose} className="block">
                                             <Button
                                                 variant="outline"

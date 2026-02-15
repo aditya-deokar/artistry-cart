@@ -12,7 +12,7 @@ import initializeConfig from './libs/initializeSiteConfig';
 const app = express();
 
 app.use(cors({
-  origin: ["http://localhost:3000"],
+  origin: ["http://localhost:3000", "http://localhost:3001"],
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
 }));
@@ -53,9 +53,12 @@ app.get('/gateway-health', (req, res) => {
 
 app.use("/auth", proxy("http://localhost:6001"));
 app.use("/product", proxy("http://localhost:6002"));
-app.use("/order", proxy("http://localhost:6004"))
+// app.use("/order", proxy("http://localhost:6004"))
 app.use("/recommendation", proxy("http://localhost:6005"))
 app.use("/ai-vision", proxy("http://localhost:6006"))
+app.use("/order", proxy("http://localhost:6004", {
+  proxyReqPathResolver: (req) => req.originalUrl
+}));
 
 const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {

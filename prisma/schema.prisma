@@ -77,12 +77,17 @@ model orders {
   // Relation to OrderItems
   items OrderItem[]
 
+  // Payment relation
+  payment payments?
+
   discountUsage discount_usage[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([shopId])
+  @@index([status])
 }
 
 model OrderItem {
@@ -148,17 +153,19 @@ model shops {
 }
 
 model sellers {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  email        String  @unique
-  phone_number String
-  country      String
-  password     String?
-  stripeId     String?
-  shop         shops?
+  id                       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name                     String
+  email                    String  @unique
+  phone_number             String
+  country                  String
+  password                 String?
+  stripeId                 String?
+  stripeOnboardingComplete Boolean @default(false)
+  shop                     shops?
 
   events        events[]
   discountCodes discount_codes[]
+  payouts       payouts[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -501,6 +508,139 @@ model discount_usage {
 }
 
 // ============================================
+// PAYMENT SYSTEM MODELS
+// ============================================
+
+// Payment Transaction Record
+model payments {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Order relation
+  orderId String @unique @db.ObjectId
+  order   orders @relation(fields: [orderId], references: [id])
+
+  // Stripe identifiers
+  stripePaymentIntent String  @unique
+  stripeChargeId      String?
+
+  // Amount breakdown (all in cents, stored as Float for MongoDB compatibility)
+  amount       Float // Total amount charged to customer
+  currency     String @default("usd")
+  platformFee  Float // 10% admin margin
+  sellerAmount Float // 90% to seller
+  stripeFee    Float? // Stripe processing fee (for records)
+
+  // Status tracking
+  status        PaymentStatus @default(PENDING)
+  paymentMethod String? // "card", "bank_transfer", etc.
+
+  // Additional data
+  metadata     Json?
+  errorMessage String?
+
+  // Refunds relation
+  refunds refunds[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Seller Payout Record
+model payouts {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Seller relation
+  sellerId String  @db.ObjectId
+  seller   sellers @relation(fields: [sellerId], references: [id])
+
+  // Stripe identifiers
+  stripeTransferId String? @unique
+  stripePayoutId   String?
+
+  // Amount details
+  amount   Float
+  currency String       @default("usd")
+  status   PayoutStatus @default(PENDING)
+
+  // Payout period (for scheduled payouts)
+  periodStart DateTime?
+  periodEnd   DateTime?
+
+  // Processing status
+  processedAt  DateTime?
+  failedAt     DateTime?
+  errorMessage String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sellerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Refund Record
+model refunds {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Payment relation
+  paymentId String   @db.ObjectId
+  payment   payments @relation(fields: [paymentId], references: [id])
+
+  // Stripe identifier
+  stripeRefundId String @unique
+
+  // Refund details
+  amount Float
+  reason String? // "duplicate", "fraudulent", "requested_by_customer"
+  status RefundStatus @default(PENDING)
+
+  // Who requested the refund
+  requestedBy     String @db.ObjectId // User or seller ID
+  requestedByType String // "customer", "seller", "admin"
+
+  // Processing status
+  processedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([paymentId])
+  @@index([status])
+}
+
+// Payment status enum
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+// Payout status enum
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+// Refund status enum
+enum RefundStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+}
+
+// ============================================
 // AI VISION MODELS
 // ============================================
 
@@ -645,6 +785,46 @@ model ArtisanMatch {
   @@index([status])
 }
 
+// Concept Collections - User-created folders for organizing concepts
+model ConceptCollection {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  name            String
+  description     String?
+  coverImage      String? // URL of concept image to use as cover
+  conceptIds      String[] @db.ObjectId
+  isPublic        Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  collaboratorIds String[] @default([]) @db.ObjectId
+  permissions     Json? // { userId: "view" | "edit" | "admin" }
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@index([isPublic])
+  @@index([collaboratorIds])
+}
+
+// Concept Comments - Discussion on concepts
+model ConceptComment {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  conceptId  String  @db.ObjectId
+  userId     String  @db.ObjectId
+  userName   String // Denormalized for performance
+  userAvatar String? // Denormalized for performance
+  content    String
+  parentId   String? @db.ObjectId // For replies
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([conceptId])
+  @@index([userId])
+  @@index([parentId])
+}
+
 // Rate Limiting (MongoDB-based, no Redis)
 model RateLimitEntry {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -739,9 +919,12 @@ enum UserRole {
 
 enum OrderStatus {
   PENDING
+  PAID
+  PROCESSING
   SHIPPED
   DELIVERED
   CANCELLED
+  REFUNDED
 }
 
 enum DeliveryStatus {

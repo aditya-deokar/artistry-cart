@@ -117,6 +117,36 @@ const redis = {
         }
     },
 
+    async keys(pattern: string): Promise<string[]> {
+        const client = getClient();
+        if (!client) return [];
+
+        try {
+            if (client.status !== "ready" && client.status !== "connect") {
+                await client.connect();
+            }
+            return await client.keys(pattern);
+        } catch (err) {
+            connectionFailed = true;
+            return [];
+        }
+    },
+
+    async setex(key: string, seconds: number, value: string): Promise<string | null> {
+        const client = getClient();
+        if (!client) return null;
+
+        try {
+            if (client.status !== "ready" && client.status !== "connect") {
+                await client.connect();
+            }
+            return await client.setex(key, seconds, value);
+        } catch (err) {
+            connectionFailed = true;
+            return null;
+        }
+    },
+
     isAvailable(): boolean {
         return !connectionFailed && redisClient !== null;
     }
