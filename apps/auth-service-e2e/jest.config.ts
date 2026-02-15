@@ -21,4 +21,13 @@ export default {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: 'test-output/jest/coverage',
+  testMatch: [
+    '**/*.e2e-spec.ts',
+    '**/*.spec.ts'
+  ],
+  testTimeout: 30000, // 30 seconds for E2E tests
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/support/'
+  ],
 };
