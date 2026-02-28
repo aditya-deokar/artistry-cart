@@ -5,7 +5,7 @@
  */
 import { vi } from 'vitest';
 
-export const transporterMock = {
+export const transporterMock: Record<string, any> = {
   sendMail: vi.fn().mockResolvedValue({
     messageId: '<test-message-id@localhost>',
     accepted: ['test@example.com'],
@@ -16,7 +16,7 @@ export const transporterMock = {
   close: vi.fn(),
 };
 
-export const nodemailerMock = {
+export const nodemailerMock: Record<string, any> = {
   createTransport: vi.fn().mockReturnValue(transporterMock),
 };
 

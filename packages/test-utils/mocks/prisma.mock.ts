@@ -30,7 +30,7 @@ function createModelMock() {
  * Create a fresh Prisma mock instance.
  * Call this in beforeEach() if you need a clean mock per test.
  */
-export function createPrismaMock() {
+export function createPrismaMock(): Record<string, any> {
   return {
     // Core models
     users: createModelMock(),

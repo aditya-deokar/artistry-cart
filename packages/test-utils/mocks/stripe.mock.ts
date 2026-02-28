@@ -7,7 +7,7 @@
 import { vi } from 'vitest';
 
 /** Individual method mocks — accessible for assertions */
-export const stripeMethodMocks = {
+export const stripeMethodMocks: Record<string, any> = {
   paymentIntents: {
     create: vi.fn().mockResolvedValue({
       id: 'pi_test_123',
@@ -97,7 +97,7 @@ export const stripeMethodMocks = {
  * }));
  * ```
  */
-export const StripeMockConstructor = vi.fn().mockImplementation(() => stripeMethodMocks);
+export const StripeMockConstructor: any = vi.fn().mockImplementation(() => stripeMethodMocks);
 
 /** Reset all Stripe mocks */
 export function resetStripeMock(): void {

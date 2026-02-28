@@ -5,7 +5,7 @@
  */
 import { vi } from 'vitest';
 
-export const kafkaProducerMock = {
+export const kafkaProducerMock: Record<string, any> = {
   connect: vi.fn().mockResolvedValue(undefined),
   disconnect: vi.fn().mockResolvedValue(undefined),
   send: vi.fn().mockResolvedValue([{ topicName: 'test-topic', partition: 0, errorCode: 0, offset: '0' }]),
@@ -14,7 +14,7 @@ export const kafkaProducerMock = {
   events: {},
 };
 
-export const kafkaConsumerMock = {
+export const kafkaConsumerMock: Record<string, any> = {
   connect: vi.fn().mockResolvedValue(undefined),
   disconnect: vi.fn().mockResolvedValue(undefined),
   subscribe: vi.fn().mockResolvedValue(undefined),
@@ -25,7 +25,7 @@ export const kafkaConsumerMock = {
   events: {},
 };
 
-export const kafkaAdminMock = {
+export const kafkaAdminMock: Record<string, any> = {
   connect: vi.fn().mockResolvedValue(undefined),
   disconnect: vi.fn().mockResolvedValue(undefined),
   createTopics: vi.fn().mockResolvedValue(true),
@@ -35,7 +35,7 @@ export const kafkaAdminMock = {
 };
 
 /** The kafka instance mock that mimics `new Kafka(config)` */
-export const kafkaMock = {
+export const kafkaMock: Record<string, any> = {
   producer: vi.fn().mockReturnValue(kafkaProducerMock),
   consumer: vi.fn().mockReturnValue(kafkaConsumerMock),
   admin: vi.fn().mockReturnValue(kafkaAdminMock),

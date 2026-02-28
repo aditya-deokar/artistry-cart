@@ -25,10 +25,9 @@ const { mockRecommendProducts } = vi.hoisted(() => ({
 }));
 
 // ── Module mocks ──
-vi.mock('../../../../packages/libs/prisma', async () => {
-  const { prismaMock: pm } = await import('../../../../packages/test-utils/mocks/prisma.mock');
-  return { default: pm };
-});
+vi.mock('../../../../packages/libs/prisma', () => ({
+  default: prismaMock,
+}));
 
 vi.mock('../services/recommendation-service', () => ({
   recommendProducts: mockRecommendProducts,

@@ -1,0 +1,35 @@
+# E2E Test Infrastructure
+#
+# Spins up test MongoDB + Redis for E2E tests.
+#
+# Usage:
+#   docker compose -f docker-compose.test.yml up -d
+#   <run e2e tests>
+#   docker compose -f docker-compose.test.yml down -v
+
+services:
+  mongodb-test:
+    image: mongo:7
+    container_name: artistry-cart-mongo-test
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_DATABASE: artistry_cart_test
+    tmpfs:
+      - /data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis-test:
+    image: redis:7-alpine
+    container_name: artistry-cart-redis-test
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

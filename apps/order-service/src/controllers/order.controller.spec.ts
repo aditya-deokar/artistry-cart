@@ -28,22 +28,6 @@ import {
   resetFactoryCounter,
 } from '../../../../packages/test-utils';
 
-// ── Hoist mock references so they're available inside vi.mock() factories ──
-const {
-  hoistedStripeMethods,
-  hoistedStripeCtor,
-  hoistedRedisMock,
-  hoistedPrismaMock,
-} = vi.hoisted(() => {
-  // We must import synchronously inside hoisted — these run before vi.mock.
-  return {
-    hoistedStripeMethods: null as any,
-    hoistedStripeCtor: null as any,
-    hoistedRedisMock: null as any,
-    hoistedPrismaMock: null as any,
-  };
-});
-
 // ── Module-level mocks ──
 vi.mock('stripe', () => {
   // StripeMockConstructor is already loaded by the time tests run.
@@ -58,10 +42,9 @@ vi.mock('ioredis', () => {
   return { default: function (..._args: any[]) { return redisMock; } };
 });
 
-vi.mock('../../../../packages/libs/prisma', async () => {
-  const { prismaMock: pm } = await import('../../../../packages/test-utils/mocks/prisma.mock');
-  return { default: pm };
-});
+vi.mock('../../../../packages/libs/prisma', () => ({
+  default: prismaMock,
+}));
 
 vi.mock('../utils/send-email', () => ({
   sendEmail: vi.fn().mockResolvedValue(true),

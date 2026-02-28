@@ -1,7 +1,7 @@
-import { defineProject } from 'vitest/config';
+import { defineConfig } from 'vitest/config';
 import path from 'path';
 
-export default defineProject({
+export default defineConfig({
   test: {
     name: 'recommendation-service',
     globals: true,

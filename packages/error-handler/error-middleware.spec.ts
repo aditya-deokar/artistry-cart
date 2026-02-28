@@ -43,15 +43,13 @@ const mockNext: NextFunction = vi.fn();
 // ── Test Suite ───────────────────────────────────────────────────────────────
 
 describe('errorMiddleware', () => {
-  const originalEnv = process.env.NODE_ENV;
-
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.NODE_ENV = 'test';
+    vi.stubEnv('NODE_ENV', 'test');
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv;
+    vi.unstubAllEnvs();
   });
 
   // ─ AppError subclass handling ─────────────────────────────────────────────
@@ -346,7 +344,7 @@ describe('errorMiddleware', () => {
 
   describe('Unknown errors', () => {
     it('should handle unknown errors → 500 with message in non-production', () => {
-      process.env.NODE_ENV = 'development';
+      vi.stubEnv('NODE_ENV', 'development');
       const err = new Error('Something unexpected');
       const req = mockRequest();
       const res = mockResponse();
@@ -364,7 +362,7 @@ describe('errorMiddleware', () => {
     });
 
     it('should not expose error details in production (NODE_ENV=production)', () => {
-      process.env.NODE_ENV = 'production';
+      vi.stubEnv('NODE_ENV', 'production');
       const err = new Error('secret internal detail');
       const req = mockRequest();
       const res = mockResponse();

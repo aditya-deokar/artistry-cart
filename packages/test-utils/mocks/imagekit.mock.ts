@@ -5,7 +5,7 @@
  */
 import { vi } from 'vitest';
 
-export const imagekitMock = {
+export const imagekitMock: Record<string, any> = {
   upload: vi.fn().mockResolvedValue({
     url: 'https://ik.imagekit.io/test/product-123.jpg',
     fileId: 'file-id-123',

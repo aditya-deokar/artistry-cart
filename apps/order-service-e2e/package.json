@@ -1,0 +1,22 @@
+{
+  "name": "@artistry-cart/order-service-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@artistry-cart/order-service"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "npx vitest run --config apps/order-service-e2e/vitest.config.ts"
+        },
+        "dependsOn": [
+          "@artistry-cart/order-service:build",
+          "@artistry-cart/order-service:serve"
+        ]
+      }
+    }
+  }
+}

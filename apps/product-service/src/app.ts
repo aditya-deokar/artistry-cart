@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type Express } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorMiddleware } from '../../../packages/error-handler/error-middelware';
@@ -9,7 +9,7 @@ import shopRouter from './routes/shop.route';
 import searchRouter from './routes/search.route';
 import offersRouter from './routes/offers.route';
 
-const app = express();
+const app: Express = express();
 
 // Enhanced CORS configuration
 app.use(cors({

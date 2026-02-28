@@ -13,16 +13,13 @@ import {
   mockNext,
   createMockShop,
   createMockOrder,
-  createMockOrderItem,
-  createMockPayment,
   resetFactoryCounter,
 } from '../../../../packages/test-utils';
 
 // ── Module mocks ──
-vi.mock('../../../../packages/libs/prisma', async () => {
-  const { prismaMock: pm } = await import('../../../../packages/test-utils/mocks/prisma.mock');
-  return { default: pm };
-});
+vi.mock('../../../../packages/libs/prisma', () => ({
+  default: prismaMock,
+}));
 
 import {
   getSellerOrders,

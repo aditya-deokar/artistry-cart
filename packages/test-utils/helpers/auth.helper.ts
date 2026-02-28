@@ -4,7 +4,7 @@
  * Utilities for creating mock JWT tokens and auth headers for
  * integration tests (Supertest).
  */
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 
 const ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET || 'test-access-token-secret-key-for-testing';
 const REFRESH_SECRET = process.env.REFRESH_TOKEN_SECRET || 'test-refresh-token-secret-key-for-testing';
@@ -18,28 +18,28 @@ interface TokenPayload {
  * Create a signed access token for testing.
  */
 export function createMockAccessToken(payload: TokenPayload, expiresIn = '15m'): string {
-  return jwt.sign(payload, ACCESS_SECRET, { expiresIn });
+  return jwt.sign(payload, ACCESS_SECRET, { expiresIn } as SignOptions);
 }
 
 /**
  * Create a signed refresh token for testing.
  */
 export function createMockRefreshToken(payload: TokenPayload, expiresIn = '7d'): string {
-  return jwt.sign(payload, REFRESH_SECRET, { expiresIn });
+  return jwt.sign(payload, REFRESH_SECRET, { expiresIn } as SignOptions);
 }
 
 /**
  * Create an expired access token for testing auth failures.
  */
 export function createExpiredAccessToken(payload: TokenPayload): string {
-  return jwt.sign(payload, ACCESS_SECRET, { expiresIn: '0s' });
+  return jwt.sign(payload, ACCESS_SECRET, { expiresIn: '0s' } as SignOptions);
 }
 
 /**
  * Create a token signed with a wrong secret for testing invalid tokens.
  */
 export function createInvalidAccessToken(payload: TokenPayload): string {
-  return jwt.sign(payload, 'wrong-secret', { expiresIn: '15m' });
+  return jwt.sign(payload, 'wrong-secret', { expiresIn: '15m' } as SignOptions);
 }
 
 /**

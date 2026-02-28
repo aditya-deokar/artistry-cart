@@ -1,0 +1,175 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [master, develop]
+  push:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  PNPM_VERSION: "9"
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Unit & Integration Tests
+  # ──────────────────────────────────────────────
+  unit-integration:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history for nx affected
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      # Run affected tests (PRs) or all tests (push to master)
+      - name: Run affected tests
+        if: github.event_name == 'pull_request'
+        run: pnpm exec nx affected --target=test --base=origin/master --head=HEAD
+
+      - name: Run all tests
+        if: github.event_name == 'push'
+        run: pnpm exec vitest run
+
+      # Coverage report (always on push to master)
+      - name: Run tests with coverage
+        if: github.event_name == 'push'
+        run: pnpm exec vitest run --coverage
+
+      - name: Upload coverage to Codecov
+        if: github.event_name == 'push'
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/coverage-final.json
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  # ──────────────────────────────────────────────
+  # E2E Tests
+  # ──────────────────────────────────────────────
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: unit-integration
+    timeout-minutes: 20
+
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand(\"ping\").ok'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: mongodb://localhost:27017/artistry-cart-test
+      REDIS_URL: redis://localhost:6379
+      NODE_ENV: test
+      JWT_SECRET: test-jwt-secret-for-ci
+      JWT_REFRESH_SECRET: test-jwt-refresh-secret-for-ci
+      STRIPE_SECRET_KEY: sk_test_placeholder
+      STRIPE_WEBHOOK_SECRET: whsec_test_placeholder
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      # Build and start services in background
+      - name: Build services
+        run: pnpm exec nx run-many --target=build --projects=auth-service,product-service,order-service,recommendation-service,api-gateway --parallel=5
+
+      - name: Start auth-service
+        run: node dist/apps/auth-service/main.js &
+        env:
+          PORT: 6001
+
+      - name: Start product-service
+        run: node dist/apps/product-service/main.js &
+        env:
+          PORT: 6002
+
+      - name: Start order-service
+        run: node dist/apps/order-service/main.js &
+        env:
+          PORT: 6004
+
+      - name: Start recommendation-service
+        run: node dist/apps/recommendation-service/main.js &
+        env:
+          PORT: 6005
+
+      - name: Start api-gateway
+        run: node dist/apps/api-gateway/main.js &
+        env:
+          PORT: 8080
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for services..."
+          for port in 6001 6002 6004 6005 8080; do
+            for i in $(seq 1 30); do
+              if curl -s http://localhost:$port/ > /dev/null 2>&1; then
+                echo "  ✓ Port $port ready"
+                break
+              fi
+              sleep 1
+            done
+          done
+
+      - name: Run E2E tests
+        run: pnpm exec nx run-many --target=e2e --projects=auth-service-e2e,product-service-e2e,order-service-e2e,api-gateway-e2e,recommendation-service-e2e

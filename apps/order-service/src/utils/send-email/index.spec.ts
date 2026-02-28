@@ -12,10 +12,9 @@ import {
 } from '../../../../../packages/test-utils';
 
 // ── Module mocks ──
-vi.mock('nodemailer', async () => {
-  const { nodemailerMock: nm } = await import('../../../../../packages/test-utils/mocks/nodemailer.mock');
-  return { default: nm };
-});
+vi.mock('nodemailer', () => ({
+  default: nodemailerMock,
+}));
 
 vi.mock('ejs', () => ({
   __esModule: true,

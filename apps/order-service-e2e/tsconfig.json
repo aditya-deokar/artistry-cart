@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out-tsc/@artistry-cart/order-service-e2e",
+    "lib": ["es2022"],
+    "types": ["node"],
+    "esModuleInterop": true,
+    "noUnusedLocals": false,
+    "noImplicitAny": false
+  },
+  "include": ["vitest.config.ts", "src/**/*.ts"],
+  "references": []
+}
