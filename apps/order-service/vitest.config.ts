@@ -11,6 +11,7 @@ export default defineProject({
     setupFiles: [
       path.resolve(__dirname, '../../packages/test-utils/setup/global-setup.ts'),
       path.resolve(__dirname, '../../packages/test-utils/setup/custom-matchers.ts'),
+      path.resolve(__dirname, 'src/__tests__/setup.ts'),
     ],
     coverage: {
       provider: 'v8',
