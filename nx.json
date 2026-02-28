@@ -21,7 +21,6 @@
       "{workspaceRoot}/.github/workflows/test.yml"
     ]
   },
-  "nxCloudId": "686b8aa48c1ce5673416fcf1",
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
