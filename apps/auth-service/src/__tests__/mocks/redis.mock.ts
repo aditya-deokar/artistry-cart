@@ -5,7 +5,7 @@
  * Uses an in-memory Map to simulate Redis operations.
  */
 
-import { vi, type Mock } from 'vitest';
+import { vi } from 'vitest';
 
 // Type definition for the Redis mock
 export interface RedisMockType {

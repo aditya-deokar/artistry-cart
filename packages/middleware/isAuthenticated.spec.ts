@@ -6,7 +6,6 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Response, NextFunction } from 'express';
 
 // ── Mocks must be declared before vi.mock factories reference them ───────────
 // vi.hoisted ensures these run before the vi.mock factory closures.
