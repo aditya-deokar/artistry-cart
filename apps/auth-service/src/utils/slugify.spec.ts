@@ -4,19 +4,20 @@
  * Tests for slug generation and uniqueness checking.
  */
 
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { generateSlug, createUniqueSlug } from './slugify';
 
 // Create a minimal mock for PrismaClient that only includes what we need
 const mockPrisma = {
   shops: {
-    findUnique: jest.fn(),
+    findUnique: vi.fn(),
   },
 } as unknown as PrismaClient;
 
 describe('Slugify Utilities', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('generateSlug', () => {
@@ -84,7 +85,7 @@ describe('Slugify Utilities', () => {
 
   describe('createUniqueSlug', () => {
     it('should return base slug if unique', async () => {
-      (mockPrisma.shops.findUnique as jest.Mock).mockResolvedValueOnce(null);
+      (mockPrisma.shops.findUnique as Mock).mockResolvedValueOnce(null);
       
       const result = await createUniqueSlug('my-shop', mockPrisma);
       
@@ -95,7 +96,7 @@ describe('Slugify Utilities', () => {
     });
 
     it('should append counter if slug exists', async () => {
-      (mockPrisma.shops.findUnique as jest.Mock)
+      (mockPrisma.shops.findUnique as Mock)
         .mockResolvedValueOnce({ id: '1', slug: 'my-shop' }) // First call: exists
         .mockResolvedValueOnce(null); // Second call: unique
       
@@ -105,7 +106,7 @@ describe('Slugify Utilities', () => {
     });
 
     it('should increment counter until unique slug found', async () => {
-      (mockPrisma.shops.findUnique as jest.Mock)
+      (mockPrisma.shops.findUnique as Mock)
         .mockResolvedValueOnce({ id: '1', slug: 'my-shop' })
         .mockResolvedValueOnce({ id: '2', slug: 'my-shop-1' })
         .mockResolvedValueOnce({ id: '3', slug: 'my-shop-2' })
@@ -119,7 +120,7 @@ describe('Slugify Utilities', () => {
     it('should handle multiple concurrent slug checks', async () => {
       // Simulate a race condition scenario
       let callCount = 0;
-      (mockPrisma.shops.findUnique as jest.Mock).mockImplementation(async () => {
+      (mockPrisma.shops.findUnique as Mock).mockImplementation(async () => {
         callCount++;
         if (callCount <= 5) {
           return { id: `${callCount}`, slug: `my-shop${callCount > 1 ? `-${callCount - 1}` : ''}` };
@@ -133,7 +134,7 @@ describe('Slugify Utilities', () => {
     });
 
     it('should handle empty base slug', async () => {
-      (mockPrisma.shops.findUnique as jest.Mock).mockResolvedValueOnce(null);
+      (mockPrisma.shops.findUnique as Mock).mockResolvedValueOnce(null);
       
       const result = await createUniqueSlug('', mockPrisma);
       

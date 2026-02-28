@@ -4,6 +4,7 @@
  * Tests for profile management, orders, and address operations.
  */
 
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
 import {
   getCurrentUser,
@@ -19,13 +20,13 @@ import {
 import { prismaMock, createMockUser, resetPrismaMock } from '../__tests__/mocks/prisma.mock';
 
 // Mock dependencies
-jest.mock('../../../../packages/libs/prisma', () => ({
-  __esModule: true,
-  default: prismaMock,
-}));
-jest.mock('../../../../packages/libs/imageKit', () => ({
+vi.mock('../../../../packages/libs/prisma', async () => {
+  const { prismaMock } = await import('../__tests__/mocks/prisma.mock');
+  return { default: prismaMock };
+});
+vi.mock('../../../../packages/libs/imageKit', () => ({
   imagekit: {
-    upload: jest.fn().mockResolvedValue({
+    upload: vi.fn().mockResolvedValue({
       url: 'https://imagekit.io/test/avatar.jpg',
       fileId: 'file_123',
     }),
@@ -45,19 +46,19 @@ const mockRequest = (data: any = {}): any => ({
 
 const mockResponse = (): any => {
   const res: any = {};
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
-  res.cookie = jest.fn().mockReturnValue(res);
-  res.clearCookie = jest.fn().mockReturnValue(res);
+  res.status = vi.fn().mockReturnValue(res);
+  res.json = vi.fn().mockReturnValue(res);
+  res.cookie = vi.fn().mockReturnValue(res);
+  res.clearCookie = vi.fn().mockReturnValue(res);
   return res;
 };
 
-const mockNext = jest.fn();
+const mockNext = vi.fn();
 
 describe('User Controller', () => {
   beforeEach(() => {
     resetPrismaMock();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockNext.mockClear();
   });
 

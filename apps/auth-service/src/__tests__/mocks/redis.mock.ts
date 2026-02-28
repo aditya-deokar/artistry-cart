@@ -5,7 +5,7 @@
  * Uses an in-memory Map to simulate Redis operations.
  */
 
-import { jest } from "@jest/globals";
+import { vi, type Mock } from 'vitest';
 
 // Type definition for the Redis mock
 export interface RedisMockType {
@@ -32,7 +32,7 @@ export const createRedisMock = (): RedisMockType => ({
   store: redisStore,
   expiry: expiryStore,
   
-  get: jest.fn((key: string): Promise<string | null> => {
+  get: vi.fn((key: string): Promise<string | null> => {
     // Check if key has expired
     const expiry = expiryStore.get(key);
     if (expiry && Date.now() > expiry) {
@@ -43,8 +43,8 @@ export const createRedisMock = (): RedisMockType => ({
     return Promise.resolve(redisStore.get(key) || null);
   }),
   
-  set: jest.fn((key: string, value: string, ...args: any[]): Promise<string> => {
-    redisStore.set(key, value);
+  set: vi.fn((key: string, value: string, ...args: any[]): Promise<string> => {
+    redisStore.set(key, String(value));
     
     // Handle EX (expiry in seconds)
     if (args[0] === 'EX' && typeof args[1] === 'number') {
@@ -58,7 +58,7 @@ export const createRedisMock = (): RedisMockType => ({
     return Promise.resolve('OK');
   }),
   
-  del: jest.fn((...keys: string[]): Promise<number> => {
+  del: vi.fn((...keys: string[]): Promise<number> => {
     let deleted = 0;
     keys.forEach(key => {
       if (redisStore.delete(key)) {
@@ -69,7 +69,7 @@ export const createRedisMock = (): RedisMockType => ({
     return Promise.resolve(deleted);
   }),
   
-  exists: jest.fn((key: string): Promise<number> => {
+  exists: vi.fn((key: string): Promise<number> => {
     const expiry = expiryStore.get(key);
     if (expiry && Date.now() > expiry) {
       redisStore.delete(key);
@@ -79,7 +79,7 @@ export const createRedisMock = (): RedisMockType => ({
     return Promise.resolve(redisStore.has(key) ? 1 : 0);
   }),
   
-  expire: jest.fn((key: string, seconds: number): Promise<number> => {
+  expire: vi.fn((key: string, seconds: number): Promise<number> => {
     if (!redisStore.has(key)) {
       return Promise.resolve(0);
     }
@@ -87,7 +87,7 @@ export const createRedisMock = (): RedisMockType => ({
     return Promise.resolve(1);
   }),
   
-  ttl: jest.fn((key: string): Promise<number> => {
+  ttl: vi.fn((key: string): Promise<number> => {
     const expiry = expiryStore.get(key);
     if (!expiry) return Promise.resolve(-1);
     if (!redisStore.has(key)) return Promise.resolve(-2);
@@ -95,19 +95,19 @@ export const createRedisMock = (): RedisMockType => ({
     return Promise.resolve(ttl > 0 ? ttl : -2);
   }),
   
-  incr: jest.fn((key: string): Promise<number> => {
+  incr: vi.fn((key: string): Promise<number> => {
     const value = parseInt(redisStore.get(key) || '0') + 1;
     redisStore.set(key, value.toString());
     return Promise.resolve(value);
   }),
   
-  decr: jest.fn((key: string): Promise<number> => {
+  decr: vi.fn((key: string): Promise<number> => {
     const value = parseInt(redisStore.get(key) || '0') - 1;
     redisStore.set(key, value.toString());
     return Promise.resolve(value);
   }),
   
-  keys: jest.fn((pattern: string): Promise<string[]> => {
+  keys: vi.fn((pattern: string): Promise<string[]> => {
     if (pattern === '*') {
       return Promise.resolve(Array.from(redisStore.keys()));
     }
@@ -118,7 +118,7 @@ export const createRedisMock = (): RedisMockType => ({
     );
   }),
   
-  flushall: jest.fn((): Promise<string> => {
+  flushall: vi.fn((): Promise<string> => {
     redisStore.clear();
     expiryStore.clear();
     return Promise.resolve('OK');
