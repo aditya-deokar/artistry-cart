@@ -4,6 +4,7 @@
  * Tests for validation, OTP handling, and password management utilities.
  */
 
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { 
   validationRegistrationData, 
   checkOTPRestrictions, 
@@ -18,20 +19,23 @@ import { redisMock, resetRedisMock, setRedisKey, hasRedisKey } from '../__tests_
 import { prismaMock, createMockUser, resetPrismaMock } from '../__tests__/mocks/prisma.mock';
 
 // Mock dependencies
-jest.mock('../../../../packages/libs/redis', () => redisMock);
-jest.mock('../../../../packages/libs/prisma', () => ({
-  __esModule: true,
-  default: prismaMock,
-}));
-jest.mock('./sendMail', () => ({
-  sendEmail: jest.fn().mockResolvedValue(undefined),
+vi.mock('../../../../packages/libs/redis', async () => {
+  const { redisMock } = await import('../__tests__/mocks/redis.mock');
+  return { default: redisMock };
+});
+vi.mock('../../../../packages/libs/prisma', async () => {
+  const { prismaMock } = await import('../__tests__/mocks/prisma.mock');
+  return { default: prismaMock };
+});
+vi.mock('./sendMail', () => ({
+  sendEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe('Auth Helper Functions', () => {
   beforeEach(() => {
     resetRedisMock();
     resetPrismaMock();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('validationRegistrationData', () => {
@@ -120,7 +124,7 @@ describe('Auth Helper Functions', () => {
   });
 
   describe('checkOTPRestrictions', () => {
-    const mockNext = jest.fn();
+    const mockNext = vi.fn();
 
     beforeEach(() => {
       mockNext.mockClear();
@@ -156,7 +160,7 @@ describe('Auth Helper Functions', () => {
 
   describe('sendOTP', () => {
     it('should generate and store OTP in Redis', async () => {
-      const { sendEmail } = require('./sendMail');
+      const { sendEmail } = await import('./sendMail');
       
       await sendOTP('Test User', 'test@example.com', 'user-activation-mail');
       
@@ -180,7 +184,7 @@ describe('Auth Helper Functions', () => {
   });
 
   describe('trackOTPRequests', () => {
-    const mockNext = jest.fn();
+    const mockNext = vi.fn();
 
     beforeEach(() => {
       mockNext.mockClear();
@@ -214,7 +218,7 @@ describe('Auth Helper Functions', () => {
   });
 
   describe('verifyOTP', () => {
-    const mockNext = jest.fn();
+    const mockNext = vi.fn();
 
     beforeEach(() => {
       mockNext.mockClear();
@@ -254,8 +258,10 @@ describe('Auth Helper Functions', () => {
       await expect(verifyOTP('test@example.com', '5678', mockNext))
         .rejects.toThrow('Too many failed attempts, Your account is locked for 30 mins!');
       
-      // Verify lock was set
-      expect(hasRedisKey('otp_lock:test@example.com')).toBe(true);
+      // Verify lock was set (set is called before del in source, so check mock calls)
+      expect(redisMock.set).toHaveBeenCalledWith(
+        'otp_lock:test@example.com', 'locked', 'EX', 1800
+      );
     });
   });
 
@@ -263,11 +269,11 @@ describe('Auth Helper Functions', () => {
     const mockReq = (body: any) => ({ body } as any);
     const mockRes = () => {
       const res: any = {};
-      res.status = jest.fn().mockReturnValue(res);
-      res.json = jest.fn().mockReturnValue(res);
+      res.status = vi.fn().mockReturnValue(res);
+      res.json = vi.fn().mockReturnValue(res);
       return res;
     };
-    const mockNext = jest.fn();
+    const mockNext = vi.fn();
 
     beforeEach(() => {
       mockNext.mockClear();
@@ -312,11 +318,11 @@ describe('Auth Helper Functions', () => {
     const mockReq = (body: any) => ({ body } as any);
     const mockRes = () => {
       const res: any = {};
-      res.status = jest.fn().mockReturnValue(res);
-      res.json = jest.fn().mockReturnValue(res);
+      res.status = vi.fn().mockReturnValue(res);
+      res.json = vi.fn().mockReturnValue(res);
       return res;
     };
-    const mockNext = jest.fn();
+    const mockNext = vi.fn();
 
     beforeEach(() => {
       mockNext.mockClear();

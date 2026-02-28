@@ -1,42 +1,55 @@
 /**
  * Unit Tests for isAuthenticated Middleware
- * 
+ *
  * Tests for JWT token validation and user authentication.
+ * Migrated from Jest → Vitest.
  */
 
-import { Response, NextFunction } from 'express';
-import isAuthenticated from './isAuthenticated';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Create mock prisma
-const prismaMock = {
-  users: {
-    findUnique: jest.fn(),
-  },
-  sellers: {
-    findUnique: jest.fn(),
-  },
-};
-
-// Mock dependencies
-jest.mock('../libs/prisma', () => ({
-  __esModule: true,
-  default: prismaMock,
-}));
-jest.mock('jsonwebtoken', () => ({
-  verify: jest.fn(),
-  TokenExpiredError: class TokenExpiredError extends Error {
+// ── Mocks must be declared before vi.mock factories reference them ───────────
+// vi.hoisted ensures these run before the vi.mock factory closures.
+const { prismaMock, jwtMock, TokenExpiredError, JsonWebTokenError } = vi.hoisted(() => {
+  class TokenExpiredError extends Error {
     constructor(message: string) {
       super(message);
       this.name = 'TokenExpiredError';
     }
-  },
-  JsonWebTokenError: class JsonWebTokenError extends Error {
+  }
+  class JsonWebTokenError extends Error {
     constructor(message: string) {
       super(message);
       this.name = 'JsonWebTokenError';
     }
-  },
+  }
+
+  return {
+    prismaMock: {
+      users: { findUnique: vi.fn() },
+      sellers: { findUnique: vi.fn() },
+    },
+    jwtMock: {
+      verify: vi.fn(),
+      TokenExpiredError,
+      JsonWebTokenError,
+    },
+    TokenExpiredError,
+    JsonWebTokenError,
+  };
+});
+
+vi.mock('../libs/prisma', () => ({
+  __esModule: true,
+  default: prismaMock,
 }));
+
+vi.mock('jsonwebtoken', () => ({
+  __esModule: true,
+  default: jwtMock,
+  ...jwtMock,
+}));
+
+import isAuthenticated from './isAuthenticated';
 
 // Helper to create mock user
 const createMockUser = (overrides: any = {}) => ({
@@ -77,16 +90,16 @@ const mockRequest = (data: any = {}): any => ({
 
 const mockResponse = (): any => {
   const res: any = {};
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
+  res.status = vi.fn().mockReturnValue(res);
+  res.json = vi.fn().mockReturnValue(res);
   return res;
 };
 
-const mockNext = jest.fn();
+const mockNext = vi.fn();
 
 describe('isAuthenticated Middleware', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockNext.mockClear();
     prismaMock.users.findUnique.mockReset();
     prismaMock.sellers.findUnique.mockReset();
@@ -131,8 +144,10 @@ describe('isAuthenticated Middleware', () => {
       });
       const res = mockResponse();
 
-      const jwt = require('jsonwebtoken');
-      jwt.verify.mockReturnValueOnce({ id: 'user-123', role: 'user' });
+      jwtMock.verify.mockReturnValueOnce({
+        id: 'user-123',
+        role: 'user',
+      });
       prismaMock.users.findUnique.mockResolvedValueOnce(createMockUser());
 
       await isAuthenticated(req, res, mockNext);
@@ -149,8 +164,10 @@ describe('isAuthenticated Middleware', () => {
       });
       const res = mockResponse();
 
-      const jwt = require('jsonwebtoken');
-      jwt.verify.mockReturnValueOnce({ id: 'user-123', role: 'user' });
+      jwtMock.verify.mockReturnValueOnce({
+        id: 'user-123',
+        role: 'user',
+      });
       prismaMock.users.findUnique.mockResolvedValueOnce(createMockUser());
 
       await isAuthenticated(req, res, mockNext);
@@ -166,13 +183,18 @@ describe('isAuthenticated Middleware', () => {
       });
       const res = mockResponse();
 
-      const jwt = require('jsonwebtoken');
-      jwt.verify.mockReturnValueOnce({ id: 'user-123', role: 'user' });
+      jwtMock.verify.mockReturnValueOnce({
+        id: 'user-123',
+        role: 'user',
+      });
       prismaMock.users.findUnique.mockResolvedValueOnce(createMockUser());
 
       await isAuthenticated(req, res, mockNext);
 
-      expect(jwt.verify).toHaveBeenCalledWith('cookie-token', expect.any(String));
+      expect(jwtMock.verify).toHaveBeenCalledWith(
+        'cookie-token',
+        expect.any(String)
+      );
     });
   });
 
@@ -185,8 +207,10 @@ describe('isAuthenticated Middleware', () => {
       const res = mockResponse();
 
       const mockUser = createMockUser();
-      const jwt = require('jsonwebtoken');
-      jwt.verify.mockReturnValueOnce({ id: 'user-123', role: 'user' });
+      jwtMock.verify.mockReturnValueOnce({
+        id: 'user-123',
+        role: 'user',
+      });
       prismaMock.users.findUnique.mockResolvedValueOnce(mockUser);
 
       await isAuthenticated(req, res, mockNext);
@@ -203,8 +227,10 @@ describe('isAuthenticated Middleware', () => {
       });
       const res = mockResponse();
 
-      const jwt = require('jsonwebtoken');
-      jwt.verify.mockReturnValueOnce({ id: 'nonexistent', role: 'user' });
+      jwtMock.verify.mockReturnValueOnce({
+        id: 'nonexistent',
+        role: 'user',
+      });
       prismaMock.users.findUnique.mockResolvedValueOnce(null);
 
       await isAuthenticated(req, res, mockNext);
@@ -225,8 +251,10 @@ describe('isAuthenticated Middleware', () => {
       const res = mockResponse();
 
       const mockSeller = createMockSeller();
-      const jwt = require('jsonwebtoken');
-      jwt.verify.mockReturnValueOnce({ id: 'seller-123', role: 'seller' });
+      jwtMock.verify.mockReturnValueOnce({
+        id: 'seller-123',
+        role: 'seller',
+      });
       prismaMock.sellers.findUnique.mockResolvedValueOnce(mockSeller);
 
       await isAuthenticated(req, res, mockNext);
@@ -245,8 +273,10 @@ describe('isAuthenticated Middleware', () => {
 
       const mockSeller = createMockSeller();
       const mockShop = { id: 'shop-123', name: 'Test Shop' };
-      const jwt = require('jsonwebtoken');
-      jwt.verify.mockReturnValueOnce({ id: 'seller-123', role: 'seller' });
+      jwtMock.verify.mockReturnValueOnce({
+        id: 'seller-123',
+        role: 'seller',
+      });
       prismaMock.sellers.findUnique.mockResolvedValueOnce({
         ...mockSeller,
         shop: mockShop,
@@ -260,6 +290,27 @@ describe('isAuthenticated Middleware', () => {
         })
       );
     });
+
+    it('should return 401 if seller not found in database', async () => {
+      const req = mockRequest({
+        cookies: { access_token: 'valid-token' },
+        headers: {},
+      });
+      const res = mockResponse();
+
+      jwtMock.verify.mockReturnValueOnce({
+        id: 'nonexistent-seller',
+        role: 'seller',
+      });
+      prismaMock.sellers.findUnique.mockResolvedValueOnce(null);
+
+      await isAuthenticated(req, res, mockNext);
+
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Account not found!',
+      });
+    });
   });
 
   describe('Error Handling', () => {
@@ -270,9 +321,7 @@ describe('isAuthenticated Middleware', () => {
       });
       const res = mockResponse();
 
-      const jwt = require('jsonwebtoken');
-      const { TokenExpiredError } = jwt;
-      jwt.verify.mockImplementationOnce(() => {
+      jwtMock.verify.mockImplementationOnce(() => {
         throw new TokenExpiredError('Token expired');
       });
 
@@ -284,16 +333,14 @@ describe('isAuthenticated Middleware', () => {
       });
     });
 
-    it('should return 401 for invalid token', async () => {
+    it('should return 401 for invalid/malformed token', async () => {
       const req = mockRequest({
         cookies: { access_token: 'invalid-token' },
         headers: {},
       });
       const res = mockResponse();
 
-      const jwt = require('jsonwebtoken');
-      const { JsonWebTokenError } = jwt;
-      jwt.verify.mockImplementationOnce(() => {
+      jwtMock.verify.mockImplementationOnce(() => {
         throw new JsonWebTokenError('Invalid token');
       });
 
@@ -312,8 +359,7 @@ describe('isAuthenticated Middleware', () => {
       });
       const res = mockResponse();
 
-      const jwt = require('jsonwebtoken');
-      jwt.verify.mockImplementationOnce(() => {
+      jwtMock.verify.mockImplementationOnce(() => {
         throw new Error('Unexpected error');
       });
 

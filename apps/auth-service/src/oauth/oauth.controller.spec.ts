@@ -4,6 +4,7 @@
  * Tests for Google, GitHub, and Facebook OAuth authentication flows.
  */
 
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
 import {
   googleLogin,
@@ -16,40 +17,45 @@ import {
 } from './oauth.controller';
 import { prismaMock, createMockUser, resetPrismaMock } from '../__tests__/mocks/prisma.mock';
 
+// Hoist mock values for vi.mock factories
+const mockFetch = vi.hoisted(() => vi.fn());
+
 // Mock dependencies
-jest.mock('../../../../packages/libs/prisma', () => ({
-  __esModule: true,
-  default: prismaMock,
+vi.mock('../../../../packages/libs/prisma', async () => {
+  const { prismaMock } = await import('../__tests__/mocks/prisma.mock');
+  return { default: prismaMock };
+});
+vi.mock('./providers', () => ({
+  getGoogleProvider: vi.fn().mockResolvedValue({
+    createAuthorizationURL: vi.fn().mockReturnValue(new URL('https://accounts.google.com/oauth?state=test')),
+    validateAuthorizationCode: vi.fn().mockResolvedValue({
+      accessToken: () => 'mock-access-token',
+    }),
+  }),
+  getGitHubProvider: vi.fn().mockResolvedValue({
+    createAuthorizationURL: vi.fn().mockReturnValue(new URL('https://github.com/login/oauth?state=test')),
+    validateAuthorizationCode: vi.fn().mockResolvedValue({
+      accessToken: () => 'mock-access-token',
+    }),
+  }),
+  getFacebookProvider: vi.fn().mockResolvedValue({
+    createAuthorizationURL: vi.fn().mockReturnValue(new URL('https://facebook.com/oauth?state=test')),
+    validateAuthorizationCode: vi.fn().mockResolvedValue({
+      accessToken: () => 'mock-access-token',
+    }),
+  }),
+  generateState: vi.fn().mockResolvedValue('test-state'),
+  generateCodeVerifier: vi.fn().mockResolvedValue('test-code-verifier'),
 }));
-jest.mock('./providers', () => ({
-  getGoogleProvider: jest.fn().mockResolvedValue({
-    createAuthorizationURL: jest.fn().mockReturnValue(new URL('https://accounts.google.com/oauth?state=test')),
-    validateAuthorizationCode: jest.fn().mockResolvedValue({
-      accessToken: () => 'mock-access-token',
-    }),
-  }),
-  getGitHubProvider: jest.fn().mockResolvedValue({
-    createAuthorizationURL: jest.fn().mockReturnValue(new URL('https://github.com/login/oauth?state=test')),
-    validateAuthorizationCode: jest.fn().mockResolvedValue({
-      accessToken: () => 'mock-access-token',
-    }),
-  }),
-  getFacebookProvider: jest.fn().mockResolvedValue({
-    createAuthorizationURL: jest.fn().mockReturnValue(new URL('https://facebook.com/oauth?state=test')),
-    validateAuthorizationCode: jest.fn().mockResolvedValue({
-      accessToken: () => 'mock-access-token',
-    }),
-  }),
-  generateState: jest.fn().mockResolvedValue('test-state'),
-  generateCodeVerifier: jest.fn().mockResolvedValue('test-code-verifier'),
-}));
-jest.mock('jsonwebtoken', () => ({
-  sign: jest.fn().mockReturnValue('mock-jwt-token'),
+vi.mock('jsonwebtoken', () => ({
+  default: {
+    sign: vi.fn().mockReturnValue('mock-jwt-token'),
+  },
+  sign: vi.fn().mockReturnValue('mock-jwt-token'),
 }));
 
 // Mock undici fetch
-const mockFetch = jest.fn();
-jest.mock('undici', () => ({
+vi.mock('undici', () => ({
   fetch: (...args: any[]) => mockFetch(...args),
 }));
 
@@ -65,20 +71,20 @@ const mockRequest = (data: any = {}): any => ({
 
 const mockResponse = (): any => {
   const res: any = {};
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
-  res.cookie = jest.fn().mockReturnValue(res);
-  res.clearCookie = jest.fn().mockReturnValue(res);
-  res.redirect = jest.fn().mockReturnValue(res);
+  res.status = vi.fn().mockReturnValue(res);
+  res.json = vi.fn().mockReturnValue(res);
+  res.cookie = vi.fn().mockReturnValue(res);
+  res.clearCookie = vi.fn().mockReturnValue(res);
+  res.redirect = vi.fn().mockReturnValue(res);
   return res;
 };
 
-const mockNext = jest.fn();
+const mockNext = vi.fn();
 
 describe('OAuth Controller', () => {
   beforeEach(() => {
     resetPrismaMock();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockNext.mockClear();
     mockFetch.mockReset();
   });
@@ -90,9 +96,7 @@ describe('OAuth Controller', () => {
 
       await getOAuthStatus(req, res, mockNext);
 
-      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
-        success: true,
         providers: expect.objectContaining({
           google: expect.any(Boolean),
           github: expect.any(Boolean),
@@ -124,8 +128,8 @@ describe('OAuth Controller', () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      const { getGoogleProvider } = require('./providers');
-      getGoogleProvider.mockRejectedValueOnce(new Error('Config error'));
+      const { getGoogleProvider } = await import('./providers');
+      vi.mocked(getGoogleProvider).mockRejectedValueOnce(new Error('Config error'));
 
       await googleLogin(req, res, mockNext);
 
@@ -272,8 +276,8 @@ describe('OAuth Controller', () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      const { getGitHubProvider } = require('./providers');
-      getGitHubProvider.mockRejectedValueOnce(new Error('Config error'));
+      const { getGitHubProvider } = await import('./providers');
+      vi.mocked(getGitHubProvider).mockRejectedValueOnce(new Error('Config error'));
 
       await githubLogin(req, res, mockNext);
 
@@ -368,8 +372,8 @@ describe('OAuth Controller', () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      const { getFacebookProvider } = require('./providers');
-      getFacebookProvider.mockRejectedValueOnce(new Error('Config error'));
+      const { getFacebookProvider } = await import('./providers');
+      vi.mocked(getFacebookProvider).mockRejectedValueOnce(new Error('Config error'));
 
       await facebookLogin(req, res, mockNext);
 

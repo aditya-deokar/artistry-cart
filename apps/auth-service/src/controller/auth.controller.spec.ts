@@ -4,109 +4,137 @@
  * Tests for user/seller registration, login, logout, and token management.
  */
 
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response } from 'express';
 
-// Mock dependencies - must be before imports that use them
-jest.mock('../../../../packages/libs/redis', () => ({
-  get: jest.fn(),
-  set: jest.fn(),
-  del: jest.fn(),
-  exists: jest.fn(),
-  expire: jest.fn(),
-  ttl: jest.fn(),
-  incr: jest.fn(),
-  decr: jest.fn(),
-  keys: jest.fn(),
-  flushall: jest.fn(),
-}));
+// Hoist all mock values so they're available inside vi.mock() factories
+const mocks = vi.hoisted(() => {
+  const mockRedis = {
+    get: vi.fn(),
+    set: vi.fn(),
+    del: vi.fn(),
+    exists: vi.fn(),
+    expire: vi.fn(),
+    ttl: vi.fn(),
+    incr: vi.fn(),
+    decr: vi.fn(),
+    keys: vi.fn(),
+    flushall: vi.fn(),
+  };
 
-jest.mock('../../../../packages/libs/prisma', () => ({
-  __esModule: true,
-  default: {
+  const mockPrisma = {
     users: {
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      deleteMany: jest.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
     },
     sellers: {
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      deleteMany: jest.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
     },
     shops: {
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
     },
     orders: {
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      count: jest.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      count: vi.fn(),
     },
     addresses: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      updateMany: jest.fn(),
-      delete: jest.fn(),
-      deleteMany: jest.fn(),
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
     },
-    $transaction: jest.fn((promises: any[]) => Promise.all(promises)),
-    $connect: jest.fn(),
-    $disconnect: jest.fn(),
-  },
-}));
+    $transaction: vi.fn((promises: any[]) => Promise.all(promises)),
+    $connect: vi.fn(),
+    $disconnect: vi.fn(),
+  };
 
-jest.mock('../utils/sendMail', () => ({
-  sendEmail: jest.fn().mockResolvedValue(undefined),
-}));
+  const mockSendEmail = vi.fn().mockResolvedValue(undefined);
 
-jest.mock('../utils/auth.helper', () => ({
-  validationRegistrationData: jest.fn(),
-  checkOTPRestrctions: jest.fn(),
-  trackOTPRequests: jest.fn(),
-  sendOTP: jest.fn(),
-  verifyOTP: jest.fn(),
-  handleForgotPassword: jest.fn(),
-  verifyForgotPasswordOTP: jest.fn(),
-}));
+  const mockAuthHelper = {
+    validationRegistrationData: vi.fn(),
+    checkOTPRestrictions: vi.fn(),
+    trackOTPRequests: vi.fn(),
+    sendOTP: vi.fn(),
+    verifyOTP: vi.fn(),
+    handleForgotPassword: vi.fn(),
+    verifyForgotPasswordOTP: vi.fn(),
+  };
 
-jest.mock('bcrypt', () => ({
-  hash: jest.fn().mockResolvedValue('$2a$10$hashedpassword'),
-  compare: jest.fn().mockResolvedValue(true),
-}));
+  const mockBcrypt = {
+    hash: vi.fn().mockResolvedValue('$2a$10$hashedpassword'),
+    compare: vi.fn().mockResolvedValue(true),
+  };
 
-jest.mock('jsonwebtoken', () => ({
-  sign: jest.fn().mockReturnValue('mock-jwt-token'),
-  verify: jest.fn().mockReturnValue({ id: 'user-123', role: 'user' }),
-}));
+  const mockJwt = {
+    sign: vi.fn().mockReturnValue('mock-jwt-token'),
+    verify: vi.fn().mockReturnValue({ id: 'user-123', role: 'user' }),
+  };
 
-jest.mock('stripe', () => {
-  return jest.fn().mockImplementation(() => ({
+  const mockStripeInstance = {
     accounts: {
-      create: jest.fn().mockResolvedValue({ id: 'acct_test123' }),
+      create: vi.fn().mockResolvedValue({ id: 'acct_test123' }),
     },
     accountLinks: {
-      create: jest.fn().mockResolvedValue({ url: 'https://stripe.com/connect' }),
+      create: vi.fn().mockResolvedValue({ url: 'https://stripe.com/connect' }),
     },
-  }));
+  };
+  const mockStripe = vi.fn(function () { return mockStripeInstance; });
+
+  return { mockRedis, mockPrisma, mockSendEmail, mockAuthHelper, mockBcrypt, mockJwt, mockStripe, mockStripeInstance };
 });
+
+// Mock dependencies using hoisted values
+vi.mock('../../../../packages/libs/redis', () => mocks.mockRedis);
+
+vi.mock('../../../../packages/libs/prisma', () => ({
+  default: mocks.mockPrisma,
+}));
+
+vi.mock('../utils/sendMail', () => ({
+  sendEmail: mocks.mockSendEmail,
+}));
+
+vi.mock('../utils/auth.helper', () => mocks.mockAuthHelper);
+
+vi.mock('bcryptjs', () => ({
+  default: mocks.mockBcrypt,
+  ...mocks.mockBcrypt,
+}));
+
+vi.mock('jsonwebtoken', () => ({
+  default: mocks.mockJwt,
+  ...mocks.mockJwt,
+  JsonWebTokenError: class JsonWebTokenError extends Error {},
+  TokenExpiredError: class TokenExpiredError extends Error {},
+}));
+
+vi.mock('stripe', () => ({
+  default: mocks.mockStripe,
+}));
 
 // Import after mocks
 import {
@@ -124,73 +152,10 @@ import {
   getSeller,
 } from './auth.controller';
 import { ValidationError, AuthError } from '../../../../packages/error-handler';
-import _prisma from '../../../../packages/libs/prisma';
-import _redis from '../../../../packages/libs/redis';
 
-// Define mock function type
-type MockFunction<T extends (...args: any[]) => any> = T & {
-  mockResolvedValueOnce: ReturnType<typeof jest.fn>['mockResolvedValueOnce'];
-  mockResolvedValue: ReturnType<typeof jest.fn>['mockResolvedValue'];
-  mockReturnValueOnce: ReturnType<typeof jest.fn>['mockReturnValueOnce'];
-  mockReturnValue: ReturnType<typeof jest.fn>['mockReturnValue'];
-  mockReset: ReturnType<typeof jest.fn>['mockReset'];
-  mockClear: ReturnType<typeof jest.fn>['mockClear'];
-};
-
-// Define mock prisma type
-type MockPrisma = {
-  users: {
-    findUnique: MockFunction<any>;
-    findFirst: MockFunction<any>;
-    findMany: MockFunction<any>;
-    create: MockFunction<any>;
-    update: MockFunction<any>;
-    delete: MockFunction<any>;
-    deleteMany: MockFunction<any>;
-  };
-  sellers: {
-    findUnique: MockFunction<any>;
-    findFirst: MockFunction<any>;
-    findMany: MockFunction<any>;
-    create: MockFunction<any>;
-    update: MockFunction<any>;
-    delete: MockFunction<any>;
-    deleteMany: MockFunction<any>;
-  };
-  shops: {
-    findUnique: MockFunction<any>;
-    findFirst: MockFunction<any>;
-    findMany: MockFunction<any>;
-    create: MockFunction<any>;
-    update: MockFunction<any>;
-    delete: MockFunction<any>;
-  };
-  orders: {
-    findUnique: MockFunction<any>;
-    findFirst: MockFunction<any>;
-    findMany: MockFunction<any>;
-    create: MockFunction<any>;
-    update: MockFunction<any>;
-    delete: MockFunction<any>;
-    count: MockFunction<any>;
-  };
-  addresses: {
-    findUnique: MockFunction<any>;
-    findMany: MockFunction<any>;
-    create: MockFunction<any>;
-    update: MockFunction<any>;
-    updateMany: MockFunction<any>;
-    delete: MockFunction<any>;
-    deleteMany: MockFunction<any>;
-  };
-  $transaction: MockFunction<any>;
-  $connect: MockFunction<any>;
-  $disconnect: MockFunction<any>;
-};
-
-// Cast imports as mocks
-const prisma = _prisma as unknown as MockPrisma;
-const redis = _redis as any;
+// Use hoisted mocks directly
+const prisma = mocks.mockPrisma;
+const redis = mocks.mockRedis;
 
 // Helper to create mock user data
 const createMockUser = (overrides: Partial<any> = {}) => ({
@@ -277,22 +242,22 @@ const mockRequest = (data: MockRequest = {}): MockRequest => ({
 
 const mockResponse = (): Partial<Response> => {
   const res: any = {};
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
-  res.cookie = jest.fn().mockReturnValue(res);
-  res.clearCookie = jest.fn().mockReturnValue(res);
-  res.redirect = jest.fn().mockReturnValue(res);
-  res.send = jest.fn().mockReturnValue(res);
+  res.status = vi.fn().mockReturnValue(res);
+  res.json = vi.fn().mockReturnValue(res);
+  res.cookie = vi.fn().mockReturnValue(res);
+  res.clearCookie = vi.fn().mockReturnValue(res);
+  res.redirect = vi.fn().mockReturnValue(res);
+  res.send = vi.fn().mockReturnValue(res);
   return res;
 };
 
-const mockNext = jest.fn();
+const mockNext = vi.fn();
 
 describe('Auth Controller', () => {
   beforeEach(() => {
     resetPrismaMock();
     resetRedisMock();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockNext.mockClear();
   });
 
@@ -350,8 +315,7 @@ describe('Auth Controller', () => {
       prisma.users.findUnique.mockResolvedValueOnce(null);
       prisma.users.create.mockResolvedValueOnce(createMockUser());
       
-      const { verifyOTP } = require('../utils/auth.helper');
-      verifyOTP.mockResolvedValueOnce(undefined);
+      mocks.mockAuthHelper.verifyOTP.mockResolvedValueOnce(undefined);
       
       await verifyUser(req, res, mockNext);
 
@@ -408,8 +372,7 @@ describe('Auth Controller', () => {
       const mockUser = createMockUser();
       prisma.users.findUnique.mockResolvedValueOnce(mockUser);
       
-      const bcrypt = require('bcrypt');
-      bcrypt.compare.mockResolvedValueOnce(true);
+      mocks.mockBcrypt.compare.mockResolvedValueOnce(true);
       
       await loginUser(req, res, mockNext);
 
@@ -465,8 +428,7 @@ describe('Auth Controller', () => {
 
       prisma.users.findUnique.mockResolvedValueOnce(createMockUser());
       
-      const bcrypt = require('bcrypt');
-      bcrypt.compare.mockResolvedValueOnce(false);
+      mocks.mockBcrypt.compare.mockResolvedValueOnce(false);
       
       await loginUser(req, res, mockNext);
 
@@ -500,8 +462,7 @@ describe('Auth Controller', () => {
 
       prisma.users.findUnique.mockResolvedValueOnce(createMockUser());
       
-      const jwt = require('jsonwebtoken');
-      jwt.verify.mockReturnValueOnce({ id: 'user-123', role: 'user' });
+      mocks.mockJwt.verify.mockReturnValueOnce({ id: 'user-123', role: 'user' });
       
       await refreshToken(req, res, mockNext);
 
@@ -556,9 +517,8 @@ describe('Auth Controller', () => {
       prisma.users.findUnique.mockResolvedValueOnce(mockUser);
       prisma.users.update.mockResolvedValueOnce({ ...mockUser, password: '$2a$10$newhashedpassword' });
       
-      const bcrypt = require('bcrypt');
-      bcrypt.compare.mockResolvedValueOnce(false);
-      bcrypt.hash.mockResolvedValueOnce('$2a$10$newhashedpassword');
+      mocks.mockBcrypt.compare.mockResolvedValueOnce(false);
+      mocks.mockBcrypt.hash.mockResolvedValueOnce('$2a$10$newhashedpassword');
       
       await resetUserPassword(req, res, mockNext);
 
@@ -613,8 +573,7 @@ describe('Auth Controller', () => {
 
       prisma.sellers.findUnique.mockResolvedValueOnce(null);
       
-      const { validationRegistrationData } = require('../utils/auth.helper');
-      validationRegistrationData.mockReturnValueOnce(undefined);
+      mocks.mockAuthHelper.validationRegistrationData.mockReturnValueOnce(undefined);
       
       await registerSeller(req, res, mockNext);
 
@@ -638,8 +597,7 @@ describe('Auth Controller', () => {
 
       prisma.sellers.findUnique.mockResolvedValueOnce(createMockSeller());
       
-      const { validationRegistrationData } = require('../utils/auth.helper');
-      validationRegistrationData.mockReturnValueOnce(undefined);
+      mocks.mockAuthHelper.validationRegistrationData.mockReturnValueOnce(undefined);
       
       await registerSeller(req, res, mockNext);
 
@@ -664,8 +622,7 @@ describe('Auth Controller', () => {
       prisma.sellers.findUnique.mockResolvedValueOnce(null);
       prisma.sellers.create.mockResolvedValueOnce(createMockSeller());
       
-      const { verifyOTP } = require('../utils/auth.helper');
-      verifyOTP.mockResolvedValueOnce(undefined);
+      mocks.mockAuthHelper.verifyOTP.mockResolvedValueOnce(undefined);
       
       await verifySeller(req, res, mockNext);
 
@@ -740,8 +697,7 @@ describe('Auth Controller', () => {
       const mockSeller = createMockSeller();
       prisma.sellers.findUnique.mockResolvedValueOnce(mockSeller);
       
-      const bcrypt = require('bcrypt');
-      bcrypt.compare.mockResolvedValueOnce(true);
+      mocks.mockBcrypt.compare.mockResolvedValueOnce(true);
       
       await loginSeller(req, res, mockNext);
 

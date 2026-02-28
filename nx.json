@@ -11,14 +11,16 @@
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
       "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/vitest.config.[jt]s",
       "!{projectRoot}/src/test-setup.[jt]s",
-      "!{projectRoot}/test-setup.[jt]s"
+      "!{projectRoot}/test-setup.[jt]s",
+      "!{projectRoot}/src/__tests__/**"
     ],
     "sharedGlobals": [
-      "{workspaceRoot}/.github/workflows/ci.yml"
+      "{workspaceRoot}/.github/workflows/ci.yml",
+      "{workspaceRoot}/.github/workflows/test.yml"
     ]
   },
-  "nxCloudId": "686b8aa48c1ce5673416fcf1",
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
@@ -82,9 +84,17 @@
       ]
     },
     "test": {
+      "cache": true,
       "dependsOn": [
         "^build"
+      ],
+      "inputs": [
+        "default",
+        "^production"
       ]
+    },
+    "e2e": {
+      "cache": false
     }
   },
   "generators": {

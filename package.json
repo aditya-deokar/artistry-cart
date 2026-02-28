@@ -5,7 +5,18 @@
   "scripts": {
     "dev": "pnpm exec nx run-many --target=serve --all",
     "user-ui": "pnpm exec nx run-many --target=dev --all --projects=user-ui",
-    "seller-ui": "pnpm exec nx run-many --target=dev --all --projects=seller-ui"
+    "seller-ui": "pnpm exec nx run-many --target=dev --all --projects=seller-ui",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
+    "test:product": "vitest run --project product-service",
+    "test:auth": "vitest run --project auth-service",
+    "test:order": "vitest run --project order-service",
+    "test:gateway": "vitest run --project api-gateway",
+    "test:recommendation": "vitest run --project recommendation-service",
+    "test:middleware": "vitest run --project middleware",
+    "test:error-handler": "vitest run --project error-handler"
   },
   "private": true,
   "dependencies": {
@@ -104,7 +115,9 @@
     "@types/nodemailer": "^6.4.17",
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",
+    "@types/supertest": "^7.2.0",
     "@types/swagger-ui-express": "^4.1.8",
+    "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "10.4.13",
     "esbuild": "^0.19.2",
     "jest": "^29.7.0",
@@ -113,11 +126,13 @@
     "nx": "21.2.2",
     "postcss": "8.4.38",
     "react-refresh": "^0.10.0",
+    "supertest": "^7.2.2",
     "tailwindcss": "^4.1.11",
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",
     "typescript": "~5.8.2",
+    "vitest": "^4.0.18",
     "webpack-cli": "^5.1.4"
   }
 }

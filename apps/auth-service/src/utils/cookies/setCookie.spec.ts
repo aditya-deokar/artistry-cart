@@ -4,15 +4,16 @@
  * Tests for HTTP cookie setting functionality.
  */
 
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { Response } from 'express';
 import { setCookie } from './setCookie';
 
 describe('Cookie Utilities', () => {
   let mockRes: Partial<Response>;
-  let mockCookie: jest.Mock;
+  let mockCookie: Mock;
 
   beforeEach(() => {
-    mockCookie = jest.fn();
+    mockCookie = vi.fn();
     mockRes = {
       cookie: mockCookie,
     };
@@ -21,7 +22,7 @@ describe('Cookie Utilities', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('setCookie', () => {

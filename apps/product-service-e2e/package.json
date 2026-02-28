@@ -8,13 +8,9 @@
     ],
     "targets": {
       "e2e": {
-        "executor": "@nx/jest:jest",
-        "outputs": [
-          "{projectRoot}/test-output/jest/coverage"
-        ],
+        "executor": "nx:run-commands",
         "options": {
-          "jestConfig": "apps/product-service-e2e/jest.config.ts",
-          "passWithNoTests": true
+          "command": "npx vitest run --config apps/product-service-e2e/vitest.config.ts"
         },
         "dependsOn": [
           "@artistry-cart/product-service:build",

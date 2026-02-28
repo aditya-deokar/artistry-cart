@@ -9,6 +9,7 @@
  */
 
 import axios from 'axios';
+import { describe, it, expect } from 'vitest';
 
 describe('User Login Flow (E2E)', () => {
   // Test user credentials (assumes user exists from previous tests or seed data)
@@ -43,38 +44,29 @@ describe('User Login Flow (E2E)', () => {
     });
 
     it('should return error for invalid credentials', async () => {
-      try {
-        await axios.post('/api/login-user', {
-          email: testUser.email,
-          password: 'WrongPassword123',
-        });
-        fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.response.status).toBe(401);
-      }
+      const res = await axios.post('/api/login-user', {
+        email: testUser.email,
+        password: 'WrongPassword123',
+      });
+
+      expect(res.status).toBe(401);
     });
 
     it('should return error for non-existent user', async () => {
-      try {
-        await axios.post('/api/login-user', {
-          email: 'nonexistent@example.com',
-          password: 'SomePassword123',
-        });
-        fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.response.status).toBe(401);
-      }
+      const res = await axios.post('/api/login-user', {
+        email: 'nonexistent@example.com',
+        password: 'SomePassword123',
+      });
+
+      expect(res.status).toBe(401);
     });
 
     it('should return error for missing fields', async () => {
-      try {
-        await axios.post('/api/login-user', {
-          email: testUser.email,
-        });
-        fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.response.status).toBe(400);
-      }
+      const res = await axios.post('/api/login-user', {
+        email: testUser.email,
+      });
+
+      expect(res.status).toBe(400);
     });
   });
 
@@ -97,12 +89,9 @@ describe('User Login Flow (E2E)', () => {
     });
 
     it('should return error when not authenticated', async () => {
-      try {
-        await axios.get('/api/logged-in-user');
-        fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.response.status).toBe(401);
-      }
+      const res = await axios.get('/api/logged-in-user');
+
+      expect(res.status).toBe(401);
     });
   });
 
@@ -125,12 +114,9 @@ describe('User Login Flow (E2E)', () => {
     });
 
     it('should return error without refresh token', async () => {
-      try {
-        await axios.post('/api/refresh-token');
-        fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.response.status).toBe(401);
-      }
+      const res = await axios.post('/api/refresh-token');
+
+      expect(res.status).toBe(401);
     });
   });
 

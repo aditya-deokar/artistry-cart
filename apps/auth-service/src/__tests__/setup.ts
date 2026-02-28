@@ -1,13 +1,13 @@
 /**
  * Test Setup File
  * 
- * Global configuration for Jest tests in the auth service.
+ * Global configuration for Vitest tests in the auth service.
  * This file runs before each test file.
  */
 
-import { expect, jest } from "@jest/globals";
+import { expect, vi } from 'vitest';
 
-// Extend Jest matchers
+// Extend Vitest matchers
 expect.extend({
   toBeValidJWT(received: string) {
     const parts = received.split('.');
@@ -36,6 +36,6 @@ process.env.FRONTEND_URL = 'http://localhost:3000';
 
 // Suppress console.log in tests unless DEBUG is set
 if (!process.env.DEBUG) {
-  jest.spyOn(console, 'log').mockImplementation(() => {});
-  jest.spyOn(console, 'error').mockImplementation(() => {});
+  vi.spyOn(console, 'log').mockImplementation(() => {});
+  vi.spyOn(console, 'error').mockImplementation(() => {});
 }

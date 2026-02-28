@@ -9,24 +9,25 @@
  */
 
 import axios from 'axios';
+import { describe, it, expect, beforeAll } from 'vitest';
 
 describe('Profile Management (E2E)', () => {
   let accessToken: string | undefined;
 
   // Login first to get access token
   beforeAll(async () => {
-    try {
-      const response = await axios.post('/api/login-user', {
-        email: 'test@example.com',
-        password: 'TestPassword123!',
-      });
+    const response = await axios.post('/api/login-user', {
+      email: 'test@example.com',
+      password: 'TestPassword123!',
+    });
 
+    if (response.status === 200) {
       const cookies = response.headers['set-cookie'];
       if (cookies) {
         const accessCookie = cookies.find((c: string) => c.startsWith('access_token='));
         if (accessCookie) accessToken = accessCookie.split(';')[0].split('=')[1];
       }
-    } catch (error) {
+    } else {
       console.warn('Could not login for profile tests - some tests may be skipped');
     }
   });
@@ -52,12 +53,9 @@ describe('Profile Management (E2E)', () => {
     });
 
     it('should return error when not authenticated', async () => {
-      try {
-        await axios.get('/api/me');
-        fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.response.status).toBe(401);
-      }
+      const res = await axios.get('/api/me');
+
+      expect(res.status).toBe(401);
     });
   });
 
@@ -79,12 +77,9 @@ describe('Profile Management (E2E)', () => {
     });
 
     it('should return error when not authenticated', async () => {
-      try {
-        await axios.patch('/api/me', { name: 'Test' });
-        fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.response.status).toBe(401);
-      }
+      const res = await axios.patch('/api/me', { name: 'Test' });
+
+      expect(res.status).toBe(401);
     });
   });
 
@@ -106,12 +101,9 @@ describe('Profile Management (E2E)', () => {
     });
 
     it('should return error when not authenticated', async () => {
-      try {
-        await axios.get('/api/me/addresses');
-        fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.response.status).toBe(401);
-      }
+      const res = await axios.get('/api/me/addresses');
+
+      expect(res.status).toBe(401);
     });
   });
 
@@ -138,14 +130,11 @@ describe('Profile Management (E2E)', () => {
     });
 
     it('should return error when not authenticated', async () => {
-      try {
-        await axios.post('/api/me/addresses', {
-          street: '123 Test St',
-        });
-        fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.response.status).toBe(401);
-      }
+      const res = await axios.post('/api/me/addresses', {
+        street: '123 Test St',
+      });
+
+      expect(res.status).toBe(401);
     });
   });
 
@@ -181,12 +170,9 @@ describe('Profile Management (E2E)', () => {
     });
 
     it('should return error when not authenticated', async () => {
-      try {
-        await axios.get('/api/me/orders');
-        fail('Should have thrown an error');
-      } catch (error: any) {
-        expect(error.response.status).toBe(401);
-      }
+      const res = await axios.get('/api/me/orders');
+
+      expect(res.status).toBe(401);
     });
   });
 });
