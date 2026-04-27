@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import { errorMiddleware } from "../../../packages/error-handler/error-middelware";
 import router from "./routes/order.route";
 import {
-  createOrder,
+  handlePaymentSucceeded,
   handlePaymentFailed,
   handleChargeRefunded,
   handleAccountUpdated,
@@ -60,8 +60,8 @@ app.post(
     try {
       switch (event.type) {
         case "payment_intent.succeeded":
-          // Handled by createOrder (legacy endpoint)
-          console.log("Payment succeeded - processed by /create-order");
+          await handlePaymentSucceeded(event.data.object as Stripe.PaymentIntent);
+          console.log("Payment succeeded - processed by handlePaymentSucceeded");
           break;
 
         case "payment_intent.payment_failed":
@@ -92,16 +92,7 @@ app.post(
   }
 );
 
-// Legacy webhook endpoint for payment_intent.succeeded
-app.post(
-  "/order/api/create-order",
-  bodyParser.raw({ type: "application/json" }),
-  (req, res, next) => {
-    (req as any).rawBody = req.body;
-    next();
-  },
-  createOrder
-);
+// (Legacy endpoint removed, fully handled in /order/api/webhooks now)
 
 app.use(express.json());
 app.use(cookieParser());

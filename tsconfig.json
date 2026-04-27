@@ -51,6 +51,9 @@
     },
     {
       "path": "./apps/aivision-service"
+    },
+    {
+      "path": "./apps/order-service-e2e"
     }
   ]
 }
