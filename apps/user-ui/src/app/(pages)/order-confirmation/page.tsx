@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, Loader2, Package, Sparkles } from 'lucide-react'; // Added Sparkles
+import Image from 'next/image';
+import { CheckCircle, Loader2, Package, Sparkles, Receipt, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import axiosInstance from '@/utils/axiosinstance';
@@ -31,14 +32,14 @@ export default function OrderConfirmationPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Get payment_intent_client_secret from URL if redirected from Stripe
-    const paymentIntentClientSecret = searchParams.get('payment_intent_client_secret');
+    // Get payment_intent from URL if redirected from Stripe
+    const paymentIntentId = searchParams.get('payment_intent');
 
     useEffect(() => {
         const fetchOrder = async () => {
             try {
-                if (paymentIntentClientSecret) {
-                    const res = await axiosInstance.get(`/order/api/payment-status?payment_intent=${paymentIntentClientSecret}`);
+                if (paymentIntentId) {
+                    const res = await axiosInstance.get(`/order/api/payment-status?payment_intent=${paymentIntentId}`);
                     if (res.data.order) {
                         setOrder(res.data.order);
                         triggerConfetti(); // Trigger confetti on success
@@ -56,7 +57,7 @@ export default function OrderConfirmationPage() {
         };
 
         fetchOrder();
-    }, [paymentIntentClientSecret]);
+    }, [paymentIntentId]);
 
     const triggerConfetti = () => {
         const duration = 5 * 1000;
@@ -104,9 +105,10 @@ export default function OrderConfirmationPage() {
                         <CheckCircle className="h-20 w-20 text-green-500 relative z-10" />
                     </div>
                     <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Order Confirmed!</h1>
-                    <p className="text-muted-foreground text-lg max-w-md mx-auto">
-                        Thank you for your purchase. Your order has been received and is being processed.
-                    </p>
+                    <div className="text-muted-foreground text-lg max-w-md mx-auto space-y-2">
+                        <p>Thank you for your purchase. Your order has been received and is being processed.</p>
+                        {order && <p className="font-medium text-foreground text-sm bg-muted/50 p-2 rounded-md inline-block">Order ID: {order.id}</p>}
+                    </div>
                 </div>
 
                 <Card className="border-muted bg-card/50 backdrop-blur-sm shadow-lg">
@@ -127,29 +129,53 @@ export default function OrderConfirmationPage() {
 
                         {order && (
                             <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground border-b pb-2">
+                                    <Receipt className="h-4 w-4" />
+                                    <span>Order Summary</span>
+                                </div>
                                 {order.items.map((item) => (
                                     <div key={item.id} className="flex gap-4 items-center">
-                                        <div className="h-12 w-12 bg-muted rounded-md border overflow-hidden relative">
-                                            {/* Image placeholder or component */}
-                                            <Package className="h-6 w-6 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-muted-foreground/50" />
+                                        <div className="h-16 w-16 bg-muted rounded-md border overflow-hidden relative flex-shrink-0">
+                                            {item.product.images && item.product.images.length > 0 ? (
+                                                <Image
+                                                    src={item.product.images[0].url}
+                                                    alt={item.product.title}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            ) : (
+                                                <Package className="h-6 w-6 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-muted-foreground/50" />
+                                            )}
                                         </div>
                                         <div className="flex-1">
                                             <p className="font-medium text-sm line-clamp-1">{item.product.title}</p>
-                                            <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                                            <p className="text-xs text-muted-foreground">Qty: {item.quantity} × ${item.price.toFixed(2)}</p>
                                         </div>
                                         <div className="font-medium text-sm">
                                             ${(item.price * item.quantity).toFixed(2)}
                                         </div>
                                     </div>
                                 ))}
-                                <div className="border-t pt-4 flex justify-between items-center">
-                                    <span className="font-medium">Total</span>
-                                    <span className="text-lg font-bold">${order.totalAmount.toFixed(2)}</span>
+                                <div className="border-t pt-4 space-y-2">
+                                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                                        <span>Subtotal</span>
+                                        <span>${order.totalAmount.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-lg font-bold">
+                                        <span>Total</span>
+                                        <span>${order.totalAmount.toFixed(2)}</span>
+                                    </div>
                                 </div>
                             </div>
                         )}
 
-                        <div className="flex justify-center pt-2">
+                        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4 border-t mt-6">
+                            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto shadow-sm rounded-full px-8">
+                                <Link href="/profile/orders">
+                                    View My Orders
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                            </Button>
                             <Button asChild size="lg" className="w-full sm:w-auto shadow-md hover:shadow-lg transition-all rounded-full px-8">
                                 <Link href="/">Continue Shopping</Link>
                             </Button>

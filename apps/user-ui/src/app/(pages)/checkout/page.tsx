@@ -8,6 +8,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { PaymentForm } from '@/components/checkout/PaymentForm';
 import { Loader2, ShieldCheck, Lock, CreditCard, ChevronRight, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
@@ -199,17 +200,25 @@ const CheckoutPageContent = () => {
                             <div className="p-6 space-y-6">
                                 <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                                     {sessionData.cart.map((item: any) => (
-                                        <div key={item.id} className="flex gap-4">
-                                            <div className="h-16 w-16 bg-background rounded-md border flex items-center justify-center overflow-hidden shrink-0">
-                                                {/* Fallback for image since it might not be in session data immediately or verified */}
-                                                <ShoppingBag className="h-6 w-6 text-muted-foreground/50" />
+                                        <div key={item.id} className="flex gap-4 items-center">
+                                            <div className="h-16 w-16 bg-background rounded-md border flex items-center justify-center overflow-hidden shrink-0 relative">
+                                                {item.images && item.images.length > 0 ? (
+                                                    <Image
+                                                        src={item.images[0].url}
+                                                        alt={item.title}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                ) : (
+                                                    <ShoppingBag className="h-6 w-6 text-muted-foreground/50" />
+                                                )}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="text-sm font-medium truncate">{item.title}</h3>
                                                 <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                                             </div>
                                             <div className="text-sm font-medium">
-                                                ${(item.sale_price * item.quantity).toFixed(2)}
+                                                ₹{(item.sale_price * item.quantity).toFixed(2)}
                                             </div>
                                         </div>
                                     ))}
@@ -220,7 +229,7 @@ const CheckoutPageContent = () => {
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
                                         <span className="text-muted-foreground">Subtotal</span>
-                                        <span>${sessionData.totalAmount.toFixed(2)}</span>
+                                        <span>₹{sessionData.totalAmount.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-muted-foreground">Shipping</span>
@@ -242,7 +251,7 @@ const CheckoutPageContent = () => {
                                         <p className="text-xs text-muted-foreground">Including taxes</p>
                                     </div>
                                     <span className="text-2xl font-bold tracking-tight">
-                                        ${sessionData.totalAmount.toFixed(2)}
+                                        ₹{sessionData.totalAmount.toFixed(2)}
                                     </span>
                                 </div>
                             </div>

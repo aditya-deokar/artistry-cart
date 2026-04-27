@@ -197,284 +197,255 @@ export const verifyingPaymentSession = async (
 };
 
 // create order
-export const createOrder = async (
-  req: any,
-  res: Response,
-  next: NextFunction
+export const handlePaymentSucceeded = async (
+  paymentIntent: Stripe.PaymentIntent
 ) => {
   try {
-    const stripeSignature = req.headers["stripe-signature"];
-    if (!stripeSignature) {
-      return res.status(400).send("Missing Stripe Signature");
+
+    const sessionId = paymentIntent.metadata.sessionId;
+    const userId = paymentIntent.metadata.userId;
+
+    const sessionKey = `payment-session:${sessionId}`;
+    const sessionData = await redisClient.get(sessionKey);
+
+    if (!sessionData) {
+      console.warn("Session data expired or missing for ", sessionId);
+      return;
     }
 
-    const rawBody = (req as any).rawBody;
+    const { cart, totalAmount, shippingAddressId, coupon } =
+      JSON.parse(sessionData);
 
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(
-        rawBody,
-        stripeSignature,
-        process.env.STRIPE_WEBHOOK_SECRET!
+    const user = await prisma.users.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    const name = user?.name!;
+    const email = user?.email!;
+
+    const shopGrouped = cart.reduce((acc: any, item: any) => {
+      if (!acc[item.shopId]) acc[item.shopId] = [];
+
+      acc[item.shopId].push(item);
+      return acc;
+    }, {});
+
+    for (const shopId in shopGrouped) {
+      const orderItems = shopGrouped[shopId];
+
+      let orderTotal = orderItems.reduce(
+        (sum: number, p: any) => sum + p.quantity * p.sale_price,
+        0
       );
-    } catch (err: any) {
-      console.error("Webhook signature verification failed. ", err.message);
-    }
 
-    if (event?.type === "payment_intent.succeeded") {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      const sessionId = paymentIntent.metadata.sessionId;
-      const userId = paymentIntent.metadata.userId;
-
-      const sessionKey = `payment-session:${sessionId}`;
-      const sessionData = await redisClient.get(sessionKey);
-
-      if (!sessionData) {
-        console.warn("Session data expired or missing for ", sessionId);
-        return res
-          .status(200)
-          .send("No session found, Skipping order creation");
-      }
-
-      const { cart, totalAmount, shippingAddressId, coupon } =
-        JSON.parse(sessionData);
-
-      const user = await prisma.users.findUnique({
-        where: {
-          id: userId,
-        },
-      });
-
-      const name = user?.name!;
-      const email = user?.email!;
-
-      const shopGrouped = cart.reduce((acc: any, item: any) => {
-        if (!acc[item.shopId]) acc[item.shopId] = [];
-
-        acc[item.shopId].push(item);
-        return acc;
-      }, {});
-
-      for (const shopId in shopGrouped) {
-        const orderItems = shopGrouped[shopId];
-
-        let orderTotal = orderItems.reduce(
-          (sum: number, p: any) => sum + p.quantity * p.sale_price,
-          0
+      // apply discount if applicable
+      if (
+        coupon &&
+        coupon.discountedProductId &&
+        orderItems.some((item: any) => item.id === coupon.discountedProductId)
+      ) {
+        const discountedItem = orderItems.find(
+          (item: any) => item.id === coupon.discountedProductId
         );
 
-        // apply discount if applicable
-        if (
-          coupon &&
-          coupon.discountedProductId &&
-          orderItems.some((item: any) => item.id === coupon.discountedProductId)
-        ) {
-          const discountedItem = orderItems.find(
-            (item: any) => item.id === coupon.discountedProductId
-          );
+        if (discountedItem) {
+          const discount =
+            coupon.discountPercent > 0
+              ? (discountedItem.sale_price *
+                discountedItem.quantity *
+                coupon.discountPercent) /
+              100
+              : coupon.discountAmount;
 
-          if (discountedItem) {
-            const discount =
-              coupon.discountPercent > 0
-                ? (discountedItem.sale_price *
-                  discountedItem.quantity *
-                  coupon.discountPercent) /
-                100
-                : coupon.discountAmount;
+          orderTotal -= discount;
+        }
+      }
 
-            orderTotal -= discount;
+      // Calculate platform fee and seller amount
+      const customerAmount = Math.round(orderTotal * 100); // in cents
+      const platformFee = Math.floor(customerAmount * 0.1); // 10% admin margin
+      const sellerAmount = customerAmount - platformFee;
+
+      // create order with payment record
+      const createdOrder = await prisma.orders.create({
+        data: {
+          userId,
+          shopId: shopId,
+          totalAmount: orderTotal,
+          status: "PAID",
+          shippingAddressId: shippingAddressId || null,
+          couponCode: coupon?.code || null,
+          discountAmount: coupon?.discountAmount || 0,
+          items: {
+            create: orderItems.map((item: any) => ({
+              productId: item.id,
+              quantity: item.quantity,
+              price: item.sale_price,
+              selectedOptions: item.selectedOptions,
+            }))
+          },
+          // Create payment record
+          payment: {
+            create: {
+              stripePaymentIntent: paymentIntent.id,
+              stripeChargeId: paymentIntent.latest_charge as string || null,
+              amount: customerAmount / 100, // Store in dollars
+              currency: paymentIntent.currency || "usd",
+              platformFee: platformFee / 100, // 10% admin margin in dollars
+              sellerAmount: sellerAmount / 100, // 90% seller amount in dollars
+              status: "SUCCEEDED",
+              paymentMethod: paymentIntent.payment_method_types?.[0] || "card",
+              metadata: {
+                sessionId,
+                userId,
+                shopId,
+              },
+            }
           }
         }
+      });
 
-        // Calculate platform fee and seller amount
-        const customerAmount = Math.round(orderTotal * 100); // in cents
-        const platformFee = Math.floor(customerAmount * 0.1); // 10% admin margin
-        const sellerAmount = customerAmount - platformFee;
 
-        // create order with payment record
-        const createdOrder = await prisma.orders.create({
+      // update product and Analytics
+      for (const item of orderItems) {
+        const { id: productId, quantity } = item;
+
+        await prisma.products.update({
+          where: {
+            id: productId
+          },
           data: {
-            userId,
-            shopId: shopId,
-            totalAmount: orderTotal,
-            status: "PAID",
-            shippingAddressId: shippingAddressId || null,
-            couponCode: coupon?.code || null,
-            discountAmount: coupon?.discountAmount || 0,
-            items: {
-              create: orderItems.map((item: any) => ({
-                productId: item.id,
-                quantity: item.quantity,
-                price: item.sale_price,
-                selectedOptions: item.selectedOptions,
-              }))
+            stock: {
+              decrement: quantity
             },
-            // Create payment record
-            payment: {
-              create: {
-                stripePaymentIntent: paymentIntent.id,
-                stripeChargeId: paymentIntent.latest_charge as string || null,
-                amount: customerAmount / 100, // Store in dollars
-                currency: paymentIntent.currency || "usd",
-                platformFee: platformFee / 100, // 10% admin margin in dollars
-                sellerAmount: sellerAmount / 100, // 90% seller amount in dollars
-                status: "SUCCEEDED",
-                paymentMethod: paymentIntent.payment_method_types?.[0] || "card",
-                metadata: {
-                  sessionId,
-                  userId,
-                  shopId,
-                },
-              }
-            }
-          }
-        });
-
-
-        // update product and Analytics
-        for (const item of orderItems) {
-          const { id: productId, quantity } = item;
-
-          await prisma.products.update({
-            where: {
-              id: productId
-            },
-            data: {
-              stock: {
-                decrement: quantity
-              },
-              totalSales: {
-                increment: quantity
-              },
-
+            totalSales: {
+              increment: quantity
             },
 
-          })
+          },
 
-          await prisma.productAnalytics.upsert({
-            where: {
-              id: productId
-            },
-            create: {
-              productId,
-              shopId,
-              purchases: quantity,
-              lastViewedAt: new Date(),
+        })
 
-            },
-            update: {
-              purchases: { increment: quantity }
-            }
-          })
-
-
-          const existingAnalytics = await prisma.userAnalytics.findUnique({
-            where: {
-              userId
-            }
-          })
-
-          const newAction = {
+        await prisma.productAnalytics.upsert({
+          where: {
+            id: productId
+          },
+          create: {
             productId,
             shopId,
-            action: "purchase",
-            timeStamp: Date.now(),
-          };
+            purchases: quantity,
+            lastViewedAt: new Date(),
 
-          const currentActions = Array.isArray(existingAnalytics?.actions) ? (existingAnalytics.actions as Prisma.JsonArray) : [];
-
-          if (existingAnalytics) {
-            await prisma.userAnalytics.update({
-              where: {
-                userId
-              },
-              data: {
-                lastVisited: new Date(),
-                actions: [...currentActions, newAction],
-              },
-            })
-          } else {
-            await prisma.userAnalytics.create({
-              data: {
-                userId,
-                lastVisited: new Date(),
-                actions: [newAction],
-              },
-            })
-          }
-
-        }
-
-        // send email for user
-        await sendEmail(
-          email,
-          "Your Artistry Cart Order Confirmation",
-          "order-confirmation",
-          {
-            name,
-            cart,
-            totalAmount: coupon?.discountAmount ? totalAmount - coupon?.discountAmount : totalAmount,
-            trackingUrl: `https://artistry.com/order/${sessionId}`,
-          }
-        )
-
-
-        // Create notification for sellers
-        const createedShopIds = Object.keys(shopGrouped);
-        const sellerShops = await prisma.shops.findMany({
-          where: {
-            id: {
-              in: createedShopIds
-            }
           },
-          select: {
-            id: true,
-            sellerId: true,
-            name: true,
+          update: {
+            purchases: { increment: quantity }
           }
         })
 
-        // Notification for Shop
-        for (const shop of sellerShops) {
-          const firstProduct = shopGrouped[shop.id][0];
-          const productTitle = firstProduct?.title || "new item";
 
-          await prisma.notification.create({
+        const existingAnalytics = await prisma.userAnalytics.findUnique({
+          where: {
+            userId
+          }
+        })
+
+        const newAction = {
+          productId,
+          shopId,
+          action: "purchase",
+          timeStamp: Date.now(),
+        };
+
+        const currentActions = Array.isArray(existingAnalytics?.actions) ? (existingAnalytics.actions as Prisma.JsonArray) : [];
+
+        if (existingAnalytics) {
+          await prisma.userAnalytics.update({
+            where: {
+              userId
+            },
             data: {
-              title: "New Order Received",
-              message: `A Customer just ordered ${productTitle} from your shop.`,
-              createrId: userId,
-              recieverId: shop.sellerId,
-              redirect_link: `https://artistry.com/order/${sessionId}`
-            }
+              lastVisited: new Date(),
+              actions: [...currentActions, newAction],
+            },
+          })
+        } else {
+          await prisma.userAnalytics.create({
+            data: {
+              userId,
+              lastVisited: new Date(),
+              actions: [newAction],
+            },
           })
         }
 
-        // Notification for Admin
+      }
+
+      // send email for user
+      await sendEmail(
+        email,
+        "Your Artistry Cart Order Confirmation",
+        "order-confirmation",
+        {
+          name,
+          cart,
+          totalAmount: coupon?.discountAmount ? totalAmount - coupon?.discountAmount : totalAmount,
+          trackingUrl: `https://artistry.com/order/${sessionId}`,
+        }
+      )
+
+
+      // Create notification for sellers
+      const createedShopIds = Object.keys(shopGrouped);
+      const sellerShops = await prisma.shops.findMany({
+        where: {
+          id: {
+            in: createedShopIds
+          }
+        },
+        select: {
+          id: true,
+          sellerId: true,
+          name: true,
+        }
+      })
+
+      // Notification for Shop
+      for (const shop of sellerShops) {
+        const firstProduct = shopGrouped[shop.id][0];
+        const productTitle = firstProduct?.title || "new item";
 
         await prisma.notification.create({
           data: {
-            title: "Platform Order Alert",
-            message: `A New Order was placed by ${name}.`,
+            title: "New Order Received",
+            message: `A Customer just ordered ${productTitle} from your shop.`,
             createrId: userId,
-            recieverId: "admin",
+            recieverId: shop.sellerId,
             redirect_link: `https://artistry.com/order/${sessionId}`
           }
         })
-
-        await redisClient.del(sessionKey)
-
-
       }
+
+      // Notification for Admin
+
+      await prisma.notification.create({
+        data: {
+          title: "Platform Order Alert",
+          message: `A New Order was placed by ${name}.`,
+          createrId: userId,
+          recieverId: "admin",
+          redirect_link: `https://artistry.com/order/${sessionId}`
+        }
+      })
+
+      await redisClient.del(sessionKey)
+
+
     }
-
-    res.status(200).json({
-      received: true
-    })
-
   } catch (error) {
     console.log(error);
-    return next(error);
+    throw error;
   }
 };
 

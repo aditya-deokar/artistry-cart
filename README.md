@@ -1,82 +1,173 @@
-# ArtistryCart
+# Artistry Cart
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+Artistry Cart is an Nx monorepo for a multi-surface commerce platform focused on artisan products. The repository contains:
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+- a buyer-facing storefront in `user-ui`
+- a seller-facing dashboard in `seller-ui`
+- backend services for auth, catalog, orders, recommendations, AI Vision, analytics ingestion, and gateway routing
+- shared infrastructure packages for Prisma, Redis, Kafka, middleware, error handling, and test utilities
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/node?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+The platform combines conventional ecommerce capabilities with AI-assisted discovery flows, seller operations, pricing and event management, and event-driven analytics.
 
-## Finish your CI setup
+## What Is In This Repo
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/VLWAgn7ZRU)
+### Frontend apps
 
+- `apps/user-ui`: Next.js storefront for shoppers
+- `apps/seller-ui`: Next.js dashboard for sellers and shop management
 
-## Run tasks
+### Backend services
 
-To run the dev server for your app, use:
+- `apps/api-gateway`: request entry point and service proxy layer
+- `apps/auth-service`: authentication, registration, OAuth, shop creation, and identity flows
+- `apps/product-service`: products, shops, search, discounts, events, and offers
+- `apps/order-service`: checkout, orders, Stripe payments, webhook handling, and seller payout-related flows
+- `apps/recommendation-service`: recommendation APIs and recommendation logic
+- `apps/kafka-service`: background consumer for analytics events
+- `apps/aivision-service`: AI-assisted generation, concept workflows, gallery, artisans, and visual search
 
-```sh
-npx nx serve auth-service
+### Shared packages
+
+- `packages/error-handler`
+- `packages/middleware`
+- `packages/test-utils`
+- `packages/libs/prisma`
+- `packages/libs/redis`
+- `packages/libs/imageKit`
+- `packages/utils/kafka`
+
+### Supporting assets
+
+- `prisma/`: MongoDB schema and seed data
+- `libs/docker-compose.yml`: local Kafka and Kafka UI setup
+- `.github/workflows/test.yml`: CI test pipeline
+- `docs/`: canonical project documentation and legacy documentation sets
+
+## Architecture Snapshot
+
+At a high level:
+
+- both frontends communicate through the API gateway or rewrites to backend APIs
+- the gateway proxies traffic to the appropriate service
+- Prisma connects services to MongoDB
+- Redis is used for cache/session-adjacent flows in parts of the system
+- Stripe powers payment and webhook flows
+- Kafka captures asynchronous user activity for analytics and recommendations
+- the AI Vision service isolates AI-heavy workflows from the main commerce APIs
+
+The system is documented in more detail under [docs/README.md](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/README.md>).
+
+## Core Stack
+
+- Monorepo tooling: Nx, pnpm
+- Frontend: Next.js 15, React 19, Tailwind CSS 4, Radix UI
+- Backend: Express, TypeScript
+- Database: MongoDB via Prisma
+- Async/eventing: Kafka
+- Cache/integration infra: Redis, ImageKit
+- Payments: Stripe
+- AI integrations: Google Gemini, Hugging Face, LangChain, TensorFlow
+- Testing: Vitest, Supertest, Nx e2e projects
+- CI: GitHub Actions
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 20
+- pnpm 9
+- MongoDB
+- Redis
+- Docker, if you want to run Kafka locally via Compose
+
+### Install dependencies
+
+```bash
+pnpm install
 ```
 
-To create a production bundle:
+### Prepare environment
 
-```sh
-npx nx build auth-service
+Use `.env.example` as the starting point, then add the additional variables required by Stripe, SMTP, ImageKit, and AI integrations. The complete env inventory is documented in [docs/01-getting-started/environment-variables.md](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/01-getting-started/environment-variables.md>).
+
+### Start local infrastructure
+
+Kafka tooling is defined in `libs/docker-compose.yml`:
+
+```bash
+docker compose -f libs/docker-compose.yml up -d
 ```
 
-To see all available targets to run for a project, run:
+MongoDB and Redis are expected separately in local development.
 
-```sh
-npx nx show project auth-service
+### Run apps
+
+Examples:
+
+```bash
+pnpm exec nx serve auth-service
+pnpm exec nx serve product-service
+pnpm exec nx serve order-service
+pnpm exec nx serve recommendation-service
+pnpm exec nx serve api-gateway
+pnpm exec nx serve aivision-service
+pnpm exec nx dev user-ui
+pnpm exec nx dev seller-ui
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Helpful root scripts:
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/node:app demo
+```bash
+pnpm test
+pnpm test:coverage
+pnpm user-ui
+pnpm seller-ui
 ```
 
-To generate a new library, use:
+## Default Local Ports
 
-```sh
-npx nx g @nx/node:lib mylib
+- `3000`: `user-ui`
+- `3001`: `seller-ui`
+- `6001`: `auth-service`
+- `6002`: `product-service`
+- `6004`: `order-service`
+- `6005`: `recommendation-service`
+- `6006`: `aivision-service`
+- `8080`: `api-gateway`
+- `8089`: Kafka UI
+- `9092`: Kafka broker
+- `6379`: Redis
+- `27017`: MongoDB
+
+The complete mapping lives in [docs/11-reference/port-map.md](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/11-reference/port-map.md>).
+
+## Testing
+
+The repository uses Vitest for unit and integration testing and Nx e2e projects for service-level end-to-end coverage.
+
+Common commands:
+
+```bash
+pnpm test
+pnpm test:coverage
+pnpm test:auth
+pnpm test:product
+pnpm test:order
+pnpm test:gateway
+pnpm test:recommendation
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+CI builds and tests are defined in `.github/workflows/test.yml`.
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Documentation
 
+Start here:
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [Documentation Index](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/README.md>)
+- [Documentation Implementation Plan](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/docs-implemenataion.md>)
+- [Project Overview](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/00-overview/product-overview.md>)
+- [Local Development Guide](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/01-getting-started/local-development.md>)
 
-## Install Nx Console
+## Current Documentation Status
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/node?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+The repo already contains useful design and feature notes, especially for brand and AI Vision work, but the old documentation is fragmented. The new `docs/` structure is the canonical path going forward, with legacy material being indexed and migrated over time.
