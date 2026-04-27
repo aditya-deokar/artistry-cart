@@ -33,6 +33,7 @@ At minimum, local development usually needs:
 - `ACCESS_TOKEN_SECRET`
 - `REFRESH_TOKEN_SECRET`
 - `FRONTEND_URL`
+- `CORS_ALLOWED_ORIGINS`
 
 Additional flows require extra configuration:
 
@@ -85,7 +86,7 @@ When bringing the stack up manually, use this order:
 10. `user-ui`
 11. `seller-ui`
 
-The gateway assumes the downstream services exist on fixed local ports, so starting the services before the gateway makes local debugging easier.
+The gateway now supports environment-based upstream service URLs, but the default local values still target the standard local ports, so starting the services before the gateway makes local debugging easier.
 
 ## Run Backend Services
 
@@ -156,12 +157,14 @@ If you need AI Vision flows:
 - `user-ui` uses Next.js rewrites to forward `/auth/api/*`, `/product/api/*`, `/order/api/*`, and `/ai-vision/api/*` to `NEXT_PUBLIC_SERVER_URI`, which defaults to the gateway on `http://localhost:8080`
 - `seller-ui` talks to backend APIs through `NEXT_PUBLIC_SERVER_URI`
 - `api-gateway` proxies to the backend services on ports `6001`, `6002`, `6004`, `6005`, and `6006`
+- standardized health endpoints are `GET /healthz` and `GET /readyz`, with some legacy aliases still available
 
 ## Common Local URLs
 
 - buyer app: `http://localhost:3000`
 - seller app: `http://localhost:3001`
-- gateway: `http://localhost:8080/gateway-health`
+- gateway readiness: `http://localhost:8080/readyz`
+- gateway legacy health alias: `http://localhost:8080/gateway-health`
 - auth service: `http://localhost:6001`
 - product service: `http://localhost:6002`
 - order service: `http://localhost:6004`

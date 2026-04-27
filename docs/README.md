@@ -139,6 +139,16 @@ Reference material such as:
 - [Port Map](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/11-reference/port-map.md>)
 - [Documentation Style Guide](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/11-reference/documentation-style-guide.md>)
 
+### `DevOps`
+
+Operational planning and deployment documentation:
+
+- [DevOps Implementation Plan](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/DevOps-implemenatation.md>)
+- [Docker Compose Strategy](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/docker-compose-strategy.md>)
+- [Dockerfile Standards](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/dockerfile-standards.md>)
+- [Kubernetes Deployment Guide](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/kubernetes-deployment-guide.md>)
+- [CI/CD Release Pipeline](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/ci-cd-release-pipeline.md>)
+
 ### `legacy`
 
 Existing docs that predate the canonical structure, plus migration notes such as:
@@ -162,6 +172,7 @@ Implemented through Phase 8:
 - decision docs
 - interview-prep docs
 - initial reference docs
+- DevOps planning docs
 - legacy migration and canonicalization docs
 
 Current state:
@@ -176,5 +187,6 @@ When a topic appears in multiple places:
 
 - prefer docs under the new numbered folders as the current source of truth
 - use `legacy/`, `brand/`, `ai-vision-api/`, and older feature docs as supporting historical context
+- use `docs/DevOps/` for active containerization, deployment, and platform-delivery planning
 
 The documentation implementation roadmap is tracked in [docs-implemenataion.md](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/docs-implemenataion.md>).

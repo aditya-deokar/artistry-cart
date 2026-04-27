@@ -2,7 +2,17 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import Stripe from "stripe";
+
 import { errorMiddleware } from "../../../packages/error-handler/error-middelware";
+import {
+  closeServer,
+  createCorsOptions,
+  getHost,
+  getPort,
+  registerGracefulShutdown,
+  registerHealthEndpoints,
+} from "../../../packages/utils/runtime";
 import router from "./routes/order.route";
 import {
   handlePaymentSucceeded,
@@ -11,30 +21,23 @@ import {
   handleAccountUpdated,
   handleTransferCreated,
 } from "./controllers/order.controller";
-import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY!, {
   apiVersion: "2025-06-30.basil",
 });
 
+const host = getHost();
+const port = getPort(6004);
 const app = express();
 
 app.use(
-  cors({
-    origin: [
-      "http://localhost:3000", // frontend dev
-      "http://localhost:3001", // seller-ui dev
-      process.env.FRONTEND_URL || "", // allow env-based frontend
-    ].filter(Boolean),
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Authorization", "Content-Type"],
-    credentials: true, // allow cookies
-  })
+  cors(
+    createCorsOptions({
+      allowedHeaders: ["Authorization", "Content-Type"],
+    }),
+  ),
 );
 
-// ============================================
-// STRIPE WEBHOOK HANDLER (before express.json())
-// ============================================
 app.post(
   "/order/api/webhooks",
   bodyParser.raw({ type: "application/json" }),
@@ -49,14 +52,13 @@ app.post(
       event = stripe.webhooks.constructEvent(
         req.body,
         signature,
-        process.env.STRIPE_WEBHOOK_SECRET!
+        process.env.STRIPE_WEBHOOK_SECRET!,
       );
     } catch (err: any) {
       console.error("Webhook signature verification failed:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    // Handle different event types
     try {
       switch (event.type) {
         case "payment_intent.succeeded":
@@ -89,24 +91,33 @@ app.post(
       console.error("Error processing webhook:", error);
       return res.status(500).json({ error: "Webhook handler failed" });
     }
-  }
+  },
 );
-
-// (Legacy endpoint removed, fully handled in /order/api/webhooks now)
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
+const { liveness, readiness } = registerHealthEndpoints(app, {
+  serviceName: "order-service",
+});
+
+app.get("/", (_req, res) => {
   res.send({ message: "Welcome to order-service!" });
 });
 
-// Routes
-app.use("/order/api", router);
+app.get("/health", liveness);
+app.get("/ready", readiness);
 
+app.use("/order/api", router);
 app.use(errorMiddleware);
-const port = process.env.PORT || 6004;
-const server = app.listen(port, () => {
-  console.log(`Order service listening at http://localhost:${port}`);
+
+const server = app.listen(port, host, () => {
+  console.log(`Order service listening at http://${host}:${port}`);
 });
+
 server.on("error", console.error);
+
+registerGracefulShutdown({
+  name: "order-service",
+  close: () => closeServer(server),
+});

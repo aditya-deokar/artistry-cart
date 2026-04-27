@@ -538,6 +538,8 @@ const stripe= new Stripe(process.env.STRIPE_SECRETE_KEY!, {
   apiVersion : "2025-06-30.basil"
 })
 
+const frontendUrl = process.env.FRONTEND_URL?.trim() || "http://localhost:3000";
+
 // create stripe connect account link
 export const createStripeConnection = async(req:Request, res: Response, next:NextFunction)=>{
   try {
@@ -580,8 +582,8 @@ export const createStripeConnection = async(req:Request, res: Response, next:Nex
 
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
-      refresh_url: `http://localhost:3000/success`,
-      return_url: `http://localhost:3000/success`,
+      refresh_url: `${frontendUrl}/success`,
+      return_url: `${frontendUrl}/success`,
       type:"account_onboarding",
     }) 
 
