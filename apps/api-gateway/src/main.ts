@@ -1,74 +1,29 @@
-import express from 'express';
-import cors from 'cors';
-import proxy from 'express-http-proxy';
-import morgan from 'morgan';
-import rateLimit from 'express-rate-limit';
-import cookieParser from 'cookie-parser';
-import initializeConfig from './libs/initializeSiteConfig';
+import initializeConfig from "./libs/initializeSiteConfig";
+import {
+  closeServer,
+  registerGracefulShutdown,
+} from "../../../packages/utils/runtime";
+import { createGatewayApp } from "./app";
+import { getGatewayConfig } from "./config";
 
+const config = getGatewayConfig();
+const app = createGatewayApp(config);
 
+const server = app.listen(config.port, config.host, () => {
+  console.log(`Listening at http://${config.host}:${config.port}/api`);
 
-
-const app = express();
-
-app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:3001"],
-  allowedHeaders: ['Authorization', 'Content-Type'],
-  credentials: true,
-}));
-
-
-app.use(morgan('dev'));
-
-app.use(express.json({ limit: '30mb' }));
-
-app.use(express.urlencoded({ limit: '30mb', extended: true }));
-
-app.use(cookieParser());
-
-app.set("trust proxy", 1);
-
-
-// Rate Limiting
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: (req: any) => (req.user ? 1000 : 100),
-  message: {
-    error: "Too many Reqeusts, please try again later!"
-  },
-  standardHeaders: true,
-  legacyHeaders: true,
-  keyGenerator: (req: any) => (req.ip),
+  void initializeConfig()
+    .then(() => {
+      console.log("Site config initailized successfully!");
+    })
+    .catch((error) => {
+      console.error("Failed to initailize site config:", error);
+    });
 });
 
-app.use(limiter);
+server.on("error", console.error);
 
-
-
-
-app.get('/gateway-health', (req, res) => {
-  res.send({ message: 'Welcome to api-gateway!' });
+registerGracefulShutdown({
+  name: "api-gateway",
+  close: () => closeServer(server),
 });
-
-app.use("/auth", proxy("http://localhost:6001"));
-app.use("/product", proxy("http://localhost:6002"));
-// app.use("/order", proxy("http://localhost:6004"))
-app.use("/recommendation", proxy("http://localhost:6005"))
-app.use("/ai-vision", proxy("http://localhost:6006"))
-app.use("/order", proxy("http://localhost:6004", {
-  proxyReqPathResolver: (req) => req.originalUrl
-}));
-
-const port = process.env.PORT || 8080;
-const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api`);
-
-  try {
-    initializeConfig();
-    console.log("Site config initailized successfully!")
-  } catch (error) {
-    console.error("Failed to initailize site config:", error)
-  }
-});
-server.on('error', console.error);

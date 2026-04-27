@@ -1,10 +1,9 @@
-import axios from 'axios';
-import { describe, it, expect } from 'vitest';
+import axios from "axios";
 
-describe('GET /gateway-health', () => {
-  it('should return a message', async () => {
-    const res = await axios.get('/gateway-health');
+describe("GET /readyz", () => {
+  it("should return gateway readiness", async () => {
+    const res = await axios.get("/readyz");
     expect(res.status).toBe(200);
-    expect(res.data).toHaveProperty('message');
+    expect(res.data).toHaveProperty("service", "api-gateway");
   });
 });

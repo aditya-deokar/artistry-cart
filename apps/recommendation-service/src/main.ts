@@ -1,24 +1,46 @@
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import router from './routes/recommendation.routes';
+import {
+  closeServer,
+  createCorsOptions,
+  getHost,
+  getPort,
+  registerGracefulShutdown,
+  registerHealthEndpoints,
+} from "../../../packages/utils/runtime";
+import router from "./routes/recommendation.routes";
 
 const app = express();
+const host = getHost();
+const port = getPort(6005);
 
-app.use(express.json({ limit:"100mb"}));
-app.use(express.urlencoded( {limit: "100mb" , extended: true}))
-app.use(cookieParser())
+app.use(cors(createCorsOptions()));
+app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ limit: "100mb", extended: true }));
+app.use(cookieParser());
 
-app.get('/', (req, res) => {
-  res.send({ message: 'Welcome to recommendation-service!' });
+const { liveness, readiness } = registerHealthEndpoints(app, {
+  serviceName: "recommendation-service",
 });
 
+app.get("/", (_req, res) => {
+  res.send({ message: "Welcome to recommendation-service!" });
+});
 
-// routes
+app.get("/health", liveness);
+app.get("/ready", readiness);
+
 app.use("/api", router);
 
-const port = process.env.PORT || 6005;
-const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api`);
+const server = app.listen(port, host, () => {
+  console.log(`Listening at http://${host}:${port}/api`);
 });
-server.on('error', console.error);
+
+server.on("error", console.error);
+
+registerGracefulShutdown({
+  name: "recommendation-service",
+  close: () => closeServer(server),
+});

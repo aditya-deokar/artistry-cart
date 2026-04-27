@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 
+import { registerGracefulShutdown } from "../../../packages/utils/runtime";
 import { kafka } from "../../../packages/utils/kafka";
 import {
   AnalyticsEvent,
@@ -40,7 +41,6 @@ const processQueue = async () => {
     }
 
     if (event.action === "shop_visit") {
-      // TODO: expand shop analytics once the write model is ready
       continue;
     }
 
@@ -52,9 +52,8 @@ const processQueue = async () => {
   }
 };
 
-setInterval(processQueue, batchIntervalMs);
+const queueProcessor = setInterval(processQueue, batchIntervalMs);
 
-// Kafka Consumer for user events
 export const consumeKafkaMessages = async () => {
   await consumer.connect();
   await consumer.subscribe({ topic, fromBeginning: false });
@@ -76,4 +75,13 @@ export const consumeKafkaMessages = async () => {
 consumeKafkaMessages().catch((error) => {
   console.error("Kafka consumer failed", error);
   process.exitCode = 1;
+});
+
+registerGracefulShutdown({
+  name: "kafka-service",
+  onShutdown: async () => {
+    clearInterval(queueProcessor);
+    await processQueue();
+    await consumer.disconnect();
+  },
 });

@@ -19,13 +19,37 @@ This document captures the environment-variable surface used by the current code
   - local default in `.env.example`: `http://localhost:3000`
 
 - `HOST`
-  - optional host override for some services
+  - shared host binding override for backend services
+  - Phase 1 runtime standardization now defaults services to `0.0.0.0`
 
 - `PORT`
   - optional port override for individual services
 
 - `NODE_ENV`
   - affects cookie security and error detail behavior in multiple services
+
+- `CORS_ALLOWED_ORIGINS`
+  - comma-separated list of allowed browser origins for services that use the shared runtime CORS helper
+  - local default in `.env.example`: `http://localhost:3000,http://localhost:3001`
+
+### Internal service URLs
+
+These are primarily used by `api-gateway` and become especially important in Docker and Kubernetes, where `localhost` should be replaced with service discovery names.
+
+- `AUTH_SERVICE_URL`
+  - local default in `.env.example`: `http://localhost:6001`
+
+- `PRODUCT_SERVICE_URL`
+  - local default in `.env.example`: `http://localhost:6002`
+
+- `ORDER_SERVICE_URL`
+  - local default in `.env.example`: `http://localhost:6004`
+
+- `RECOMMENDATION_SERVICE_URL`
+  - local default in `.env.example`: `http://localhost:6005`
+
+- `AIVISION_SERVICE_URL`
+  - local default in `.env.example`: `http://localhost:6006`
 
 ## Auth and Token Variables
 
@@ -155,6 +179,13 @@ The following list is a practical local baseline for most backend work:
 ```dotenv
 DATABASE_URL="mongodb://localhost:27017/artistry-cart"
 FRONTEND_URL="http://localhost:3000"
+HOST="0.0.0.0"
+CORS_ALLOWED_ORIGINS="http://localhost:3000,http://localhost:3001"
+AUTH_SERVICE_URL="http://localhost:6001"
+PRODUCT_SERVICE_URL="http://localhost:6002"
+ORDER_SERVICE_URL="http://localhost:6004"
+RECOMMENDATION_SERVICE_URL="http://localhost:6005"
+AIVISION_SERVICE_URL="http://localhost:6006"
 ACCESS_TOKEN_SECRET="replace-me"
 REFRESH_TOKEN_SECRET="replace-me"
 REDIS_ENABLED="true"
@@ -175,7 +206,7 @@ Add Stripe, SMTP, OAuth, AI, and frontend variables only when your flows require
 
 ## Documentation Gap To Track
 
-`.env.example` currently documents only part of the runtime surface. One future cleanup item is to align `.env.example` with the full configuration inventory documented here.
+`.env.example` now covers the core Phase 1 runtime contract, but it still does not capture every optional integration variable used by Stripe, SMTP, OAuth, and AI workflows.
 
 ## Related Docs
 

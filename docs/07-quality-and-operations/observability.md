@@ -10,12 +10,13 @@ The current observability posture is functional but uneven. The platform has hea
 
 Visible health-style endpoints include:
 
-- `api-gateway`: `GET /gateway-health`
-- `product-service`: `GET /`
-- `recommendation-service`: `GET /`
-- `aivision-service`: `GET /` and `GET /health`
+- standardized liveness route: `GET /healthz`
+- standardized readiness route: `GET /readyz`
+- legacy compatibility routes still exist in some services such as:
+  - `api-gateway`: `GET /gateway-health`
+  - `aivision-service`: `GET /health`
 
-The shape is helpful, but not standardized.
+Phase 1 of the DevOps runtime cleanup introduced the standardized endpoints, but some legacy aliases remain for backward compatibility.
 
 ### Request logging
 
@@ -61,7 +62,7 @@ This is workable in development, but not ideal as a long-term production standar
 - metrics dashboards
 - event lag and delivery monitoring for Kafka
 - alerting for webhook failures, recommendation latency, or AI job degradation
-- consistent readiness/liveness semantics across services
+- dependency-aware readiness depth beyond the current baseline, especially outside AI Vision
 
 ## Strong Spots
 

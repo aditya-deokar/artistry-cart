@@ -1,25 +1,29 @@
-import "./jobs/product-cron.job"
-import app from './app';
+import "./jobs/product-cron.job";
 
-const host = process.env.HOST ?? 'localhost';
-const port = process.env.PORT ? Number(process.env.PORT) : 6002;
+import app from "./app";
+import {
+  closeServer,
+  getHost,
+  getPort,
+  registerGracefulShutdown,
+} from "../../../packages/utils/runtime";
 
-const server = app.listen(port, () => {
-  console.log(`🚀 Product Service is Running at http://${host}:${port}/api`);
-  console.log(`📊 Health Check: http://${host}:${port}/`);
-  console.log(`🛍️  Products API: http://${host}:${port}/api`);
-  console.log(`🎉 Events API: http://${host}:${port}/api/events`);
-  console.log(`💰 Discounts API: http://${host}:${port}/api/discounts`);
+const host = getHost();
+const port = getPort(6002);
+
+const server = app.listen(port, host, () => {
+  console.log(`Product Service is running at http://${host}:${port}/api`);
+  console.log(`Health Check: http://${host}:${port}/healthz`);
+  console.log(`Products API: http://${host}:${port}/api`);
+  console.log(`Events API: http://${host}:${port}/api/events`);
+  console.log(`Discounts API: http://${host}:${port}/api/discounts`);
 });
 
-server.on('error', (err) => {
-  console.error("❌ Server Error:", err);
+server.on("error", (err) => {
+  console.error("Server Error:", err);
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    console.log('Process terminated');
-  });
+registerGracefulShutdown({
+  name: "product-service",
+  close: () => closeServer(server),
 });
