@@ -72,7 +72,7 @@ export default function BulkActionsPage() {
               <BulkInventoryUpdate />
             </CardContent>
           </Card>
-        </CardContent>
+        </TabsContent>
 
         <TabsContent value="categories">
           <Card>

@@ -1,4 +1,6 @@
 // components/dashboard/shared/ActionDropdown.tsx
+import * as React from 'react';
+
 import {
   DropdownMenu,
   DropdownMenuContent,

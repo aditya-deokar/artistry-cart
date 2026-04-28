@@ -148,6 +148,11 @@ These are used by auth and order email-sending utilities.
   - used by both frontends to reach backend APIs
   - typical local value: `http://localhost:8080`
 
+- `INTERNAL_SERVER_URI`
+  - used by Next.js server-side code and rewrites when the frontend itself runs inside Docker
+  - keeps container-to-container traffic on the Compose network while `NEXT_PUBLIC_SERVER_URI` stays browser-reachable
+  - typical local non-container value: `http://localhost:8080`
+
 - `NEXT_PUBLIC_FRONTEND_URL`
   - used in checkout return URL construction in `user-ui`
 
@@ -200,6 +205,8 @@ KAFKA_CONSUMER_GROUP_ID="user-events-group"
 KAFKA_USER_EVENTS_TOPIC="users-events"
 KAFKA_CONSUMER_BATCH_INTERVAL_MS="3000"
 OAUTH_REDIRECT_BASE_URL="http://localhost:6001"
+NEXT_PUBLIC_SERVER_URI="http://localhost:8080"
+INTERNAL_SERVER_URI="http://localhost:8080"
 ```
 
 Add Stripe, SMTP, OAuth, AI, and frontend variables only when your flows require them.

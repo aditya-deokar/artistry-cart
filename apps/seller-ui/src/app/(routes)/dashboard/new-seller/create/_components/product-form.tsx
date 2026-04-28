@@ -2,7 +2,7 @@
 'use client'
 
 import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { type Resolver, SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { useCreateProduct } from '@/hooks/use-product-mutations'
@@ -28,7 +28,7 @@ export function ProductForm() {
   const [activeTab, setActiveTab] = useState('basic')
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productFormSchema),
+    resolver: zodResolver(productFormSchema) as Resolver<ProductFormValues>,
     defaultValues: formData,
     mode: 'onChange'
   })

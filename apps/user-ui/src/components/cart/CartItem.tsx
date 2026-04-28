@@ -12,7 +12,7 @@ import { QuantitySelector } from './QuantitySelector';
 
 type CartItemProps = {
   item: CartItemType;
-  onRemove: (productId: string, user:any, deviceInfo:string, location:any) => void;
+  onRemove: (productId: string) => void;
   onUpdateQuantity: (productId: string, newQuantity: number) => void;
 };
 
@@ -42,7 +42,7 @@ export const CartItem = ({ item, onRemove, onUpdateQuantity }: CartItemProps) =>
             </Link>
           </h3>
           <p className="text-sm text-muted-foreground mt-1">
-            by {item.Shop.name}
+            by {item.Shop?.name ?? 'Unknown Artist'}
           </p>
         </div>
         <div className="flex items-center gap-2">

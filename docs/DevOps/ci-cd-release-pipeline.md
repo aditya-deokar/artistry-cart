@@ -13,16 +13,20 @@ It explains:
 
 ## Current State
 
-The current visible workflow is [test.yml](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/.github/workflows/test.yml>).
+The repo now has:
 
-Today it gives the repo:
+- [test.yml](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/.github/workflows/test.yml>) for validation
+- [build-publish.yml](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/.github/workflows/build-publish.yml>) for image build, scan, and registry publishing
+
+Today that gives the repo:
 
 - pull request and push test validation
-- Nx affected testing on pull requests
-- Vitest execution on push
+- Nx affected testing and build validation on pull requests
+- Vitest coverage and deployable build validation on pushes
 - MongoDB and Redis-backed e2e runs for selected backend services
-
-That is a solid validation baseline, but it is not yet a release pipeline.
+- GHCR image build and publish for affected deployable apps
+- SHA and release-tag image tagging
+- Trivy scan output and SBOM attestation during image publishing
 
 ## What The Current Workflow Covers Well
 
@@ -34,13 +38,10 @@ That is a solid validation baseline, but it is not yet a release pipeline.
 
 ## What It Does Not Yet Cover
 
-- no image build or publish
-- no frontend production build validation
-- no `aivision-service` image or e2e coverage in the main CI path
-- no Kafka-backed workflow validation
 - no staging or production deployment automation
-- no vulnerability scanning
-- no SBOM generation
+- no `aivision-service-e2e` or `kafka-service-e2e` coverage in the main CI path
+- no Kafka-backed workflow validation in CI services
+- no release promotion workflow that reuses published digests
 
 ## Pipeline Goals
 
@@ -128,13 +129,13 @@ Recommended GitHub Actions files:
 
 | Workflow | Purpose |
 | --- | --- |
-| `pr-validate.yml` | pull request tests and builds |
+| `test.yml` | pull request and default-branch validation |
 | `build-publish.yml` | image build, scan, and push |
 | `deploy-staging.yml` | deploy published images to staging |
 | `deploy-production.yml` | controlled production promotion |
 | `nightly-security.yml` | optional scheduled scan and dependency hygiene |
 
-The current `test.yml` can remain temporarily and later be absorbed into the PR validation workflow.
+The current split already reflects the Phase 4 direction: validation remains in `test.yml`, while image publication now lives in `build-publish.yml`.
 
 ## Nx-Aware Build Strategy
 
@@ -318,10 +319,9 @@ Do not require a rebuild in order to roll back.
 
 ## Gaps To Close Before Full CI/CD Rollout
 
-- standardize health endpoints across services
-- remove gateway hardcoded localhost upstreams
-- validate frontend production builds in CI
-- add `aivision-service` and Kafka paths to the release picture
+- add staging deploy automation
+- add production promotion and digest-based rollback flow
+- add `aivision-service-e2e` and Kafka validation paths where feasible
 - split background jobs from API pods where scale behavior requires it
 
 ## Definition Of Done

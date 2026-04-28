@@ -11,11 +11,18 @@ const nextConfig = {
   // Use this to set Nx-specific options
   // See: https://nx.dev/recipes/next/next-config-setup
   nx: {},
+  output: 'standalone',
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     domains: ['plus.unsplash.com', 'images.unsplash.com', 'plus.unsplash.com', 'ik.imagekit.io', 'placehold.co', 'lh3.googleusercontent.com']
   },
   async rewrites() {
-    const serverUri = process.env.NEXT_PUBLIC_SERVER_URI || 'http://localhost:8080';
+    const serverUri =
+      process.env.INTERNAL_SERVER_URI ||
+      process.env.NEXT_PUBLIC_SERVER_URI ||
+      'http://localhost:8080';
 
     return [
       {

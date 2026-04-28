@@ -186,7 +186,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             // 1. Create Checkout Session
             const response = await axiosInstance.post('/order/api/create-payment-session', {
                 cart,
-                couponCode: appliedCoupon?.code,
+                couponCode: appliedCoupon?.discountCode,
             });
 
             const { sessionId } = response.data;

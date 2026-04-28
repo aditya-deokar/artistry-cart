@@ -6,7 +6,7 @@ import axios, { AxiosError } from 'axios';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
@@ -18,7 +18,7 @@ type FormData = {
 
 import { motion } from 'framer-motion';
 
-const LoginPage = () => {
+const LoginPageContent = () => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [serverError, setServerError] = useState<string | null>(null);
 
@@ -253,4 +253,10 @@ const LoginPage = () => {
     );
 };
 
-export default LoginPage;
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="flex justify-center p-20">Loading...</div>}>
+            <LoginPageContent />
+        </Suspense>
+    );
+}

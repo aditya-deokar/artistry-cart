@@ -20,7 +20,7 @@ export const OtherProducts: FC<OtherProductsProps> = ({ products }) => {
 
       <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {products.map((product) => {
-          const primaryImage = product.image.find(img => img !== null);
+          const primaryImage = product.images.find((img) => img !== null);
           return (
             <li key={product.slug}> {/* Use the database ID for the key */}
               <TransitionLink href={`/products/${product.slug}`}>
@@ -41,7 +41,7 @@ export const OtherProducts: FC<OtherProductsProps> = ({ products }) => {
 
                   <div className="mt-4 space-y-1">
                     <h3 className="font-display text-2xl">{product.title}</h3>
-                    <p className="text-sm text-primary/90">{product.subcategory}</p>
+                    <p className="text-sm text-primary/90">{product.subCategory}</p>
                     <p className="text-base font-light">
                       {formatPrice(product.sale_price ?? product.regular_price)}
                     </p>

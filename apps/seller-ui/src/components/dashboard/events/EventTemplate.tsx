@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { FileTemplate, Plus, Eye, Edit, Trash2, Copy, Star, Users } from 'lucide-react';
+import { FileText, Plus, Eye, Edit, Trash2, Copy, Star, Users } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { EventTemplate } from '@/types/event';
@@ -193,7 +193,7 @@ export default function EventTemplates() {
 
           <div className="flex gap-2 pt-2">
             <Button size="sm" onClick={() => handleUseTemplate(template)}>
-              <FileTemplate className="h-4 w-4 mr-1" />
+              <FileText className="h-4 w-4 mr-1" />
               Use Template
             </Button>
             <Button variant="outline" size="sm" onClick={() => handleEdit(template)}>
@@ -411,7 +411,7 @@ export default function EventTemplates() {
       ) : (
         <Card>
           <CardContent className="p-12 text-center">
-            <FileTemplate className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+            <FileText className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-xl font-semibold mb-2">No Templates Yet</h3>
             <p className="text-muted-foreground mb-6">
               Create your first event template to speed up future event creation

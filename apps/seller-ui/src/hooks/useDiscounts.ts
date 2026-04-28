@@ -83,8 +83,9 @@ export const useCreateDiscount = () => {
 // Update discount code with optimistic updates
 export const useUpdateDiscount = () => {
   const queryClient = useQueryClient();
+  type DiscountUpdatePayload = Partial<CreateDiscountData> & { isActive?: boolean };
   
-  return useMutation<DiscountCode, Error, { discountId: string; data: Partial<CreateDiscountData> }>({
+  return useMutation<DiscountCode, Error, { discountId: string; data: DiscountUpdatePayload }>({
     mutationFn: async ({ discountId, data }): Promise<DiscountCode> => {
       const response = await axiosInstance.put(`/product/api/discounts/${discountId}`, data); // Updated route
       return response.data.data;

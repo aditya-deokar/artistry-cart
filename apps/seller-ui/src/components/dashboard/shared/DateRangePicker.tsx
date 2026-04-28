@@ -104,13 +104,16 @@ export function DateRangePicker({
   };
 
   const getCurrentPreset = () => {
-    if (!value?.from || !value?.to) return null;
+    const currentFrom = value?.from;
+    const currentTo = value?.to;
+
+    if (!currentFrom || !currentTo) return null;
     
     return presets.find(preset => {
       const presetFrom = format(preset.range.from!, 'yyyy-MM-dd');
       const presetTo = format(preset.range.to!, 'yyyy-MM-dd');
-      const valueFrom = format(value.from, 'yyyy-MM-dd');
-      const valueTo = format(value.to, 'yyyy-MM-dd');
+      const valueFrom = format(currentFrom, 'yyyy-MM-dd');
+      const valueTo = format(currentTo, 'yyyy-MM-dd');
       
       return presetFrom === valueFrom && presetTo === valueTo;
     });
@@ -165,7 +168,7 @@ export function DateRangePicker({
               mode="range"
               defaultMonth={value?.from}
               selected={value}
-              onSelect={onChange}
+              onSelect={(range) => onChange(range)}
               numberOfMonths={2}
               className="rounded-md"
             />

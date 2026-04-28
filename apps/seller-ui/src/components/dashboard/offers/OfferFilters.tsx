@@ -323,7 +323,7 @@ export default function OfferFilters({ onFiltersChange, activeFilters = {} }: Of
                 }
               />
               <Label htmlFor="high-conversion" className="text-sm">
-                High Conversion (>5%)
+                High Conversion (&gt;5%)
               </Label>
             </div>
 
@@ -336,7 +336,7 @@ export default function OfferFilters({ onFiltersChange, activeFilters = {} }: Of
                 }
               />
               <Label htmlFor="high-revenue" className="text-sm">
-                High Revenue (>$1000)
+                High Revenue (&gt;$1000)
               </Label>
             </div>
           </div>

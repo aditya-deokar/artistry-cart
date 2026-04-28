@@ -1,0 +1,395 @@
+name: Build and Publish Images
+
+on:
+  push:
+    branches: [master]
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to build. Defaults to the current ref.
+        required: false
+        type: string
+      apps:
+        description: Optional comma-separated deployable app list.
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  PNPM_VERSION: "9"
+  DEPLOYABLE_APPS: user-ui,seller-ui,api-gateway,auth-service,product-service,order-service,recommendation-service,aivision-service,kafka-service
+  CORE_E2E_APPS: auth-service-e2e,product-service-e2e,order-service-e2e,api-gateway-e2e,recommendation-service-e2e
+  CORE_BACKEND_BUILD_APPS: auth-service,product-service,order-service,recommendation-service,api-gateway
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Release Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.ref || github.sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm exec prisma generate
+
+      - name: Run unit and integration tests with coverage
+        run: pnpm exec vitest run --coverage
+
+      - name: Build deployable apps
+        run: pnpm exec nx run-many --target=build --projects=${{ env.DEPLOYABLE_APPS }} --parallel=5
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-build-publish
+          path: coverage
+          if-no-files-found: warn
+
+  e2e:
+    name: Release E2E Validation
+    runs-on: ubuntu-latest
+    needs: validate
+    timeout-minutes: 25
+
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval \"db.adminCommand('ping').ok\""
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      HOST: localhost
+      DATABASE_URL: mongodb://localhost:27017/artistry-cart-test
+      REDIS_ENABLED: "false"
+      REDIS_URL: redis://localhost:6379
+      ACCESS_TOKEN_SECRET: test-access-token-secret
+      REFRESH_TOKEN_SECRET: test-refresh-token-secret
+      STRIPE_SECRETE_KEY: sk_test_placeholder
+      STRIPE_WEBHOOK_SECRET: whsec_test_placeholder
+      FRONTEND_URL: http://localhost:3000
+      OAUTH_REDIRECT_BASE_URL: http://localhost:6001
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
+      GOOGLE_CLIENT_ID: test-google-client-id
+      GOOGLE_CLIENT_SECRET: test-google-client-secret
+      GITHUB_CLIENT_ID: test-github-client-id
+      GITHUB_CLIENT_SECRET: test-github-client-secret
+      FACEBOOK_CLIENT_ID: test-facebook-client-id
+      FACEBOOK_CLIENT_SECRET: test-facebook-client-secret
+      SMTP_HOST: smtp.test.local
+      SMTP_PORT: "587"
+      SMTP_SERVICE: smtp
+      SMTP_USER: test@artistry.local
+      SMTP_PASS: test-smtp-password
+      AUTH_SERVICE_URL: http://localhost:6001
+      PRODUCT_SERVICE_URL: http://localhost:6002
+      ORDER_SERVICE_URL: http://localhost:6004
+      RECOMMENDATION_SERVICE_URL: http://localhost:6005
+      AIVISION_SERVICE_URL: http://localhost:6006
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm exec prisma generate
+
+      - name: Build core backend services
+        run: pnpm exec nx run-many --target=build --projects=${{ env.CORE_BACKEND_BUILD_APPS }} --parallel=5
+
+      - name: Start auth-service
+        run: node apps/auth-service/dist/main.js >/tmp/auth-service.log 2>&1 &
+        env:
+          PORT: 6001
+
+      - name: Start product-service
+        run: node apps/product-service/dist/main.js >/tmp/product-service.log 2>&1 &
+        env:
+          PORT: 6002
+
+      - name: Start order-service
+        run: node apps/order-service/dist/main.js >/tmp/order-service.log 2>&1 &
+        env:
+          PORT: 6004
+
+      - name: Start recommendation-service
+        run: node apps/recommendation-service/dist/main.js >/tmp/recommendation-service.log 2>&1 &
+        env:
+          PORT: 6005
+
+      - name: Start api-gateway
+        run: node apps/api-gateway/dist/main.js >/tmp/api-gateway.log 2>&1 &
+        env:
+          PORT: 8080
+
+      - name: Wait for services to be ready
+        shell: bash
+        run: |
+          declare -A checks=(
+            ["auth-service"]="http://localhost:6001/readyz"
+            ["product-service"]="http://localhost:6002/readyz"
+            ["order-service"]="http://localhost:6004/readyz"
+            ["recommendation-service"]="http://localhost:6005/readyz"
+            ["api-gateway"]="http://localhost:8080/readyz"
+          )
+
+          for service in "${!checks[@]}"; do
+            echo "Waiting for ${service}..."
+            for attempt in $(seq 1 60); do
+              if curl --fail --silent "${checks[$service]}" >/dev/null; then
+                echo "  ${service} is ready"
+                break
+              fi
+
+              if [[ "${attempt}" == "60" ]]; then
+                echo "${service} did not become ready in time"
+                exit 1
+              fi
+
+              sleep 1
+            done
+          done
+
+      - name: Run E2E tests
+        run: pnpm exec nx run-many --target=e2e --projects=${{ env.CORE_E2E_APPS }} --parallel=1
+
+      - name: Show service logs on failure
+        if: failure()
+        shell: bash
+        run: |
+          for service in auth-service product-service order-service recommendation-service api-gateway; do
+            echo "::group::${service}.log"
+            if [[ -f "/tmp/${service}.log" ]]; then
+              cat "/tmp/${service}.log"
+            else
+              echo "No log captured"
+            fi
+            echo "::endgroup::"
+          done
+
+  detect-images:
+    name: Select Image Matrix
+    runs-on: ubuntu-latest
+    needs: [validate, e2e]
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+      has_images: ${{ steps.select.outputs.has_images }}
+      app_names: ${{ steps.select.outputs.app_names }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.ref || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Select deployable apps
+        id: select
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          INPUT_APPS: ${{ github.event.inputs.apps || '' }}
+        run: |
+          args=()
+
+          if [[ -n "${INPUT_APPS}" ]]; then
+            args+=(--apps "${INPUT_APPS}")
+          elif [[ "${EVENT_NAME}" == "workflow_dispatch" || "${REF_TYPE}" == "tag" ]]; then
+            args+=(--all)
+          elif [[ -n "${BEFORE_SHA}" && "${BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]]; then
+            args+=(--base "${BEFORE_SHA}" --head "${HEAD_SHA}")
+          else
+            args+=(--all)
+          fi
+
+          matrix="$(node scripts/ci/select-deployable-apps.mjs "${args[@]}")"
+          echo "matrix=${matrix}" >> "${GITHUB_OUTPUT}"
+
+          count="$(node -e "const data = JSON.parse(process.argv[1]); process.stdout.write(String(data.include.length));" "${matrix}")"
+          names="$(node -e "const data = JSON.parse(process.argv[1]); process.stdout.write(data.include.map((entry) => entry.app).join(','));" "${matrix}")"
+
+          if [[ "${count}" == "0" ]]; then
+            echo "has_images=false" >> "${GITHUB_OUTPUT}"
+          else
+            echo "has_images=true" >> "${GITHUB_OUTPUT}"
+          fi
+
+          echo "app_names=${names}" >> "${GITHUB_OUTPUT}"
+
+  build-and-publish:
+    name: Build, Scan, and Publish
+    runs-on: ubuntu-latest
+    needs: detect-images
+    if: needs.detect-images.outputs.has_images == 'true'
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-images.outputs.matrix) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.sha }}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Normalize image repository
+        id: image
+        shell: bash
+        run: |
+          owner="$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')"
+          echo "repository=ghcr.io/${owner}/artistry-cart-${{ matrix.app }}" >> "${GITHUB_OUTPUT}"
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.image.outputs.repository }}
+          flavor: |
+            latest=false
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=tag
+            type=raw,value=master,enable=${{ github.ref == 'refs/heads/master' }}
+
+      - name: Compose Docker build args
+        id: build-args
+        shell: bash
+        run: |
+          {
+            echo "args<<EOF"
+            echo "APP_NAME=${{ matrix.app }}"
+            echo "APP_PORT=${{ matrix.app_port }}"
+
+            if [[ "${{ matrix.app_type }}" == "frontend" ]]; then
+              echo "APP_ROOT=${{ matrix.app_root }}"
+              echo "OUTPUT_ROOT=${{ matrix.build_output }}"
+              echo "NEXT_PUBLIC_SERVER_URI=${{ vars.NEXT_PUBLIC_SERVER_URI || 'http://localhost:8080' }}"
+              echo "INTERNAL_SERVER_URI=${{ vars.INTERNAL_SERVER_URI || 'http://api-gateway:8080' }}"
+              echo "NEXT_PUBLIC_FRONTEND_URL=${{ vars.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000' }}"
+              echo "NEXT_PUBLIC_AI_VISION_API_URL=${{ vars.NEXT_PUBLIC_AI_VISION_API_URL || 'http://localhost:8080/ai-vision/api/v1/ai' }}"
+              echo "NEXT_PUBLIC_USER_UI_LINK=${{ vars.NEXT_PUBLIC_USER_UI_LINK || 'http://localhost:3000' }}"
+              echo "NEXT_PUBLIC_STRIPE_PUBLIC_KEY=${{ vars.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || '' }}"
+            else
+              echo "BUILD_OUTPUT=${{ matrix.build_output }}"
+            fi
+
+            echo "EOF"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Build and push image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: ${{ steps.build-args.outputs.args }}
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}
+          provenance: true
+          sbom: true
+
+      - name: Scan published image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ steps.image.outputs.repository }}@${{ steps.build.outputs.digest }}
+          format: sarif
+          output: trivy-results.sarif
+          ignore-unfixed: true
+          severity: HIGH,CRITICAL
+          vuln-type: os,library
+          exit-code: "0"
+
+      - name: Upload scan results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+
+      - name: Upload image scan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-${{ matrix.app }}
+          path: trivy-results.sarif
+          if-no-files-found: error

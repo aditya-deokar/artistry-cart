@@ -1,4 +1,6 @@
 // types/event.ts
+import type { Product } from './productTypes';
+
 export interface Event {
   id: string;
   title: string;

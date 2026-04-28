@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import EventTemplates from '@/components/dashboard/events/EventTemplates';
 import EventTemplateCreator from '@/components/dashboard/events/EventTemplateCreator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, FileTemplate } from 'lucide-react';
+import { ArrowLeft, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -25,7 +25,7 @@ export default function EventTemplatesPage() {
         </Button>
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
-            <FileTemplate className="h-8 w-8" />
+            <FileText className="h-8 w-8" />
             Event Templates
           </h1>
           <p className="text-muted-foreground">
@@ -70,7 +70,7 @@ export default function EventTemplatesPage() {
             </CardHeader>
             <CardContent>
               <div className="text-center py-12 text-muted-foreground">
-                <FileTemplate className="h-12 w-12 mx-auto mb-4" />
+                <FileText className="h-12 w-12 mx-auto mb-4" />
                 <p>Browse pre-built templates from the community</p>
                 <p className="text-sm">Coming soon...</p>
               </div>

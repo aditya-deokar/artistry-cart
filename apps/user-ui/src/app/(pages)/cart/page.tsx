@@ -15,7 +15,10 @@ const CartPage = () => {
     // Select state and actions from the Zustand store
     const cart = useStore((state) => state.cart);
     const { removeFromCart, updateQuantity } = useStore((state) => state.actions);
-   
+    
+    const handleRemoveFromCart = (productId: string) => {
+        removeFromCart(productId, null, null, '');
+    };
 
     // Calculate subtotal, memoized for performance.
     // This calculation runs only when the cart's contents change.
@@ -51,7 +54,7 @@ const CartPage = () => {
                                         <CartItem
                                             key={item.id}
                                             item={item}
-                                            onRemove={removeFromCart}
+                                            onRemove={handleRemoveFromCart}
                                             onUpdateQuantity={updateQuantity}
                                         />
                                     ))}

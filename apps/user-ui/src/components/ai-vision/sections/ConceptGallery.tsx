@@ -220,7 +220,7 @@ export function ConceptGallery() {
                             item={item}
                             onClick={() => handleItemClick(item)}
                             onFavoriteToggle={() => handleFavoriteToggle(item.id)}
-                            isNew={index >= items.length - 8 && pagination && pagination.page > 1}
+                            isNew={index >= items.length - 8 && Boolean(pagination && pagination.page > 1)}
                         />
                     ))}
                 </div>

@@ -70,6 +70,23 @@ Recommended defaults:
 - MongoDB: `mongodb://localhost:27017/artistry-cart`
 - Redis: `redis://localhost:6379`
 
+### Full Docker Compose stack
+
+Phase 3 of the DevOps rollout adds a canonical full-stack Compose setup under `docker/compose/`:
+
+```bash
+docker compose -f docker/compose/docker-compose.full.yml up --build
+```
+
+Helpful partial entry points:
+
+```bash
+docker compose -f docker/compose/docker-compose.infra.yml up -d
+docker compose -f docker/compose/docker-compose.apps.yml up --build
+```
+
+The Compose stack keeps the browser-facing gateway URL on `http://localhost:8080` while using `INTERNAL_SERVER_URI=http://api-gateway:8080` for server-side frontend traffic inside the Docker network.
+
 ## Recommended Service Startup Order
 
 When bringing the stack up manually, use this order:
