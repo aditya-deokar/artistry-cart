@@ -82,16 +82,19 @@ export function ArtisanSpotlight({
             });
 
             // Parallax on image
-            gsap.to(imageRef.current?.querySelector('.parallax-image'), {
-                yPercent: 15,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1,
-                },
-            });
+            const parallaxImage = imageRef.current?.querySelector('.parallax-image');
+            if (parallaxImage) {
+                gsap.to(parallaxImage, {
+                    yPercent: 15,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: containerRef.current,
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: 1,
+                    },
+                });
+            }
         }, containerRef);
 
         return () => ctx.revert();

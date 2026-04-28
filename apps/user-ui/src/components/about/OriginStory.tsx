@@ -78,16 +78,19 @@ export function OriginStory({
             });
 
             // Image parallax
-            gsap.to(imageRef.current?.querySelector('.parallax-img'), {
-                yPercent: 15,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1,
-                },
-            });
+            const parallaxImage = imageRef.current?.querySelector('.parallax-img');
+            if (parallaxImage) {
+                gsap.to(parallaxImage, {
+                    yPercent: 15,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: containerRef.current,
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: 1,
+                    },
+                });
+            }
         }, containerRef);
 
         return () => ctx.revert();

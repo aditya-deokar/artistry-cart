@@ -37,7 +37,7 @@ Important facts from the current codebase:
 - monorepo tool: Nx `21`
 - frontends: Next.js `15`
 - backend mix: inferred Nx builds plus custom configs
-- one generated Dockerfile exists at [apps/auth-service/Dockerfile](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/apps/auth-service/Dockerfile>)
+- shared Docker build templates now live at [docker/backend.Dockerfile](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docker/backend.Dockerfile>) and [docker/frontend.Dockerfile](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docker/frontend.Dockerfile>)
 - `recommendation-service` uses `@tensorflow/tfjs-node`
 - `aivision-service` has heavier AI-related runtime needs
 - both Next apps are not yet configured with `output: 'standalone'`
@@ -306,7 +306,7 @@ All of these belong in:
 
 ### `auth-service`
 
-- replace the generated Nx Dockerfile
+- use the shared backend Dockerfile with `APP_NAME=auth-service`
 - ensure final command and port match actual runtime expectations
 
 ### `product-service`

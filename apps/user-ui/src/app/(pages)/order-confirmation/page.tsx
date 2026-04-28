@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,7 +25,7 @@ interface Order {
     }[];
 }
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationContent() {
     const params = useParams();
     const searchParams = useSearchParams();
     const [order, setOrder] = useState<Order | null>(null);
@@ -75,12 +75,12 @@ export default function OrderConfirmationPage() {
 
             const particleCount = 50 * (timeLeft / duration);
             confetti({
-                ...defaults, party: true, // Type fix if party isn't in types, otherwise just omit
+                ...defaults,
                 particleCount,
                 origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
             });
             confetti({
-                ...defaults, party: true,
+                ...defaults,
                 particleCount,
                 origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
             });
@@ -184,5 +184,18 @@ export default function OrderConfirmationPage() {
                 </Card>
             </div>
         </div>
+    );
+}
+
+export default function OrderConfirmationPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex flex-col items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+                <h2 className="text-xl font-medium">Loading your order...</h2>
+            </div>
+        }>
+            <OrderConfirmationContent />
+        </Suspense>
     );
 }

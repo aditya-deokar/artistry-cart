@@ -1,7 +1,15 @@
 import axios from "axios";
 
+const resolveGatewayBaseUrl = () => {
+    if (typeof window === "undefined") {
+        return process.env.INTERNAL_SERVER_URI || process.env.NEXT_PUBLIC_SERVER_URI || "";
+    }
+
+    return process.env.NEXT_PUBLIC_SERVER_URI || window.location.origin;
+};
+
 const axiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_SERVER_URI,
+    baseURL: resolveGatewayBaseUrl(),
     withCredentials: true,
 });
 
@@ -49,7 +57,7 @@ axiosInstance.interceptors.response.use(
             isRefreshing= true;
             try {
                 await axios.post(
-                    `${process.env.NEXT_PUBLIC_SERVER_URI}/auth/api/refresh-token`,
+                    `${resolveGatewayBaseUrl()}/auth/api/refresh-token`,
                     {},
                     { withCredentials:true }
                 );

@@ -17,6 +17,7 @@
             "cjs"
           ],
           "bundle": false,
+          "generatePackageJson": true,
           "main": "apps/auth-service/src/main.ts",
           "tsConfig": "apps/auth-service/tsconfig.app.json",
           "assets": [
@@ -72,7 +73,7 @@
         "dependsOn": [
           "build"
         ],
-        "command": "docker build -f apps/auth-service/Dockerfile . -t artistry-cart-auth-service"
+        "command": "docker build -f docker/backend.Dockerfile . --build-arg APP_NAME=auth-service --build-arg BUILD_OUTPUT=apps/auth-service/dist --build-arg APP_PORT=6001 -t artistry-cart-auth-service"
       }
     }
   }

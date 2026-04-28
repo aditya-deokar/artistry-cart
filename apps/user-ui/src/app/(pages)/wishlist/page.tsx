@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { useStore } from '@/store'; 
+import { useStore } from '@/store';
 import { AnimatePresence } from 'framer-motion';
+import { type ArtProduct } from '@/types/products';
 
 // --- UI & Helper Components ---
 import { Bounded } from '@/components/common/Bounded';
@@ -19,8 +20,14 @@ const WishlistPage = () => {
     // Select actions from the nested 'actions' object
     const { addToCart, removeFromWishlist } = useStore((state) => state.actions);
 
-    
-    
+    const handleRemoveFromWishlist = (productId: string) => {
+        removeFromWishlist(productId, null, null, '');
+    };
+
+    const handleMoveToCart = (product: ArtProduct) => {
+        addToCart({ ...product, quantity: 1 }, null, null, '');
+        removeFromWishlist(product.id, null, null, '');
+    };
 
     return (
         <Bounded className="py-16 md:py-24">
@@ -43,10 +50,8 @@ const WishlistPage = () => {
                                 <WishlistItem
                                     key={product.id}
                                     product={product}
-                                    // The component now passes the store actions directly as props.
-                                    // The complex handler logic has been removed from the page.
-                                    onRemove={removeFromWishlist}
-                                    onMoveToCart={addToCart}
+                                    onRemove={handleRemoveFromWishlist}
+                                    onMoveToCart={handleMoveToCart}
                                 />
                             ))}
                         </AnimatePresence>

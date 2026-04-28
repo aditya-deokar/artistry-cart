@@ -140,16 +140,19 @@ export function ArtisansHero({
                 );
 
             // Parallax effect on featured image
-            gsap.to(featuredRef.current?.querySelector('.featured-image'), {
-                yPercent: -10,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: 1,
-                },
-            });
+            const featuredImage = featuredRef.current?.querySelector('.featured-image');
+            if (featuredImage) {
+                gsap.to(featuredImage, {
+                    yPercent: -10,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: containerRef.current,
+                        start: 'top top',
+                        end: 'bottom top',
+                        scrub: 1,
+                    },
+                });
+            }
 
             // Decorative element rotation
             gsap.to(decorRef.current, {

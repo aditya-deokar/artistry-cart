@@ -43,15 +43,17 @@ export function ProductSelector({ searchQuery, onSelect, selected }: ProductSele
 
     // Debounced search
     useEffect(() => {
-        if (searchQuery.length >= 2) {
-            const timer = setTimeout(() => {
-                search(searchQuery);
-            }, 300);
-            return () => clearTimeout(timer);
-        } else {
+        if (searchQuery.length < 2) {
             clear();
             setLocalProducts([]);
+            return;
         }
+
+        const timer = setTimeout(() => {
+            search(searchQuery);
+        }, 300);
+
+        return () => clearTimeout(timer);
     }, [searchQuery, search, clear]);
 
     // Transform results when they change

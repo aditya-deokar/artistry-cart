@@ -89,10 +89,11 @@ export function ConfirmDialog({
 
   // Get icon component
   let IconComponent;
+  const iconKey = typeof icon === 'string' ? (icon as keyof typeof iconComponents) : undefined;
   if (isValidElement(icon)) {
     IconComponent = () => icon;
-  } else if (typeof icon === 'string' && iconComponents[icon]) {
-    IconComponent = iconComponents[icon];
+  } else if (iconKey && iconComponents[iconKey]) {
+    IconComponent = iconComponents[iconKey];
   } else {
     IconComponent = iconComponents[config.defaultIcon];
   }

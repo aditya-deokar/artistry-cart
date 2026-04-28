@@ -2,75 +2,98 @@
 
 ## Overview
 
-The repository currently has one visible GitHub Actions workflow:
+The repository now has two primary GitHub Actions workflows:
 
 - `.github/workflows/test.yml`
+- `.github/workflows/build-publish.yml`
 
-This workflow is focused on test execution rather than full deployment automation.
+The first keeps fast validation in place. The second extends the repo into Phase 4 image build, scan, and registry delivery.
 
 ## Trigger Strategy
 
-The workflow runs on:
+Validation runs on:
 
 - pull requests to `master` and `develop`
 - pushes to `master`
 
-It also uses workflow concurrency to cancel superseded runs on the same ref.
+Image build and publish runs on:
+
+- pushes to `master`
+- semantic version tags such as `v1.2.0`
+- manual workflow dispatch
+
+Both workflows use concurrency to cancel superseded runs on the same ref.
 
 ## CI Pipeline Structure
 
-### Job 1: Unit and integration tests
+### Validation workflow
 
-This job:
+The validation workflow:
 
 - checks out the repository
 - sets up pnpm and Node.js 20
 - installs dependencies with `pnpm install --frozen-lockfile`
-- runs `npx prisma generate`
+- runs `pnpm exec prisma generate`
 - runs:
   - `nx affected --target=test` on pull requests
-  - `vitest run` on pushes
-  - coverage on pushes
+  - `nx affected --target=build` on pull requests
+  - `vitest run --coverage` on pushes
+  - deployable app builds on pushes
 - uploads coverage to Codecov on pushes
 
-### Job 2: E2E tests
+### Release workflow
 
-This job:
+The build-and-publish workflow:
 
-- depends on the unit/integration job
+- reruns coverage before publish
+- reruns core backend e2e validation before publish
+- selects affected deployable apps on branch pushes
+- builds and pushes images to GHCR
+- tags images with immutable SHA tags and release tags
+- enables SBOM attestation during image builds
+- runs Trivy image scans and uploads SARIF output
+
+### E2E tests
+
+The core e2e job:
+
+- depends on successful validation
 - provisions MongoDB and Redis as CI services
 - installs dependencies
-- runs `prisma generate`
+- runs `pnpm exec prisma generate`
 - builds:
   - `auth-service`
   - `product-service`
   - `order-service`
   - `recommendation-service`
   - `api-gateway`
-- starts those services
-- waits for ports to come up
+- starts those services from their built outputs
+- waits for readiness endpoints
 - runs selected e2e projects
 
 ## What CI Covers Well
 
 - core backend install/build/test loop
-- affected-test optimization for pull requests
+- affected-test and affected-build optimization for pull requests
+- frontend and backend build validation on the default branch
 - service startup and cross-service request-path validation for core commerce apps
 - coverage publishing on push
+- container image build, scan, and GHCR publish for deployable apps
 
 ## What CI Does Not Yet Cover Fully
 
-- no visible deploy workflow
+- no staging deploy workflow yet
+- no production promotion workflow yet
 - no visible lint-only workflow
-- no visible frontend build/test workflow
-- `aivision-service-e2e` and `kafka-service-e2e` exist in the repo but are not currently run in the inspected e2e job
-- AI Vision and Kafka are not part of the core backend build/start sequence in this workflow
+- `aivision-service-e2e` and `kafka-service-e2e` exist in the repo but are not currently run in the core e2e job
+- Kafka-backed runtime validation is still outside the visible CI service stack
 
 ## Operational Notes
 
 - CI standardizes on Node.js 20 and pnpm 9
 - MongoDB and Redis are explicitly provisioned in CI
-- Kafka is not provisioned in the visible workflow
+- GHCR is the current image registry target
+- Kafka is not yet provisioned in the visible CI workflow jobs
 
 That matters because analytics and event-driven behavior are not fully represented in the current CI runtime.
 
@@ -82,15 +105,15 @@ That matters because analytics and event-driven behavior are not fully represent
 
 ## Gaps And Next Improvements
 
-- add AI Vision and Kafka coverage paths where feasible
-- add frontend build validation
+- add AI Vision and Kafka e2e coverage paths where feasible
+- add staging deployment automation
+- add production promotion and rollback workflows
 - add lint/static analysis if desired
-- add deployment, preview, or release automation when the project stage requires it
 
 ## Interview Framing
 
 A strong summary is:
 
-- CI is real and useful for core backend quality
-- it is stronger on validation than on release automation
-- the biggest next step is widening coverage to experimental and non-core surfaces
+- CI covers core backend quality and deployable build validation
+- the repo now has real container delivery automation to GHCR
+- the next step is promotion automation plus broader AI and Kafka end-to-end coverage

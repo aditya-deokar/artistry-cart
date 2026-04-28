@@ -80,10 +80,11 @@ export function EmptyState({
 
   // Get icon component
   let IconComponent;
+  const iconKey = typeof icon === 'string' ? (icon as keyof typeof icons) : undefined;
   if (isValidElement(icon)) {
     IconComponent = () => icon;
-  } else if (typeof icon === 'string' && icons[icon]) {
-    IconComponent = icons[icon];
+  } else if (iconKey && icons[iconKey]) {
+    IconComponent = icons[iconKey];
   } else {
     IconComponent = icons.package;
   }

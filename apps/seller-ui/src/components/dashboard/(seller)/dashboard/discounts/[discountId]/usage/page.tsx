@@ -8,6 +8,9 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import DiscountUsageAnalytics from '@/components/dashboard/discounts/DiscountUsageAnalytics';
+import DiscountUsageCharts from '@/components/dashboard/discounts/DiscountUsageCharts';
+import DiscountUsageTable from '@/components/dashboard/discounts/DiscountUsageTable';
 
 interface DiscountUsagePageProps {
   params: { discountId: string };

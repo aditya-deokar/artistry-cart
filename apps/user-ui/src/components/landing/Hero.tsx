@@ -100,16 +100,19 @@ export function Hero({
                 );
 
             // Parallax effect on scroll - subtle movement for all content
-            gsap.to(containerRef.current?.querySelector('.hero-content'), {
-                yPercent: 20,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: 1,
-                },
-            });
+            const heroContent = containerRef.current?.querySelector('.hero-content');
+            if (heroContent) {
+                gsap.to(heroContent, {
+                    yPercent: 20,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: containerRef.current,
+                        start: 'top top',
+                        end: 'bottom top',
+                        scrub: 1,
+                    },
+                });
+            }
 
             // Hide scroll indicator on scroll
             gsap.to(scrollIndicatorRef.current, {

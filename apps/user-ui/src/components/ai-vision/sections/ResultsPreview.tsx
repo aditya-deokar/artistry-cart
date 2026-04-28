@@ -54,20 +54,21 @@ export function ResultsPreview({ show, exampleId }: ResultsPreviewProps) {
     const [showResults, setShowResults] = useState(false);
 
     useEffect(() => {
-        if (show && exampleId) {
-            setIsSearching(true);
-            setShowResults(false);
-
-            const timer = setTimeout(() => {
-                setIsSearching(false);
-                setShowResults(true);
-            }, 1200);
-
-            return () => clearTimeout(timer);
-        } else {
+        if (!show || !exampleId) {
             setShowResults(false);
             setIsSearching(false);
+            return;
         }
+
+        setIsSearching(true);
+        setShowResults(false);
+
+        const timer = setTimeout(() => {
+            setIsSearching(false);
+            setShowResults(true);
+        }, 1200);
+
+        return () => clearTimeout(timer);
     }, [show, exampleId]);
 
     useGSAP(

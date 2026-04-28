@@ -70,7 +70,7 @@ The codebase already has a strong monorepo structure, but it is not fully contai
 - Nx monorepo organization for frontends, APIs, workers, and shared packages
 - `docker-compose.test.yml` for MongoDB and Redis test infrastructure
 - `libs/docker-compose.yml` for Kafka and Kafka UI
-- one generated Dockerfile in `apps/auth-service/Dockerfile`
+- shared Docker build templates in `docker/backend.Dockerfile` and `docker/frontend.Dockerfile`
 - mostly configurable ports through `PORT`
 - basic health-style endpoints in several services
 
@@ -84,7 +84,7 @@ The codebase already has a strong monorepo structure, but it is not fully contai
 - `aivision-service` runs Agenda background jobs inside the API container, which mixes HTTP traffic and worker concerns
 - `recommendation-service` depends on `@tensorflow/tfjs-node`, which makes base-image choice important
 - both Next.js apps are not yet configured for `output: 'standalone'`, which is the easiest route to small runtime images
-- the generated `apps/auth-service/Dockerfile` uses port `3000`, which does not match the service default of `6001`
+- the shared backend Dockerfile should be the source of truth for `auth-service`, with port `6001`
 
 ## Design Goals
 
@@ -497,7 +497,7 @@ Deliverable:
 
 ### `auth-service`
 
-- replace the generated Dockerfile
+- use the shared backend Dockerfile with the `auth-service` build args
 - ensure OAuth redirect variables are environment-driven
 - verify cookies, CORS, and frontend URLs per environment
 

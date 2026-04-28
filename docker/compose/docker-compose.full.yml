@@ -1,0 +1,82 @@
+services:
+  mongodb:
+    extends:
+      file: docker-compose.infra.yml
+      service: mongodb
+
+  redis:
+    extends:
+      file: docker-compose.infra.yml
+      service: redis
+
+  zookeeper:
+    extends:
+      file: docker-compose.infra.yml
+      service: zookeeper
+
+  kafka:
+    extends:
+      file: docker-compose.infra.yml
+      service: kafka
+
+  kafka-ui:
+    extends:
+      file: docker-compose.infra.yml
+      service: kafka-ui
+
+  auth-service:
+    extends:
+      file: docker-compose.apps.yml
+      service: auth-service
+
+  product-service:
+    extends:
+      file: docker-compose.apps.yml
+      service: product-service
+
+  order-service:
+    extends:
+      file: docker-compose.apps.yml
+      service: order-service
+
+  recommendation-service:
+    extends:
+      file: docker-compose.apps.yml
+      service: recommendation-service
+
+  aivision-service:
+    extends:
+      file: docker-compose.apps.yml
+      service: aivision-service
+
+  kafka-service:
+    extends:
+      file: docker-compose.apps.yml
+      service: kafka-service
+
+  api-gateway:
+    extends:
+      file: docker-compose.apps.yml
+      service: api-gateway
+
+  user-ui:
+    extends:
+      file: docker-compose.apps.yml
+      service: user-ui
+
+  seller-ui:
+    extends:
+      file: docker-compose.apps.yml
+      service: seller-ui
+
+networks:
+  edge:
+    name: artistry-cart-edge
+  app:
+    name: artistry-cart-app
+  data:
+    name: artistry-cart-data
+
+volumes:
+  mongodb-data:
+  kafka-data:

@@ -127,7 +127,7 @@ export function AIVisionVisual({ className = '' }: AIVisionVisualProps) {
     const productRef = useRef<HTMLDivElement>(null);
     const statusRef = useRef<HTMLDivElement>(null);
     const particlesRef = useRef<Particle[]>([]);
-    const animationFrameRef = useRef<number>();
+    const animationFrameRef = useRef<number | null>(null);
     const mouseRef = useRef({ x: 0, y: 0 });
 
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -228,7 +228,7 @@ export function AIVisionVisual({ className = '' }: AIVisionVisualProps) {
 
         return () => {
             window.removeEventListener('resize', resizeCanvas);
-            if (animationFrameRef.current) {
+            if (animationFrameRef.current !== null) {
                 cancelAnimationFrame(animationFrameRef.current);
             }
         };

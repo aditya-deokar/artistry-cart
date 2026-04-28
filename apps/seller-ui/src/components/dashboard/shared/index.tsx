@@ -33,8 +33,7 @@ export type {
 } from './FilterSidebar';
 
 export type { 
-  BulkAction, 
-  ActionGroup 
+  BulkAction
 } from './BulkActionBar';
 
 export type { 
