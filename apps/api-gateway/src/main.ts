@@ -1,29 +1,38 @@
 import initializeConfig from "./libs/initializeSiteConfig";
 import {
   closeServer,
+  createLogger,
   registerGracefulShutdown,
 } from "../../../packages/utils/runtime";
 import { createGatewayApp } from "./app";
 import { getGatewayConfig } from "./config";
 
 const config = getGatewayConfig();
-const app = createGatewayApp(config);
+const logger = createLogger("api-gateway");
+const app = createGatewayApp(config, logger);
 
 const server = app.listen(config.port, config.host, () => {
-  console.log(`Listening at http://${config.host}:${config.port}/api`);
+  logger.info("API gateway listening", {
+    host: config.host,
+    port: config.port,
+    upstreams: config.upstreams,
+  });
 
   void initializeConfig()
     .then(() => {
-      console.log("Site config initailized successfully!");
+      logger.info("Site config initialized successfully");
     })
     .catch((error) => {
-      console.error("Failed to initailize site config:", error);
+      logger.error("Failed to initialize site config", { error });
     });
 });
 
-server.on("error", console.error);
+server.on("error", (error) => {
+  logger.error("Server error", { error });
+});
 
 registerGracefulShutdown({
   name: "api-gateway",
+  logger,
   close: () => closeServer(server),
 });

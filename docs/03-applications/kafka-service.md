@@ -2,7 +2,7 @@
 
 ## Overview
 
-`kafka-service` is the asynchronous analytics ingestion worker. It consumes user-activity events from Kafka, batches them in memory, and materializes analytics records into MongoDB.
+`kafka-service` is the asynchronous analytics ingestion worker. It consumes user-activity events from Kafka, batches them in memory, materializes analytics records into MongoDB, and now exposes a small HTTP management surface for health and metrics.
 
 This service is a key bridge between user interaction telemetry and recommendation/analytics reads.
 
@@ -16,13 +16,20 @@ This service is a key bridge between user interaction telemetry and recommendati
 
 ## Inbound Interfaces
 
-This service does not expose HTTP endpoints. Its interface is the Kafka topic subscription.
+This service has two inbound interfaces:
+
+- Kafka topic subscription for analytics events
+- HTTP management endpoints for health and observability
 
 Primary topic:
 
-- `users-events` or the configured `KAFKA_USER_EVENTS_TOPIC`
+- `user-events` or the configured `KAFKA_USER_EVENTS_TOPIC`
 
-The frontend producer currently sends to `user-events`, which is an implementation detail worth documenting carefully because topic naming consistency matters here.
+Management endpoints:
+
+- `/healthz`
+- `/readyz`
+- `/metrics`
 
 ## Outbound Dependencies
 
@@ -47,6 +54,8 @@ The service keeps its design intentionally small: boot consumer, buffer events, 
 - drains the queue every configured interval, default `3000ms`
 - ignores invalid or unsupported actions
 - currently skips `shop_visit` expansion until the write model is ready
+- exposes readiness based on Kafka consumer connection state
+- exposes Prometheus-compatible worker metrics
 
 ## Data Touch Points
 
@@ -67,11 +76,11 @@ It also enriches analytics state with optional country, city, and device metadat
 
 - in-memory queueing is simple but fragile if the process crashes before the batch flush
 - there is no documented dead-letter or retry strategy beyond basic error logging
-- topic naming consistency should be tightened between config defaults and frontend producer behavior
+- the worker now has better platform visibility, but still lacks true lag-aware autoscaling
 
 ## Future Hardening
 
 - add stronger event schema governance
 - add monitoring for lag, failures, and dropped events
 - consider durable retry or dead-letter handling
-- align topic naming conventions across producers and consumers
+- add KEDA or another lag-aware scaling strategy

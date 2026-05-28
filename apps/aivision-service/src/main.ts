@@ -1,6 +1,5 @@
 import express, { Express } from "express";
 import cors from "cors";
-import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
 import prisma from "../../../packages/libs/prisma";
@@ -11,6 +10,7 @@ import {
   getPort,
   registerGracefulShutdown,
   registerHealthEndpoints,
+  setupHttpObservability,
 } from "../../../packages/utils/runtime";
 import { errorMiddleware } from "./middleware/error.middleware";
 import routes from "./routes";
@@ -21,6 +21,11 @@ const host = getHost();
 const port = getPort(6006);
 
 const app: Express = express();
+
+setupHttpObservability(app, {
+  serviceName: "aivision-service",
+  logger,
+});
 
 const dbUrl = process.env.DATABASE_URL;
 logger.info("Service Startup Config:", {
@@ -44,7 +49,6 @@ app.use(
   ),
 );
 
-app.use(morgan("dev"));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());

@@ -1,0 +1,120 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: artistry-cart-platform-config
+data:
+  CORS_ALLOWED_ORIGINS: https://app.staging.artistrycart.example,https://seller.staging.artistrycart.example
+  FRONTEND_URL: https://app.staging.artistrycart.example
+  NEXT_PUBLIC_SERVER_URI: https://api.staging.artistrycart.example
+  NEXT_PUBLIC_FRONTEND_URL: https://app.staging.artistrycart.example
+  NEXT_PUBLIC_USER_UI_LINK: https://app.staging.artistrycart.example
+  NEXT_PUBLIC_AI_VISION_API_URL: https://api.staging.artistrycart.example/ai-vision/api/v1/ai
+  OAUTH_REDIRECT_BASE_URL: https://api.staging.artistrycart.example/auth
+  KAFKA_BROKERS: kafka.staging.example.com:9092
+  KAFKA_SSL: "true"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: artistry-cart
+spec:
+  tls:
+    - hosts:
+        - app.staging.artistrycart.example
+        - seller.staging.artistrycart.example
+        - api.staging.artistrycart.example
+      secretName: artistry-cart-staging-tls
+  rules:
+    - host: app.staging.artistrycart.example
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: user-ui
+                port:
+                  number: 3000
+    - host: seller.staging.artistrycart.example
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: seller-ui
+                port:
+                  number: 3001
+    - host: api.staging.artistrycart.example
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-ui
+spec:
+  replicas: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seller-ui
+spec:
+  replicas: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  replicas: 2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+spec:
+  replicas: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+spec:
+  replicas: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  replicas: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation-service
+spec:
+  replicas: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aivision-service
+spec:
+  replicas: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-service
+spec:
+  replicas: 1

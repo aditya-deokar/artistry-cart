@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: artistry-cart-prod
+
+resources:
+  - ../../base
+
+patches:
+  - target:
+      kind: Namespace
+      name: artistry-cart
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: artistry-cart-prod
+  - path: settings-patches.yaml
+  - path: hpa-patches.yaml
+
+images:
+  - name: ghcr.io/your-org/artistry-cart-user-ui
+    newTag: master
+  - name: ghcr.io/your-org/artistry-cart-seller-ui
+    newTag: master
+  - name: ghcr.io/your-org/artistry-cart-api-gateway
+    newTag: master
+  - name: ghcr.io/your-org/artistry-cart-auth-service
+    newTag: master
+  - name: ghcr.io/your-org/artistry-cart-product-service
+    newTag: master
+  - name: ghcr.io/your-org/artistry-cart-order-service
+    newTag: master
+  - name: ghcr.io/your-org/artistry-cart-recommendation-service
+    newTag: master
+  - name: ghcr.io/your-org/artistry-cart-aivision-service
+    newTag: master
+  - name: ghcr.io/your-org/artistry-cart-kafka-service
+    newTag: master

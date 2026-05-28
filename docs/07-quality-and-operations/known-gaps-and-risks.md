@@ -41,18 +41,32 @@ Why it matters:
 
 - some important runtime paths exist in the repo without corresponding CI execution
 
-## 4. Kafka Topic Contract Mismatch
+## 4. Deployment Promotion Exists, But Environment Wiring Still Matters
 
-Observed mismatch:
+The repo now includes:
 
-- producer sends to `user-events`
-- consumer default/config expects `users-events`
+- `deploy-staging.yml`
+- `deploy-production.yml`
+- digest-driven overlay rendering from the `release-image-manifest`
+
+Why it still matters:
+
+- GitHub Environment secrets, kubeconfig setup, and ingress URLs still need to be configured correctly outside the codebase
+- rollback convenience automation is still thinner than the main forward-deploy path
+
+## 5. Secrets Management Is Still Basic
+
+Current patterns are acceptable as a baseline, but the repo still lacks:
+
+- external secret manager integration
+- rotation workflow documentation
+- narrower secret ownership by workload
 
 Why it matters:
 
-- analytics and recommendation freshness can silently break if topic configuration is not corrected
+- the current setup is fine for a baseline, but mature operations need stronger secret lifecycle control
 
-## 5. Configuration Naming Inconsistencies
+## 6. Configuration Naming Inconsistencies
 
 Examples include:
 
@@ -63,25 +77,29 @@ Why it matters:
 - env mistakes become easier
 - onboarding and operations become less reliable
 
-## 6. Observability Is Uneven
+## 7. Observability Is Better, But Not Fully Installed
 
-AI Vision has a stronger logging story than most other services.
+Phase 6 added shared logs, request IDs, `/metrics`, Prometheus annotations, and worker health for Kafka.
 
-Why it matters:
-
-- production debugging quality differs by service
-- correlation and cross-service diagnosis are harder
-
-## 7. Gateway Rate-Limit Assumption Risk
-
-The gateway rate limiter uses `req.user` to grant a higher limit, but the gateway itself does not visibly hydrate auth context.
+The repo now also includes optional monitoring addon manifests for `PodMonitor` and `PrometheusRule`.
 
 Why it matters:
 
-- authenticated traffic may not actually receive differentiated limits
-- intended policy and real runtime behavior may differ
+- the repo has instrumentation and monitoring scaffolding, but not yet an installed central monitoring stack
+- dashboards, alerts, and trace aggregation still need cluster-side operator and platform setup
 
-## 8. Validation Strategy Is Not Uniform
+## 8. Worker And API Responsibilities Are Still Partly Coupled
+
+Examples:
+
+- `aivision-service` still mixes API and Agenda worker behavior
+- `product-service` now supports a CronJob pattern, but the in-process cron can still run when enabled
+
+Why it matters:
+
+- scaling and incident isolation are still weaker than a fully separated worker model
+
+## 9. Validation Strategy Is Not Uniform
 
 AI Vision uses explicit Zod validation middleware. Equivalent shared validation is not consistently visible across the rest of the backend.
 
@@ -89,7 +107,7 @@ Why it matters:
 
 - request integrity depends more on controller logic in some services than in others
 
-## 9. Feature TODOs In User-Facing Paths
+## 10. Feature TODOs In User-Facing Paths
 
 Visible TODOs exist in:
 
@@ -103,7 +121,19 @@ Why it matters:
 - some features may present as partially complete
 - documentation should distinguish implemented flows from planned flows
 
-## 10. Health And Ops Conventions Are Not Standardized
+## 11. Backup And Restore Runbooks Are Not Yet Defined
+
+The repo does not yet include a concrete backup and restore runbook for:
+
+- MongoDB
+- Redis
+- Kafka-related recovery expectations
+
+Why it matters:
+
+- production readiness depends on recovery planning, not only deployment manifests
+
+## 12. Health And Ops Conventions Still Have Compatibility Drift
 
 Visible health endpoints differ by service:
 
@@ -113,7 +143,7 @@ Visible health endpoints differ by service:
 
 Why it matters:
 
-- automation, monitoring, and platform tooling become harder without standard readiness/liveness conventions
+- the standardized `/healthz` and `/readyz` pattern now exists, but legacy aliases still need to be managed carefully in dashboards and probes
 
 ## Risk Posture Summary
 
@@ -121,7 +151,7 @@ The project's strongest risks are not "the code is chaotic." They are:
 
 - uneven maturity across subsystems
 - shared persistence coupling
-- contract inconsistencies
-- operations and observability not yet fully standardized
+- environment-side deployment dependencies
+- incomplete operations hardening after the new baseline
 
 That is the kind of risk profile common to ambitious product-rich platforms that are evolving quickly.

@@ -26,6 +26,13 @@ This guide covers the stateless application layer inside Kubernetes:
 - `aivision-service`
 - `kafka-service`
 
+The repository now includes a Phase 5 Kubernetes baseline under:
+
+- [k8s/README.md](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/k8s/README.md>)
+- [k8s/base](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/k8s/base>)
+- [k8s/overlays](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/k8s/overlays>)
+- [k8s/addons/monitoring](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/k8s/addons/monitoring>)
+
 It does not recommend self-hosting all stateful infrastructure in-cluster for production. For production, managed services remain the preferred direction for:
 
 - MongoDB
@@ -282,11 +289,24 @@ Baseline Kubernetes security rules:
 - introduce `NetworkPolicy` as the platform matures
 - restrict egress for sensitive workloads where practical
 
+Current repo status:
+
+- baseline container `securityContext` is already present in the workload manifests
+- Prometheus scrape annotations are already present for the main backend services
+- baseline `NetworkPolicy` resources are already included in `k8s/base/network-policies.yaml`
+- the next security step is stronger secret management, egress control, and admission policy enforcement
+
 ## Observability Expectations
 
-Before calling the deployment production-ready, the platform should support:
+The repo now supports a Phase 6 observability baseline:
 
-- structured application logs
+- shared structured logs at the service runtime layer
+- `/metrics` endpoints on the main backend services
+- Kafka worker health, readiness, and metrics
+- Prometheus scrape annotations in Kubernetes
+
+Before calling the deployment fully production-ready, the platform should also support:
+
 - pod and container metrics
 - HTTP error rate tracking
 - restart and readiness alerting
@@ -297,14 +317,15 @@ Nice early wins:
 - central log aggregation
 - Prometheus-compatible metrics
 - dashboarding for gateway, order flows, AI workloads, and worker lag
+- tracing from `api-gateway` into internal services
 
 ## High-Risk Areas To Address Before Production
 
-- gateway still uses hardcoded localhost upstreams
-- service health endpoints are inconsistent
-- `product-service` embeds cron work in the API container
-- `aivision-service` mixes API and Agenda worker behavior
-- environment variable naming has at least one mismatch today: code expects `STRIPE_SECRETE_KEY`, while common conventions usually use `STRIPE_SECRET_KEY`
+- frontend `NEXT_PUBLIC_*` values still need disciplined build-time and runtime coordination across environments
+- `product-service` now supports a Kubernetes CronJob pattern, but long-term cleanup logic should move to a more dedicated maintenance path or worker
+- `aivision-service` still mixes API and Agenda worker behavior
+- the baseline uses a shared Kubernetes secret for simplicity; production hardening should move toward narrower secret ownership or an external secret manager
+- environment variable naming still includes the repo-specific `STRIPE_SECRETE_KEY` convention, which should be normalized carefully later
 
 ## Suggested Deployment Sequence
 
@@ -333,4 +354,5 @@ The Kubernetes deployment design is in good shape when:
 - [Docker Compose Strategy](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/docker-compose-strategy.md>)
 - [Dockerfile Standards](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/dockerfile-standards.md>)
 - [CI/CD Release Pipeline](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/ci-cd-release-pipeline.md>)
+- [DevOps Learning Guide](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/learning-guide/README.md>)
 - [Service Topology](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/02-architecture/service-topology.md>)

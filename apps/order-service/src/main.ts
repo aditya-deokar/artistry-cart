@@ -8,10 +8,12 @@ import { errorMiddleware } from "../../../packages/error-handler/error-middelwar
 import {
   closeServer,
   createCorsOptions,
+  createLogger,
   getHost,
   getPort,
   registerGracefulShutdown,
   registerHealthEndpoints,
+  setupHttpObservability,
 } from "../../../packages/utils/runtime";
 import router from "./routes/order.route";
 import {
@@ -28,7 +30,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY!, {
 
 const host = getHost();
 const port = getPort(6004);
+const logger = createLogger("order-service");
 const app = express();
+
+setupHttpObservability(app, {
+  serviceName: "order-service",
+  logger,
+});
 
 app.use(
   cors(
@@ -55,7 +63,9 @@ app.post(
         process.env.STRIPE_WEBHOOK_SECRET!,
       );
     } catch (err: any) {
-      console.error("Webhook signature verification failed:", err.message);
+      logger.warn("Webhook signature verification failed", {
+        error: err,
+      });
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
@@ -63,7 +73,7 @@ app.post(
       switch (event.type) {
         case "payment_intent.succeeded":
           await handlePaymentSucceeded(event.data.object as Stripe.PaymentIntent);
-          console.log("Payment succeeded - processed by handlePaymentSucceeded");
+          logger.info("Stripe payment succeeded webhook processed");
           break;
 
         case "payment_intent.payment_failed":
@@ -83,12 +93,12 @@ app.post(
           break;
 
         default:
-          console.log(`Unhandled event type: ${event.type}`);
+          logger.info("Unhandled Stripe webhook event type", { eventType: event.type });
       }
 
       return res.status(200).json({ received: true });
     } catch (error) {
-      console.error("Error processing webhook:", error);
+      logger.error("Error processing webhook", { error, eventType: event.type });
       return res.status(500).json({ error: "Webhook handler failed" });
     }
   },
@@ -112,12 +122,15 @@ app.use("/order/api", router);
 app.use(errorMiddleware);
 
 const server = app.listen(port, host, () => {
-  console.log(`Order service listening at http://${host}:${port}`);
+  logger.info("Order service listening", { host, port });
 });
 
-server.on("error", console.error);
+server.on("error", (error) => {
+  logger.error("Server error", { error });
+});
 
 registerGracefulShutdown({
   name: "order-service",
+  logger,
   close: () => closeServer(server),
 });

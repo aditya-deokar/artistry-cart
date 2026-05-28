@@ -2,96 +2,117 @@
 
 ## Overview
 
-The current observability posture is functional but uneven. The platform has health endpoints, console and request logging, and some structured logging in AI Vision, but it does not yet present as a fully standardized observability stack.
+Phase 6 gives the repo a real observability baseline.
 
-## Current Signals
+The platform is no longer just a mix of health checks and ad hoc console logs. The shared runtime now provides structured request logging, request IDs, Prometheus-style metrics endpoints, and reusable health/readiness conventions across the main backend services.
 
-### Health endpoints
+## What Is Implemented Now
 
-Visible health-style endpoints include:
+### Shared HTTP observability baseline
 
-- standardized liveness route: `GET /healthz`
-- standardized readiness route: `GET /readyz`
-- legacy compatibility routes still exist in some services such as:
-  - `api-gateway`: `GET /gateway-health`
-  - `aivision-service`: `GET /health`
+`packages/utils/runtime` now provides:
 
-Phase 1 of the DevOps runtime cleanup introduced the standardized endpoints, but some legacy aliases remain for backward compatibility.
+- a shared structured logger
+- `x-request-id` generation and propagation
+- automatic request-completion logging
+- Prometheus-compatible `/metrics` endpoints
+- baseline Express security headers
 
-### Request logging
+This is now used by the main runtime entrypoints for:
 
-Visible usage includes:
+- `api-gateway`
+- `auth-service`
+- `product-service`
+- `order-service`
+- `recommendation-service`
+- `aivision-service`
+- `kafka-service`
 
-- `morgan('dev')` in `api-gateway`
-- `morgan('dev')` in `aivision-service`
+### Health and readiness
 
-### Structured logging
+Standardized endpoints remain:
 
-AI Vision uses a Winston logger with:
+- `GET /healthz`
+- `GET /readyz`
 
-- timestamps
-- stack-aware error formatting
-- JSON output in production
-- service metadata
+Legacy aliases still exist in a few services for compatibility, such as:
 
-This is the most mature logging implementation in the repo.
+- `GET /gateway-health`
+- `GET /health`
+- `GET /ready`
 
-### Console logging
+### Metrics coverage
 
-Many services still rely on:
+Every service using `setupHttpObservability()` now exposes baseline HTTP metrics such as:
 
-- `console.log`
-- `console.error`
-- `console.warn`
+- total request count
+- error request count
+- cumulative request duration
+- inflight requests
+- process uptime
 
-This is workable in development, but not ideal as a long-term production standard.
+`kafka-service` also exposes worker-focused metrics such as:
+
+- processed event count
+- parse error count
+- in-memory queue size
+
+### Kubernetes integration
+
+The Kubernetes baseline now includes Prometheus scrape annotations for the main API and worker Deployments.
+
+That means the repo is ready for a Prometheus operator or scrape configuration to consume the app-level metrics once a monitoring stack is installed.
 
 ## What Is Observable Today
 
-- service startup
-- gateway health
-- some request traffic
-- AI Vision job lifecycle events
-- basic webhook and processing failures through logs
-- test workflow results and coverage artifacts in CI
+- startup and shutdown events for the main services
+- per-request logs with request IDs on the main HTTP services
+- readiness and liveness status
+- gateway and internal API HTTP metrics
+- Kafka worker readiness state
+- Kafka event processing counts and parse failures
+- CI release and security workflow results in GitHub Actions
 
-## What Is Not Yet Fully Observable
+## What Is Still Missing
 
-- standardized structured logs across all services
-- distributed request tracing
-- metrics dashboards
-- event lag and delivery monitoring for Kafka
-- alerting for webhook failures, recommendation latency, or AI job degradation
-- dependency-aware readiness depth beyond the current baseline, especially outside AI Vision
+The repo now has instrumentation, but not yet a full central observability platform.
+
+Missing or partial areas:
+
+- no in-repo Prometheus, Grafana, Loki, or ELK deployment
+- no OpenTelemetry tracing pipeline yet
+- no alert rules in the repo for 5xx spikes, restart loops, or Kafka lag
+- no SLO or error-budget definitions yet
+- feature-level logging inside controllers and services is still uneven in some apps
 
 ## Strong Spots
 
-- AI Vision already treats observability more seriously than the average service
-- health endpoints exist in multiple places
-- recurring AI jobs emit lifecycle events
+- the platform now has one shared observability pattern instead of service-by-service drift
+- Kafka is no longer a blind background worker because it now exposes health, readiness, and metrics
+- Kubernetes manifests are already prepared for metrics scraping
 
-## Weak Spots
+## Remaining Weak Spots
 
-- logging is inconsistent across services
-- request ids are not standardized outside AI Vision
-- gateway, payments, analytics, and recommendations would benefit from stronger latency/error metrics
+- observability is strongest at the runtime boundary, not yet equally mature inside every controller and domain workflow
+- distributed tracing between gateway and internal services is not implemented
+- dashboarding and alerting still need a central stack
 
 ## Recommended Next Steps
 
-- standardize structured logging across backend services
-- add request correlation ids end to end
-- define health, readiness, and dependency-check conventions
-- add metrics for:
-  - auth failures
-  - payment webhook failures
-  - recommendation latency
-  - Kafka lag
-  - AI job success/failure
+- add Prometheus and Grafana in the cluster or through your managed platform
+- centralize logs with Loki or ELK
+- introduce OpenTelemetry traces starting at `api-gateway`
+- define alerts for:
+  - readiness failures
+  - high 5xx rate in `api-gateway`
+  - Kafka consumer lag or stalled queue processing
+  - repeated pod restarts
+- add domain metrics for Stripe webhooks, recommendation latency, and AI job success/failure
 
 ## Interview Framing
 
-The honest framing is:
+The honest summary now is:
 
-- the platform has the beginnings of observability
-- AI Vision is ahead of the rest
-- the next maturity step is consistency and measurable runtime telemetry
+- the repo has a real observability baseline
+- instrumentation is standardized at the platform layer
+- the next maturity step is central aggregation, tracing, dashboards, and alerting

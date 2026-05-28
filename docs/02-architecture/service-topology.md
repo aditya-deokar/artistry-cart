@@ -16,7 +16,7 @@ This document explains how the major runtime components are arranged, what each 
 | `order-service` | Express service | `6004` | orders, payment intents/sessions, Stripe webhooks, seller payouts | MongoDB, Redis, Stripe, SMTP |
 | `recommendation-service` | Express service | `6005` | recommendation API responses | MongoDB, TensorFlow |
 | `aivision-service` | Express service | `6006` | AI generation, visual search, concepts, collections, comments, artisans, gallery | MongoDB, Gemini, Hugging Face, ImageKit, Agenda |
-| `kafka-service` | background worker | n/a | consume user activity events and materialize analytics | Kafka, MongoDB |
+| `kafka-service` | background worker | `3000` management port | consume user activity events and materialize analytics | Kafka, MongoDB |
 | MongoDB | data store | `27017` | primary persistence | Prisma client in multiple services |
 | Redis | cache/auxiliary infra | `6379` | optional fast-path support for selected flows | auth and order codepaths |
 | Kafka | event bus | `9092` | analytics event transport | frontend producer and kafka-service consumer |

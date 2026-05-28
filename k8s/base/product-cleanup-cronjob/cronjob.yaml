@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: product-cleanup
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: product-cleanup
+            app.kubernetes.io/component: maintenance
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: product-cleanup
+              image: curlimages/curl:8.8.0
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: MAINTENANCE_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: artistry-cart-secrets
+                      key: MAINTENANCE_TOKEN
+              command:
+                - /bin/sh
+                - -c
+                - >
+                  curl --fail --silent --show-error
+                  -X POST
+                  -H "x-maintenance-token: ${MAINTENANCE_TOKEN}"
+                  http://product-service:6002/internal/maintenance/product-cleanup

@@ -1,18 +1,32 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import proxy from "express-http-proxy";
-import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 
 import {
   createCorsOptions,
   registerHealthEndpoints,
+  setupHttpObservability,
+  type AppLogger,
 } from "../../../packages/utils/runtime";
 import type { GatewayConfig } from "./config";
 
-export function createGatewayApp(config: GatewayConfig): Express {
+export function createGatewayApp(config: GatewayConfig, logger: AppLogger): Express {
   const app = express();
+  const parsedWindowMs = Number(process.env.GATEWAY_RATE_LIMIT_WINDOW_MS ?? "900000");
+  const parsedMaxRequests = Number(process.env.GATEWAY_RATE_LIMIT_MAX ?? "100");
+  const rateLimitWindowMs =
+    Number.isFinite(parsedWindowMs) && parsedWindowMs > 0 ? parsedWindowMs : 900000;
+  const rateLimitMaxRequests =
+    Number.isFinite(parsedMaxRequests) && parsedMaxRequests > 0
+      ? parsedMaxRequests
+      : 100;
+
+  setupHttpObservability(app, {
+    serviceName: "api-gateway",
+    logger,
+  });
 
   app.use(
     cors(
@@ -23,17 +37,16 @@ export function createGatewayApp(config: GatewayConfig): Express {
     ),
   );
 
-  app.use(morgan("dev"));
   app.use(express.json({ limit: "30mb" }));
   app.use(express.urlencoded({ limit: "30mb", extended: true }));
   app.use(cookieParser());
   app.set("trust proxy", 1);
 
   const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: (req: any) => (req.user ? 1000 : 100),
+    windowMs: rateLimitWindowMs,
+    max: rateLimitMaxRequests,
     message: {
-      error: "Too many Reqeusts, please try again later!",
+      error: "Too many requests, please try again later!",
     },
     standardHeaders: true,
     legacyHeaders: true,
