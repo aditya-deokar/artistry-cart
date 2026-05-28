@@ -17,6 +17,8 @@ The repo now has:
 
 - [test.yml](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/.github/workflows/test.yml>) for validation
 - [build-publish.yml](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/.github/workflows/build-publish.yml>) for image build, scan, and registry publishing
+- [deploy-staging.yml](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/.github/workflows/deploy-staging.yml>) for digest-based staging deployment
+- [deploy-production.yml](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/.github/workflows/deploy-production.yml>) for controlled production promotion
 
 Today that gives the repo:
 
@@ -24,9 +26,11 @@ Today that gives the repo:
 - Nx affected testing and build validation on pull requests
 - Vitest coverage and deployable build validation on pushes
 - MongoDB and Redis-backed e2e runs for selected backend services
-- GHCR image build and publish for affected deployable apps
+- GHCR image build and publish for deployable apps on `master` and tags
 - SHA and release-tag image tagging
 - Trivy scan output and SBOM attestation during image publishing
+- release manifest artifact generation for exact image digest promotion
+- digest-based Kustomize deployment workflows for staging and production
 
 ## What The Current Workflow Covers Well
 
@@ -38,10 +42,10 @@ Today that gives the repo:
 
 ## What It Does Not Yet Cover
 
-- no staging or production deployment automation
 - no `aivision-service-e2e` or `kafka-service-e2e` coverage in the main CI path
 - no Kafka-backed workflow validation in CI services
-- no release promotion workflow that reuses published digests
+- no centralized deploy smoke suite beyond health-oriented checks
+- no rollback workflow shortcut yet, even though deployment by digest now makes rollback straightforward
 
 ## Pipeline Goals
 
@@ -84,7 +88,7 @@ Trigger:
 
 Goals:
 
-- build all affected deployable workloads
+- build all deployable workloads for automated master releases
 - publish images to registry
 - attach traceable metadata
 
@@ -150,6 +154,7 @@ Recommended commands:
 Important note:
 
 - Docker build decisions should follow deployable app boundaries, not every changed file blindly
+- the release workflow now also publishes a `release-image-manifest` artifact so later deploy jobs can consume exact digests
 
 Deployable workloads in scope:
 
@@ -323,6 +328,12 @@ Do not require a rebuild in order to roll back.
 - add production promotion and digest-based rollback flow
 - add `aivision-service-e2e` and Kafka validation paths where feasible
 - split background jobs from API pods where scale behavior requires it
+
+## Learning Guide
+
+For a beginner-friendly walkthrough of what is implemented and what to do next, read:
+
+- [DevOps Learning Guide](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/learning-guide/README.md>)
 
 ## Definition Of Done
 

@@ -1,29 +1,29 @@
-import "./jobs/product-cron.job";
-
 import app from "./app";
 import {
   closeServer,
+  createLogger,
   getHost,
   getPort,
   registerGracefulShutdown,
 } from "../../../packages/utils/runtime";
+import { registerProductCleanupCron } from "./jobs/product-cron.job";
 
 const host = getHost();
 const port = getPort(6002);
+const logger = createLogger("product-service");
+
+registerProductCleanupCron(logger);
 
 const server = app.listen(port, host, () => {
-  console.log(`Product Service is running at http://${host}:${port}/api`);
-  console.log(`Health Check: http://${host}:${port}/healthz`);
-  console.log(`Products API: http://${host}:${port}/api`);
-  console.log(`Events API: http://${host}:${port}/api/events`);
-  console.log(`Discounts API: http://${host}:${port}/api/discounts`);
+  logger.info("Product service listening", { host, port });
 });
 
 server.on("error", (err) => {
-  console.error("Server Error:", err);
+  logger.error("Server error", { error: err });
 });
 
 registerGracefulShutdown({
   name: "product-service",
+  logger,
   close: () => closeServer(server),
 });

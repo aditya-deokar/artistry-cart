@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - ingress.yaml
+  - network-policies.yaml
+  - user-ui/deployment.yaml
+  - user-ui/service.yaml
+  - user-ui/pdb.yaml
+  - user-ui/hpa.yaml
+  - seller-ui/deployment.yaml
+  - seller-ui/service.yaml
+  - seller-ui/pdb.yaml
+  - seller-ui/hpa.yaml
+  - api-gateway/deployment.yaml
+  - api-gateway/service.yaml
+  - api-gateway/pdb.yaml
+  - api-gateway/hpa.yaml
+  - auth-service/deployment.yaml
+  - auth-service/service.yaml
+  - auth-service/hpa.yaml
+  - product-service/deployment.yaml
+  - product-service/service.yaml
+  - order-service/deployment.yaml
+  - order-service/service.yaml
+  - order-service/hpa.yaml
+  - recommendation-service/deployment.yaml
+  - recommendation-service/service.yaml
+  - recommendation-service/hpa.yaml
+  - aivision-service/deployment.yaml
+  - aivision-service/service.yaml
+  - aivision-service/hpa.yaml
+  - kafka-service/deployment.yaml
+  - product-cleanup-cronjob/cronjob.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: artistry-cart
+  app.kubernetes.io/managed-by: kustomize

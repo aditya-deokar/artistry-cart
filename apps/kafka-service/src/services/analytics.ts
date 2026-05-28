@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 
 import prisma from "../../../../packages/libs/prisma";
+import { createLogger } from "../../../../packages/utils/runtime";
 
 export type UserAction =
     | "add_to_wishlist"
@@ -28,6 +29,8 @@ type StoredAction = {
     productId?: string;
     shopId?: string;
 };
+
+const logger = createLogger("kafka-service");
 
 export const updateUserAnalytics = async (event: AnalyticsEvent) => {
     try {
@@ -125,7 +128,7 @@ export const updateUserAnalytics = async (event: AnalyticsEvent) => {
 
         await updateProductAnalytics(event);
     } catch (error) {
-        console.log("Error in storing user analytics", error);
+        logger.error("Error in storing user analytics", { error, event });
     }
 };
 
@@ -185,6 +188,6 @@ export const updateProductAnalytics = async (event: AnalyticsEvent) => {
             },
         });
     } catch (error) {
-        console.error("Error in Product Analytics", error);
+        logger.error("Error in product analytics", { error, event });
     }
 };

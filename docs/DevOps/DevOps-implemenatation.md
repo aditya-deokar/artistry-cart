@@ -4,6 +4,17 @@
 
 This document is the working DevOps plan for Dockerizing the full Artistry Cart Nx monorepo and preparing it for scalable Kubernetes deployment.
 
+## Current Status Snapshot
+
+| Phase | Status | Summary |
+| --- | --- | --- |
+| Phase 1: Runtime Standardization | Implemented | shared runtime helpers, env-driven service URLs, shared health endpoints |
+| Phase 2: Dockerfile Strategy | Implemented | shared backend and frontend Dockerfiles, `.dockerignore`, Next standalone output |
+| Phase 3: Local Docker Compose Platform | Implemented | app, infra, and full compose stacks are in the repo |
+| Phase 4: CI/CD And Registry Delivery | Implemented baseline | validation workflow, release workflow, GHCR publishing, Trivy scanning, SBOM/provenance, release manifest artifact, staging and production deploy workflows |
+| Phase 5: Kubernetes Baseline | Implemented baseline | `k8s/base` and `k8s/overlays/*` now define the first Kubernetes deployment model |
+| Phase 6: Observability, Security, And Operations | Implemented baseline | shared logs and metrics, frontend security headers, Kubernetes scrape annotations and policies, nightly security workflow, Dependabot, optional monitoring addon manifests |
+
 It covers:
 
 - what Docker is and why it is useful here
@@ -26,7 +37,7 @@ This monorepo currently contains these deployable runtime units:
 | `order-service` | Express API | `6004` | internal service |
 | `recommendation-service` | Express API | `6005` | internal service |
 | `aivision-service` | Express API | `6006` | internal service with AI and background jobs |
-| `kafka-service` | background worker | n/a | internal Kafka consumer |
+| `kafka-service` | background worker | `3000` management port | internal Kafka consumer with health and metrics endpoint |
 
 Supporting infrastructure:
 
@@ -64,6 +75,12 @@ Main benefits for Artistry Cart:
 ## Current Repo Assessment
 
 The codebase already has a strong monorepo structure, but it is not fully container-ready yet.
+
+Historical note:
+
+- this assessment started as the pre-implementation gap list
+- many of the original Phase 1 to Phase 5 items have now been implemented
+- use the current status snapshot and the learning guide for the latest state of the repo
 
 ### What already exists
 
@@ -436,6 +453,13 @@ Deliverable:
 
 - reproducible container delivery pipeline
 
+Current repo status:
+
+- implemented through GitHub Actions workflows in `.github/workflows`
+- images publish to GHCR
+- Trivy scanning and SBOM/provenance are enabled
+- a `release-image-manifest` artifact is generated so later deployment jobs can use exact image digests
+
 ### Phase 5: Kubernetes Baseline
 
 Goal: deploy the Dockerized application stack in a scalable and operationally safe way.
@@ -457,6 +481,12 @@ Deliverable:
 
 - a production-ready baseline deployment model
 
+Current repo status:
+
+- implemented as a Kubernetes baseline under `k8s/base` and `k8s/overlays`
+- includes Deployments, Services, Ingress, HPAs, PDBs, and a product cleanup CronJob pattern
+- still needs CI-driven environment promotion to become full deployment automation
+
 ### Phase 6: Observability, Security, And Operations
 
 Goal: make the platform supportable after deployment.
@@ -465,15 +495,33 @@ Tasks:
 
 - emit structured JSON logs
 - add metrics endpoints where practical
-- integrate logs, metrics, and traces into a central monitoring stack
-- manage secrets outside source control
-- add container vulnerability scanning
+- add baseline browser and service security headers
+- add Kubernetes-level hardening and scrape hooks
+- add container vulnerability scanning and recurring dependency checks
+- define the next central monitoring and alerting work
 - define backup and restore strategy for MongoDB
-- define alerting for gateway errors, worker lag, pod restarts, and readiness failures
 
 Deliverable:
 
 - a deployable system that can also be monitored and operated safely
+
+Current repo status:
+
+- implemented as a Phase 6 baseline
+- `packages/utils/runtime` now provides shared logger, request IDs, `/metrics`, and Express security headers
+- core backend services now use the shared observability runtime
+- `kafka-service` now exposes health, readiness, and metrics through a management HTTP server
+- both Next.js frontends now send baseline security headers
+- Kubernetes Deployments now include Prometheus scrape annotations and baseline `NetworkPolicy` resources
+- recurring security automation now exists through `.github/workflows/nightly-security.yml` and `.github/dependabot.yml`
+
+Still needed for full maturity:
+
+- central Prometheus, Grafana, and log aggregation stack
+- tracing with OpenTelemetry
+- external secret manager integration
+- alert rules for gateway errors, worker lag, restarts, and readiness failures
+- backup and restore runbooks
 
 ## Service-Specific Docker Notes
 
@@ -646,6 +694,7 @@ The implementation plan is supported by these focused DevOps documents:
 - [Dockerfile Standards](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/dockerfile-standards.md>)
 - [Kubernetes Deployment Guide](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/kubernetes-deployment-guide.md>)
 - [CI/CD Release Pipeline](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/ci-cd-release-pipeline.md>)
+- [DevOps Learning Guide](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/DevOps/learning-guide/README.md>)
 
 ## Related Docs
 

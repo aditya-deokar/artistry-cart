@@ -2,103 +2,126 @@
 
 ## Overview
 
-The current codebase shows several good security-conscious decisions, but the security posture is still mixed. There are clear protections in auth, cookies, OAuth, rate limiting, and Stripe webhook handling, but the implementation is not yet fully standardized across the platform.
+The security posture is stronger after Phase 6 than it was during the initial repo audit.
+
+The codebase now combines application-level protections with platform-level hardening in Kubernetes and CI, but it is still a baseline, not a finished enterprise security program.
 
 ## Current Strengths
 
-### JWT and protected-route enforcement
+### Auth and session protections
 
 - shared backend auth middleware verifies JWTs
 - protected routes load the current account from the database
 - seller and admin routes use explicit role guards
-
-### Cookie settings
-
-Auth cookies are:
-
-- `httpOnly`
-- `secure` in production
-- `sameSite=lax` in development
-- `sameSite=none` in production
-
-This is a reasonable default strategy for cross-site production usage with local development ergonomics.
+- auth cookies use production-aware `httpOnly`, `secure`, and `sameSite` settings
 
 ### OAuth protections
 
-The OAuth provider layer uses Arctic and includes:
+The OAuth layer uses Arctic with:
 
 - generated state values
 - generated code verifiers
 
-That is a good sign for CSRF and PKCE-aware OAuth handling.
+That is a solid PKCE and CSRF-conscious baseline.
 
 ### Stripe webhook verification
 
-`order-service`:
+`order-service` still follows the correct Stripe pattern:
 
 - reads the raw request body
 - extracts `stripe-signature`
 - verifies the event with `constructEvent`
-
-This is the right pattern for Stripe webhooks.
 
 ### Rate limiting
 
 Visible rate limiting exists in:
 
 - `api-gateway` via `express-rate-limit`
-- `aivision-service` via MongoDB-backed per-endpoint rate limiting
+- `aivision-service` via MongoDB-backed per-endpoint controls
 
-### Input validation
+The gateway policy is now env-driven instead of assuming request auth state in the rate-limit key logic.
 
-AI Vision uses Zod-backed validation middleware for body and query validation on important routes.
+### Security headers
+
+Baseline security headers are now applied in two places:
+
+- Express services through the shared runtime middleware
+- Next.js frontends through `next.config.js` response headers
+
+Current baseline headers include:
+
+- `X-Content-Type-Options`
+- `X-Frame-Options`
+- `Referrer-Policy`
+
+### Kubernetes hardening
+
+The Kubernetes baseline already includes:
+
+- non-root container execution
+- dropped Linux capabilities
+- disabled privilege escalation
+- runtime-default seccomp profile
+- baseline `NetworkPolicy` objects
+
+### Supply-chain security
+
+Phase 6 added:
+
+- Trivy image and filesystem scanning
+- a scheduled nightly security workflow
+- Dependabot for npm and GitHub Actions updates
+- SBOM and provenance generation in the release pipeline
 
 ## Security Gaps And Inconsistencies
 
-### Validation is uneven
+### Secrets management is still baseline only
 
-Validation is strongest in AI Vision. Other services do not show the same centralized request validation posture in the inspected files.
+The repo uses env files locally and Kubernetes `Secret` manifests by pattern, but it does not yet include:
 
-### Secret and env naming inconsistencies
+- an external secret manager
+- rotation workflow automation
+- per-service secret ownership boundaries
 
-Examples:
+### Validation is still uneven
 
-- `STRIPE_SECRETE_KEY` spelling in code
+AI Vision has the strongest centralized validation posture. Other backend services still rely more on controller-level behavior and less on a shared validation standard.
 
-Inconsistent secret naming is not just cosmetic. It increases operational error risk.
+### Security headers are not yet a full browser hardening policy
 
-### Role and auth convention drift risk
+The new headers are a good start, but there is still no documented or enforced baseline for:
 
-The platform uses multiple auth paths:
+- Content Security Policy
+- Permissions Policy
+- HSTS strategy at the ingress layer
 
-- shared JWT auth
-- AI Vision optional auth
-- buyer and seller frontend refresh behaviors that are not identical
+### Naming inconsistencies still increase ops risk
 
-That flexibility is useful, but it increases the risk of contract drift.
+Examples include:
 
-### Gateway trust assumptions
+- `STRIPE_SECRETE_KEY`
 
-The gateway trusts proxy headers and applies coarse rate limiting, but it does not appear to perform its own auth hydration. That means some rate-limit logic tied to `req.user` may not behave as intended unless upstream assumptions change.
+Typos in configuration names create operational mistakes during deployment and secret rotation.
 
 ## Additional Risks To Track
 
-- no visible standardized CSRF documentation for state-changing cookie-based flows
-- no visible centralized secrets-management or rotation story
-- no visible audit-logging or security-event telemetry layer
-- no visible standard security headers policy documented at the app layer
+- no centralized audit-log or security-event pipeline yet
+- no image signing yet
+- no admission-policy enforcement such as Kyverno or OPA Gatekeeper yet
+- no external secret manager integration yet
+- egress restrictions are not yet defined in Kubernetes network policy
 
 ## Overall Assessment
 
-Current posture is best described as:
+The current posture is best described as:
 
-- good foundational safeguards
-- several strong point solutions
-- still short of a uniformly hardened production security program
+- solid baseline safeguards
+- meaningful platform hardening progress
+- still missing centralized secrets, signing, and policy enforcement
 
 ## Interview Framing
 
 A strong answer here is:
 
-- the system already protects the most sensitive boundaries reasonably well
-- the next security maturity step is consistency, standard validation, and stronger operational controls
+- the repo now has both app-level and platform-level security controls
+- the next maturity step is secret management, policy enforcement, and continuous security operations

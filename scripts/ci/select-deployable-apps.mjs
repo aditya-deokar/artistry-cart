@@ -80,6 +80,7 @@ const deployableApps = [
 const sharedPathPrefixes = [
   ".github/workflows/",
   "docker/",
+  "scripts/",
   "packages/",
   "libs/",
   "prisma/",

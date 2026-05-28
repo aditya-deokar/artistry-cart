@@ -25,7 +25,7 @@ Visible consumer:
 The Kafka consumer uses:
 
 - `KAFKA_USER_EVENTS_TOPIC`
-- default fallback: `users-events`
+- default fallback: `user-events`
 
 ### Hardcoded producer topic
 
@@ -35,12 +35,9 @@ The inspected producer sends to:
 
 ## Important Note
 
-There is a naming discrepancy between:
+The producer and the consumer default now align on:
 
-- producer topic: `user-events`
-- consumer/config default topic: `users-events`
-
-This should be treated as a real contract risk and cleaned up or documented clearly in operational setup.
+- `user-events`
 
 ## Event Shape
 
@@ -96,12 +93,10 @@ This event stream ultimately supports:
 ## Design Constraints
 
 - event schema governance is code-driven rather than formalized
-- topic naming inconsistency is a real contract hazard
 - in-memory batching means crash-before-flush is a possible data-loss scenario
 
 ## Recommended Future Contract Hardening
 
-- normalize topic naming
 - version or formalize event schemas
 - document replay and failure-handling expectations
 - add lag and delivery monitoring

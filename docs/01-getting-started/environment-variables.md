@@ -100,7 +100,7 @@ These are primarily used by `api-gateway` and become especially important in Doc
   - `.env.example` default: `user-events-group`
 
 - `KAFKA_USER_EVENTS_TOPIC`
-  - `.env.example` default: `users-events`
+  - `.env.example` default: `user-events`
 
 - `KAFKA_CONSUMER_BATCH_INTERVAL_MS`
   - `.env.example` default: `3000`
@@ -202,7 +202,7 @@ KAFKA_SASL_USERNAME=""
 KAFKA_SASL_PASSWORD=""
 KAFKA_SASL_MECHANISM="plain"
 KAFKA_CONSUMER_GROUP_ID="user-events-group"
-KAFKA_USER_EVENTS_TOPIC="users-events"
+KAFKA_USER_EVENTS_TOPIC="user-events"
 KAFKA_CONSUMER_BATCH_INTERVAL_MS="3000"
 OAUTH_REDIRECT_BASE_URL="http://localhost:6001"
 NEXT_PUBLIC_SERVER_URI="http://localhost:8080"

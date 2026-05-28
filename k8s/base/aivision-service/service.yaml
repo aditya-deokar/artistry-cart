@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: aivision-service
+spec:
+  selector:
+    app.kubernetes.io/name: aivision-service
+  ports:
+    - name: http
+      port: 6006
+      targetPort: http

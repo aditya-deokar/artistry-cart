@@ -50,12 +50,13 @@ describe("api-gateway runtime config", () => {
   });
 
   async function buildGatewayApp() {
-    const [{ createGatewayApp }, { getGatewayConfig }] = await Promise.all([
+    const [{ createGatewayApp }, { getGatewayConfig }, { createLogger }] = await Promise.all([
       import("../app.js"),
       import("../config.js"),
+      import("../../../../packages/utils/runtime/index.js"),
     ]);
 
-    return createGatewayApp(getGatewayConfig());
+    return createGatewayApp(getGatewayConfig(), createLogger("api-gateway-test"));
   }
 
   it("registers healthz and readyz endpoints", async () => {

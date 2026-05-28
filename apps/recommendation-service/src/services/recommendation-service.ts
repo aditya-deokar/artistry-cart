@@ -1,8 +1,10 @@
 import * as tf from '@tensorflow/tfjs';
+import { createLogger } from '../../../../packages/utils/runtime';
 import { getUserActivity } from './fetch-user-activity';
 import { preprocessData } from '../utils/preprocessData';
 
 const EMBEDDING_DIM = 50;
+const logger = createLogger('recommendation-service');
 
 interface UserAction {
     userId: string;
@@ -28,12 +30,12 @@ async function fetchUserActivity(userId: string): Promise<UserAction[]> {
 
 
 export const recommendProducts = async (userId: string, allProducts: any): Promise<string[]> => {
-    console.log(`Starting recommendation for user: ${userId}`);
+    logger.info('Starting recommendation generation', { userId });
     const userActions: UserAction[] = await fetchUserActivity(userId);
-    console.log(`Fetched ${userActions.length} user actions.`);
+    logger.info('Fetched user actions', { userId, count: userActions.length });
 
     if (userActions.length === 0) {
-        console.log('No user actions found.');
+        logger.info('No user actions found for recommendation generation', { userId });
         return [];
     }
 
@@ -50,14 +52,17 @@ export const recommendProducts = async (userId: string, allProducts: any): Promi
 
     // Fix logic: If processedData is null or interactions missing. Remove incorrect products check.
     if (!processedData || !processedData.interactions || processedData.interactions.length === 0) {
-        console.log('Preprocess returned empty interactions.');
+        logger.info('Preprocess returned no usable interactions', { userId });
         return [];
     }
 
     const { interactions } = processedData as {
         interactions: Interaction[];
     }
-    console.log(`Preprocessed interactions count: ${interactions.length}`);
+    logger.info('Preprocessed recommendation interactions', {
+        userId,
+        interactionCount: interactions.length,
+    });
 
     const userMap: Record<string, number> = {}
     const productMap: Record<string, number> = {}
@@ -69,11 +74,15 @@ export const recommendProducts = async (userId: string, allProducts: any): Promi
         if (!(userId in userMap)) userMap[userId] = userCount++;
         if (!(productId in productMap)) productMap[productId] = productCount++;
     })
-    console.log(`User map size: ${userCount}, Product map size: ${productCount}`);
+    logger.info('Prepared recommendation index maps', {
+        userId,
+        userCount,
+        productCount,
+    });
 
     // Ensure current user is in map (should be if interactions exist)
     if (!(userId in userMap)) {
-        console.log('User ID not found in userMap after processing interactions.');
+        logger.warn('User ID missing from recommendation user map', { userId });
         // This is possible if all interactions were filtered out or something.
         // But we checked interactions.length > 0.
         // Wait, interactions in preprocessData are FORCED to have the passed userId.
@@ -162,7 +171,10 @@ export const recommendProducts = async (userId: string, allProducts: any): Promi
         // validationSplit: 0.2
     })
 
-    console.log('Model training complete.');
+    logger.info('Recommendation model training complete', {
+        userId,
+        interactionCount: interactions.length,
+    });
 
     const productTensorAll = tf.tensor1d(
         Object.values(productMap),
@@ -174,7 +186,7 @@ export const recommendProducts = async (userId: string, allProducts: any): Promi
     const userIndex = userMap[userId] ?? 0;
 
     if (Object.keys(productMap).length === 0) {
-        console.log('No products in productMap to recommend.');
+        logger.info('No products available in recommendation map', { userId });
         return [];
     }
 
@@ -184,7 +196,7 @@ export const recommendProducts = async (userId: string, allProducts: any): Promi
     ]) as tf.Tensor;
 
     const scores = (await predictions.array()) as number[];
-    console.log(`Generated ${scores.length} scores.`);
+    logger.info('Generated recommendation scores', { userId, scoreCount: scores.length });
 
     // sort and select top 10 recommended products
     const recommendedProducts: RecommendedProduct[] = Object.keys(productMap)
@@ -195,7 +207,10 @@ export const recommendProducts = async (userId: string, allProducts: any): Promi
         .sort((a, b) => b.score - a.score)
         .slice(0, 10);
 
-    console.log('Top recommendations:', recommendedProducts);
+    logger.info('Prepared top recommendations', {
+        userId,
+        recommendationCount: recommendedProducts.length,
+    });
 
     return recommendedProducts.map(({ productId }) => productId);
 }

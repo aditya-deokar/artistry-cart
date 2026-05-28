@@ -90,7 +90,7 @@ Recommended local Compose service names:
 | `order-service` | internal API | no | `http://order-service:6004` |
 | `recommendation-service` | internal API | no | `http://recommendation-service:6005` |
 | `aivision-service` | internal API | no | `http://aivision-service:6006` |
-| `kafka-service` | worker | no | n/a |
+| `kafka-service` | worker | no | `http://kafka-service:3000` management endpoint |
 | `mongodb` | database | optional | `mongodb://mongodb:27017/artistry-cart` |
 | `redis` | cache | optional | `redis://redis:6379` |
 | `zookeeper` | Kafka dependency | no | `zookeeper:2181` |

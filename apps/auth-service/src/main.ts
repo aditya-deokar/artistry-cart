@@ -6,18 +6,26 @@ import { errorMiddleware } from "../../../packages/error-handler/error-middelwar
 import {
   closeServer,
   createCorsOptions,
+  createLogger,
   getHost,
   getPort,
   registerGracefulShutdown,
   registerHealthEndpoints,
+  setupHttpObservability,
 } from "../../../packages/utils/runtime";
 import router from "./routes/auth.router";
 import { oauthRouter } from "./oauth";
 
 const host = getHost();
 const port = getPort(6001);
+const logger = createLogger("auth-service");
 
 const app = express();
+
+setupHttpObservability(app, {
+  serviceName: "auth-service",
+  logger,
+});
 
 app.use(
   cors(
@@ -46,14 +54,15 @@ app.use("/api/oauth", oauthRouter);
 app.use(errorMiddleware);
 
 const server = app.listen(port, host, () => {
-  console.log(`Auth Service running at http://${host}:${port}/api`);
+  logger.info("Auth service listening", { host, port });
 });
 
 server.on("error", (err) => {
-  console.error("Server Error:", err);
+  logger.error("Server error", { error: err });
 });
 
 registerGracefulShutdown({
   name: "auth-service",
+  logger,
   close: () => closeServer(server),
 });

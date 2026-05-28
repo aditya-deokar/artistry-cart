@@ -1,0 +1,46 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: artistry-cart-platform-alerts
+spec:
+  groups:
+    - name: artistry-cart-http
+      rules:
+        - alert: ArtistryCartHttp5xxBurst
+          expr: sum by (namespace, pod) (rate(http_request_errors_total{status=~"5.."}[5m])) > 0.2
+          for: 10m
+          labels:
+            severity: warning
+            team: platform
+          annotations:
+            summary: Elevated HTTP 5xx rate on an Artistry Cart pod
+            description: A pod is returning a sustained rate of 5xx responses for more than 10 minutes.
+        - alert: ArtistryCartMetricsScrapeMissing
+          expr: up{namespace=~"artistry-cart.*"} == 0
+          for: 10m
+          labels:
+            severity: critical
+            team: platform
+          annotations:
+            summary: Metrics scrape target is down
+            description: Prometheus has not been able to scrape an Artistry Cart target for 10 minutes.
+    - name: artistry-cart-kafka
+      rules:
+        - alert: ArtistryCartKafkaQueueGrowing
+          expr: max by (namespace, pod) (kafka_event_queue_size) > 100
+          for: 10m
+          labels:
+            severity: warning
+            team: platform
+          annotations:
+            summary: Kafka worker queue is growing
+            description: The in-memory Kafka event queue is above 100 items for at least 10 minutes.
+        - alert: ArtistryCartKafkaParseErrors
+          expr: increase(kafka_events_parse_errors_total[10m]) > 0
+          for: 0m
+          labels:
+            severity: warning
+            team: platform
+          annotations:
+            summary: Kafka worker is encountering parse errors
+            description: Kafka event parsing errors were detected in the last 10 minutes.

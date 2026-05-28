@@ -17,8 +17,12 @@
       "!{projectRoot}/src/__tests__/**"
     ],
     "sharedGlobals": [
-      "{workspaceRoot}/.github/workflows/ci.yml",
-      "{workspaceRoot}/.github/workflows/test.yml"
+      "{workspaceRoot}/.github/workflows/test.yml",
+      "{workspaceRoot}/.github/workflows/build-publish.yml",
+      "{workspaceRoot}/.github/workflows/deploy-staging.yml",
+      "{workspaceRoot}/.github/workflows/deploy-production.yml",
+      "{workspaceRoot}/.github/workflows/nightly-security.yml",
+      "{workspaceRoot}/scripts/ci/**/*"
     ]
   },
   "plugins": [
