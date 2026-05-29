@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 import { getUserConcepts, getConceptById, saveConcept as saveConceptService, deleteConcept as deleteConceptService } from '../services/session.service';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import { logger } from '../utils/logger';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 // ============================================
 // List Concepts

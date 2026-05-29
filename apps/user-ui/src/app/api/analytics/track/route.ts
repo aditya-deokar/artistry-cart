@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import {
   analyticsTrackRequestSchema,
   publishAnalyticsEvent,
-} from "../../../../../../../packages/utils/kafka";
+} from "@artistry-cart/utils/kafka";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

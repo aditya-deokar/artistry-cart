@@ -3,7 +3,7 @@ import { visualSearch, findSimilarConcepts } from '../services/search/visual-sea
 import { hybridSearch } from '../services/search/hybrid-search.service';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import { logger } from '../utils/logger';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 // ============================================
 // Visual Search

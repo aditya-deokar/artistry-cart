@@ -21,7 +21,7 @@ import { prismaMock, createMockUser, resetPrismaMock } from '../__tests__/mocks/
 const mockFetch = vi.hoisted(() => vi.fn());
 
 // Mock dependencies
-vi.mock('../../../../packages/libs/prisma', async () => {
+vi.mock('@artistry-cart/libs/prisma', async () => {
   const { prismaMock } = await import('../__tests__/mocks/prisma.mock');
   return { default: prismaMock };
 });

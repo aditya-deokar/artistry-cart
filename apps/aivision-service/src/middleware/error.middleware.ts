@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../utils/logger';
-import { AppError } from '../../../../packages/error-handler';
+import { AppError } from '@artistry-cart/error-handler';
 
 /**
  * Express error handling middleware with Winston logging

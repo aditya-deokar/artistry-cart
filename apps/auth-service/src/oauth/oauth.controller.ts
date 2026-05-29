@@ -13,7 +13,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { getGoogleProvider, getGitHubProvider, getFacebookProvider, generateState, generateCodeVerifier } from "./providers";
-import prisma from "../../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 import { setCookie } from "../utils/cookies/setCookie";
 
 // Use undici fetch for Node.js (bundled with Node 18+)

@@ -39,12 +39,12 @@ const { prismaMock, imagekitMock, pricingServiceMock } = vi.hoisted(() => {
   return { prismaMock, imagekitMock, pricingServiceMock };
 });
 
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   __esModule: true,
   default: prismaMock,
 }));
 
-vi.mock('../../../../packages/libs/imageKit', () => ({
+vi.mock('@artistry-cart/libs/imageKit', () => ({
   __esModule: true,
   imagekit: imagekitMock,
 }));
@@ -53,7 +53,7 @@ vi.mock('../lib/pricing.service', () => ({
   PricingService: pricingServiceMock,
 }));
 
-vi.mock('../../../../packages/error-handler', () => ({
+vi.mock('@artistry-cart/error-handler', () => ({
   AuthError: class AuthError extends Error {
     constructor(msg: string) { super(msg); this.name = 'AuthError'; }
   },
@@ -80,7 +80,7 @@ import {
   getSellerProductsSummary,
 } from './product.controller';
 
-import { mockRequest, mockResponse, mockNext } from '../../../../packages/test-utils';
+import { mockRequest, mockResponse, mockNext } from '@artistry-cart/test-utils';
 
 // ── Helpers ──
 function req(data: Record<string, unknown> = {}) { return mockRequest(data); }

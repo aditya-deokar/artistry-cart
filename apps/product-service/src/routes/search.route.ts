@@ -8,7 +8,7 @@ import {
   getSearchSuggestions,
   sellerSearch
 } from "../controllers/search.controller";
-import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
+import isAuthenticated from "@artistry-cart/middleware/isAuthenticated";
 
 const searchRouter: Router = express.Router();
 

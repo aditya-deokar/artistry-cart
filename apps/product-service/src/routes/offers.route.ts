@@ -8,8 +8,8 @@ import {
   getOfferStatistics
 } from "../controllers/offers.controller";
 
-import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
-import isAdmin from "../../../../packages/middleware/isAdmin";
+import isAuthenticated from "@artistry-cart/middleware/isAuthenticated";
+import isAdmin from "@artistry-cart/middleware/isAdmin";
 
 
 const offersRouter: Router = express.Router();

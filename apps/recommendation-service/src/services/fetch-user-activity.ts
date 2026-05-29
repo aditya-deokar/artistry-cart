@@ -1,4 +1,4 @@
-import prisma from "../../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 
 export const getUserActivity = async (userId: string) => {
   try {

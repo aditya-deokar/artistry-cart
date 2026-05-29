@@ -3,7 +3,7 @@ import {
   closeServer,
   createLogger,
   registerGracefulShutdown,
-} from "../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 import { createGatewayApp } from "./app";
 import { getGatewayConfig } from "./config";
 

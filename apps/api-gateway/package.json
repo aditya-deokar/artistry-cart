@@ -25,5 +25,8 @@
         }
       }
     }
+  },
+  "dependencies": {
+    "@artistry-cart/utils": "workspace:*"
   }
 }

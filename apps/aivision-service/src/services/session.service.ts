@@ -2,7 +2,7 @@
 import { VisionMode, SessionStatus, ConceptStatus } from '@prisma/client';
 import { logger } from '../utils/logger';
 import { GeneratedImage } from './generation/image.service';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 // Default session expiry: 24 hours
 const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000;

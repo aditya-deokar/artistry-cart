@@ -5,12 +5,11 @@
     "types": [
       "node"
     ],
-    "rootDir": "../../",
+    "rootDir": "src",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo"
   },
   "include": [
     "src/**/*.ts",
-    "../../packages/**/*.ts",
     "src/**/*.json"
   ],
   "exclude": [
@@ -19,5 +18,19 @@
     "jest.config.ts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/middleware/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/libs/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/error-handler/tsconfig.lib.json"
+    }
   ]
 }

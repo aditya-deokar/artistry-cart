@@ -5,9 +5,9 @@
  * Import from this file in your test specs:
  *
  * ```ts
- * import { prismaMock, resetPrismaMock } from '../../../packages/test-utils';
- * import { mockRequest, mockResponse, mockNext } from '../../../packages/test-utils';
- * import { createMockUser, createMockProduct } from '../../../packages/test-utils';
+ * import { prismaMock, resetPrismaMock } from '@artistry-cart/test-utils';
+ * import { mockRequest, mockResponse, mockNext } from '@artistry-cart/test-utils';
+ * import { createMockUser, createMockProduct } from '@artistry-cart/test-utils';
  * ```
  */
 

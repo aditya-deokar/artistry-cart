@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 
-import prisma from "../../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 import {
   analyticsEventSchema,
   createAnalyticsEvent,
@@ -8,8 +8,8 @@ import {
   getAnalyticsTopic,
   publishAnalyticsEvent,
   type AnalyticsEvent,
-} from "../../../../packages/utils/kafka";
-import { createLogger } from "../../../../packages/utils/runtime";
+} from "@artistry-cart/utils/kafka";
+import { createLogger } from "@artistry-cart/utils/runtime";
 
 const logger = createLogger("order-analytics-outbox");
 

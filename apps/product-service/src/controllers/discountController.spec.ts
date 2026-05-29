@@ -33,12 +33,12 @@ const { prismaMock } = vi.hoisted(() => {
   return { prismaMock };
 });
 
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   __esModule: true,
   default: prismaMock,
 }));
 
-vi.mock('../../../../packages/error-handler', () => ({
+vi.mock('@artistry-cart/error-handler', () => ({
   ValidationError: class ValidationError extends Error {
     constructor(msg: string) { super(msg); this.name = 'ValidationError'; }
   },
@@ -54,7 +54,7 @@ import {
   getDiscountUsageStats,
 } from './discountController';
 
-import { mockRequest, mockResponse, mockNext } from '../../../../packages/test-utils';
+import { mockRequest, mockResponse, mockNext } from '@artistry-cart/test-utils';
 
 function req(data: Record<string, unknown> = {}) { return mockRequest(data); }
 function res() { return mockResponse(); }

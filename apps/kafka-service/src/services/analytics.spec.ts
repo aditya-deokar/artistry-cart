@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createAnalyticsEvent } from "../../../../packages/utils/kafka";
+import { createAnalyticsEvent } from "@artistry-cart/utils/kafka";
 
 const mocks = vi.hoisted(() => {
   const prismaMock = {
@@ -38,7 +38,7 @@ const mocks = vi.hoisted(() => {
   return { prismaMock, reset };
 });
 
-vi.mock("../../../../packages/libs/prisma", () => ({
+vi.mock("@artistry-cart/libs/prisma", () => ({
   __esModule: true,
   default: mocks.prismaMock,
 }));

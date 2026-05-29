@@ -10,8 +10,8 @@ import {
   registerGracefulShutdown,
   registerHealthEndpoints,
   setupHttpObservability,
-} from "../../../packages/utils/runtime";
-import { kafka } from "../../../packages/utils/kafka";
+} from "@artistry-cart/utils/runtime";
+import { kafka } from "@artistry-cart/utils/kafka";
 import { kafkaServiceConfig } from "./config";
 import {
   createKafkaWorkerMetrics,

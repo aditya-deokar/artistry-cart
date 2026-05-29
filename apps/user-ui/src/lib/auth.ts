@@ -1,7 +1,7 @@
 import 'server-only'; // Ensures this code never runs on the client
 import { cookies } from 'next/headers';
 import * as jwt from 'jsonwebtoken';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 // Define the shape of the user object we want to return
 // This excludes sensitive fields like the password hash.

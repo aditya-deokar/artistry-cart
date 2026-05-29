@@ -26,7 +26,7 @@ import {
   createMockRefund,
   createMockOrderItem,
   resetFactoryCounter,
-} from '../../../../packages/test-utils';
+} from '@artistry-cart/test-utils';
 
 // ── Module-level mocks ──
 vi.mock('stripe', () => {
@@ -42,7 +42,7 @@ vi.mock('ioredis', () => {
   return { default: function (..._args: any[]) { return redisMock; } };
 });
 
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   default: prismaMock,
 }));
 

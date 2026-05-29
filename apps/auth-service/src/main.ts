@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import { errorMiddleware } from "../../../packages/error-handler/error-middelware";
+import { errorMiddleware } from "@artistry-cart/error-handler/error-middelware";
 import {
   closeServer,
   createCorsOptions,
@@ -12,7 +12,7 @@ import {
   registerGracefulShutdown,
   registerHealthEndpoints,
   setupHttpObservability,
-} from "../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 import router from "./routes/auth.router";
 import { oauthRouter } from "./oauth";
 

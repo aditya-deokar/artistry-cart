@@ -12,8 +12,8 @@ import {
   verifyOTP,
 } from "../utils/auth.helper";
 import bcrypt from "bcryptjs";
-import { AuthError, ValidationError } from "../../../../packages/error-handler";
-import prisma from "../../../../packages/libs/prisma";
+import { AuthError, ValidationError } from "@artistry-cart/error-handler";
+import prisma from "@artistry-cart/libs/prisma";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { setCookie } from "../utils/cookies/setCookie";
 import { createUniqueSlug, generateSlug } from "../utils/slugify";

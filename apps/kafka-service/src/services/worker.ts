@@ -3,7 +3,7 @@ import type { EachBatchPayload, Producer } from "kafkajs";
 import type {
   AppLogger,
   MetricsRegistry,
-} from "../../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 import type { KafkaServiceConfig } from "../config";
 import type { AnalyticsEvent } from "./events";
 import {

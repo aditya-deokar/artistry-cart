@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-import { createLogger } from '../../../../packages/utils/runtime';
+import { createLogger } from '@artistry-cart/utils/runtime';
 import { getUserActivity } from './fetch-user-activity';
 import { preprocessData } from '../utils/preprocessData';
 

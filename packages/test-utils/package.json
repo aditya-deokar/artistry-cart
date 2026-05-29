@@ -1,0 +1,45 @@
+{
+  "name": "@artistry-cart/test-utils",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./setup/custom-matchers": {
+      "types": "./setup/custom-matchers.ts",
+      "default": "./dist/setup/custom-matchers.js",
+      "require": "./dist/setup/custom-matchers.js"
+    },
+    "./setup/global-setup": {
+      "types": "./setup/global-setup.ts",
+      "default": "./dist/setup/global-setup.js",
+      "require": "./dist/setup/global-setup.js"
+    },
+    "./types": {
+      "types": "./types.d.ts",
+      "default": "./types.d.ts"
+    }
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "@nx/js:tsc",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "options": {
+          "main": "packages/test-utils/index.ts",
+          "outputPath": "packages/test-utils/dist",
+          "tsConfig": "packages/test-utils/tsconfig.lib.json",
+          "clean": true,
+          "generatePackageJson": false
+        }
+      }
+    }
+  }
+}

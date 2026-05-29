@@ -20,8 +20,8 @@ import {
   validateCoupon
 } from "../controllers/product.controller";
 
-import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
-import isAdmin from "../../../../packages/middleware/isAdmin";
+import isAuthenticated from "@artistry-cart/middleware/isAuthenticated";
+import isAdmin from "@artistry-cart/middleware/isAdmin";
 
 
 

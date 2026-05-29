@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 
-import { errorMiddleware } from "../../../packages/error-handler/error-middelware";
+import { errorMiddleware } from "@artistry-cart/error-handler/error-middelware";
 import {
   closeServer,
   createCorsOptions,
@@ -13,7 +13,7 @@ import {
   registerGracefulShutdown,
   registerHealthEndpoints,
   setupHttpObservability,
-} from "../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 import router from "./routes/order.route";
 import {
   createOrder,

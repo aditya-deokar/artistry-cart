@@ -1,7 +1,7 @@
 import express, { Router } from "express";
-import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
+import isAuthenticated from "@artistry-cart/middleware/isAuthenticated";
 import { applyDiscountCode, createDiscountCode, deleteDiscountCode, getDiscountUsageStats, getSellerDiscountCodes, updateDiscountCode, validateDiscountCode } from "../controllers/discountController";
-import isAdmin from "../../../../packages/middleware/isAdmin";
+import isAdmin from "@artistry-cart/middleware/isAdmin";
 
 
 const router: Router = express.Router();

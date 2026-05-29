@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 
-import prisma from "../../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 import type { AnalyticsEvent, UserAction } from "./events";
 import { PermanentEventError } from "./events";
 

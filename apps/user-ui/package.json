@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@artistry-cart/libs": "workspace:*",
+    "@artistry-cart/utils": "workspace:*",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.1.1",
     "@radix-ui/react-accordion": "^1.2.11",

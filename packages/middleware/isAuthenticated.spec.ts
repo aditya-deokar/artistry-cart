@@ -38,7 +38,7 @@ const { prismaMock, jwtMock, TokenExpiredError, JsonWebTokenError } = vi.hoisted
   };
 });
 
-vi.mock('../libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   __esModule: true,
   default: prismaMock,
 }));

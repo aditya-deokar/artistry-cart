@@ -4,7 +4,7 @@ import useDeviceTracking from '@/hooks/useDeviceTracking';
 import useLocationTracking from '@/hooks/useLocationTracking';
 import useUser from '@/hooks/useUser';
 import { postAnalyticsEvent } from '@/lib/analytics/track';
-import type { AnalyticsTrackRequest } from '../../../../packages/utils/kafka/analytics-contract';
+import type { AnalyticsTrackRequest } from '@artistry-cart/utils/kafka/analytics-contract';
 
 type TrackableAnalyticsEvent = Omit<
   AnalyticsTrackRequest,

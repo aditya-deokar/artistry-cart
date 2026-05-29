@@ -25,5 +25,10 @@
         }
       }
     }
+  },
+  "dependencies": {
+    "@artistry-cart/error-handler": "workspace:*",
+    "@artistry-cart/libs": "workspace:*",
+    "@artistry-cart/utils": "workspace:*"
   }
 }

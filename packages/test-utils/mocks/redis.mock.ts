@@ -3,7 +3,7 @@
  *
  * In-memory Redis mock using a Map store.
  * Mirrors the interface of packages/libs/redis (wrapper) so it can be
- * swapped via vi.mock('../../../../packages/libs/redis', ...).
+ * swapped via vi.mock('@artistry-cart/libs/redis', ...).
  *
  * Also works for tests that mock `ioredis` directly (order-service).
  */

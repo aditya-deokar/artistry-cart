@@ -3,7 +3,7 @@ import {
   getHost,
   getPort,
   getServiceUrl,
-} from "../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 
 export function getGatewayConfig() {
   return {

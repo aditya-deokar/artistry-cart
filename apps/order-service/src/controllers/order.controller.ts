@@ -1,8 +1,8 @@
 import { NextFunction, Response } from "express";
 import Stripe from "stripe";
 import Redis from "ioredis";
-import { ValidationError } from "../../../../packages/error-handler";
-import prisma from "../../../../packages/libs/prisma";
+import { ValidationError } from "@artistry-cart/error-handler";
+import prisma from "@artistry-cart/libs/prisma";
 import crypto from "crypto";
 import { sendEmail } from "../utils/send-email";
 import {

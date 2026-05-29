@@ -92,7 +92,7 @@ const { prismaMock, redisMockInstance, stripeMocks, authState } = vi.hoisted(() 
 
 // ── Module mocks ──
 
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   __esModule: true,
   default: prismaMock,
 }));
@@ -119,7 +119,7 @@ vi.mock('crypto', async (importOriginal) => {
   };
 });
 
-vi.mock('../../../../packages/error-handler', () => {
+vi.mock('@artistry-cart/error-handler', () => {
   class AppError extends Error {
     statusCode: number;
     constructor(msg: string, code = 500) { super(msg); this.statusCode = code; }
@@ -143,7 +143,7 @@ vi.mock('../../../../packages/error-handler', () => {
   };
 });
 
-vi.mock('../../../../packages/error-handler/error-middelware', () => ({
+vi.mock('@artistry-cart/error-handler/error-middelware', () => ({
   __esModule: true,
   errorMiddleware: (err: any, _req: any, res: any, _next: any) => {
     const status = err.statusCode || 500;
@@ -151,7 +151,7 @@ vi.mock('../../../../packages/error-handler/error-middelware', () => ({
   },
 }));
 
-vi.mock('../../../../packages/middleware/isAuthenticated', () => ({
+vi.mock('@artistry-cart/middleware/isAuthenticated', () => ({
   __esModule: true,
   default: vi.fn((req: any, res: any, next: any) => {
     if (!authState.user) {
@@ -163,7 +163,7 @@ vi.mock('../../../../packages/middleware/isAuthenticated', () => ({
   }),
 }));
 
-vi.mock('../../../../packages/middleware/authorizedRoles', () => ({
+vi.mock('@artistry-cart/middleware/authorizedRoles', () => ({
   __esModule: true,
   isSeller: vi.fn((req: any, res: any, next: any) => {
     if (req.role !== 'seller') {
@@ -182,7 +182,7 @@ vi.mock('../../../../packages/middleware/authorizedRoles', () => ({
 // ── Build Express app matching main.ts route registration ──
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { errorMiddleware } from '../../../../packages/error-handler/error-middelware';
+import { errorMiddleware } from '@artistry-cart/error-handler/error-middelware';
 import router from '../routes/order.route';
 
 function buildApp() {

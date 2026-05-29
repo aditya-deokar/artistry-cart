@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import prisma from "../../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
-import { ValidationError } from "../../../../packages/error-handler";
+import { ValidationError } from "@artistry-cart/error-handler";
 
 const ensureProductsBelongToShop = async (productIds: string[] | undefined, shopId: string) => {
   if (!productIds?.length) {

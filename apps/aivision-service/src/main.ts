@@ -2,7 +2,7 @@ import express, { Express } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import prisma from "../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 import {
   closeServer,
   createCorsOptions,
@@ -11,7 +11,7 @@ import {
   registerGracefulShutdown,
   registerHealthEndpoints,
   setupHttpObservability,
-} from "../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 import { errorMiddleware } from "./middleware/error.middleware";
 import routes from "./routes";
 import { initAgenda, stopAgenda } from "./jobs/agenda";

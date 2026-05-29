@@ -3,7 +3,7 @@
 import {
   analyticsTrackRequestSchema,
   type AnalyticsTrackRequest,
-} from "../../../../../packages/utils/kafka/analytics-contract";
+} from "@artistry-cart/utils/kafka/analytics-contract";
 
 export async function postAnalyticsEvent(input: AnalyticsTrackRequest): Promise<boolean> {
   const parsedInput = analyticsTrackRequestSchema.safeParse(input);

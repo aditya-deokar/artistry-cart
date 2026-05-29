@@ -5,7 +5,7 @@ import {
   getHost,
   getPort,
   registerGracefulShutdown,
-} from "../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 import { registerProductCleanupCron } from "./jobs/product-cron.job";
 
 const host = getHost();

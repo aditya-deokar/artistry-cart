@@ -2,10 +2,10 @@ import {
   analyticsEventSchema,
   type AnalyticsEvent,
   type AnalyticsUserAction,
-} from "../../../../packages/utils/kafka";
+} from "@artistry-cart/utils/kafka";
 
 export type UserAction = AnalyticsUserAction;
-export { ANALYTICS_USER_ACTIONS as USER_ACTIONS } from "../../../../packages/utils/kafka";
+export { ANALYTICS_USER_ACTIONS as USER_ACTIONS } from "@artistry-cart/utils/kafka";
 export type { AnalyticsEvent };
 
 export class PermanentEventError extends Error {

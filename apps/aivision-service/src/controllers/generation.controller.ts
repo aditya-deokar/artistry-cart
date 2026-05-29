@@ -5,7 +5,7 @@ import { generateConcept } from '../agents/concept-generator.agent';
 import { getOrCreateSession, createConcept, addConceptImages } from '../services/session.service';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import { logger } from '../utils/logger';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 
 // ============================================

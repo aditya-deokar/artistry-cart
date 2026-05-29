@@ -1,4 +1,4 @@
-import { getHost, getPort } from "../../../../packages/utils/runtime";
+import { getHost, getPort } from "@artistry-cart/utils/runtime";
 
 export const config = {
   host: getHost(),

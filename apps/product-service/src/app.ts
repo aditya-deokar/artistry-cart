@@ -2,13 +2,13 @@ import express, { type Express } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import { errorMiddleware } from "../../../packages/error-handler/error-middelware";
+import { errorMiddleware } from "@artistry-cart/error-handler/error-middelware";
 import {
   createCorsOptions,
   registerHealthEndpoints,
   setupHttpObservability,
   createLogger,
-} from "../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 import { deleteExpiredProducts } from "./jobs/product-cron.job";
 import productRouter from "./routes/product.route";
 import eventRouter from "./routes/events.route";

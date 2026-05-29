@@ -3,7 +3,7 @@ import { GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
 import { config } from '../config';
 import { logger } from '../utils/logger';
 import { withRetry } from '../utils/retry';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 // Google Gemini Embeddings (lazy init)
 let embeddingModel: GoogleGenerativeAIEmbeddings | null = null;

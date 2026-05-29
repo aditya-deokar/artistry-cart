@@ -1,0 +1,36 @@
+{
+  "name": "@artistry-cart/error-handler",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./error-middelware": {
+      "types": "./error-middelware.ts",
+      "default": "./dist/error-middelware.js",
+      "require": "./dist/error-middelware.js"
+    }
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "@nx/js:tsc",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "options": {
+          "main": "packages/error-handler/index.ts",
+          "outputPath": "packages/error-handler/dist",
+          "tsConfig": "packages/error-handler/tsconfig.lib.json",
+          "clean": true,
+          "generatePackageJson": false
+        }
+      }
+    }
+  }
+}

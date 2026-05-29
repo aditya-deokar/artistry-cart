@@ -1,4 +1,4 @@
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 import { logger } from '../utils/logger';
 import { MatchStatus, Prisma } from '@prisma/client';
 

@@ -1,9 +1,9 @@
 import crypto from 'crypto';
-import { ValidationError } from '../../../../packages/error-handler';
+import { ValidationError } from '@artistry-cart/error-handler';
 import { NextFunction, Request, Response } from 'express';
-import redis from '../../../../packages/libs/redis';
+import redis from '@artistry-cart/libs/redis';
 import { sendEmail } from './sendMail';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

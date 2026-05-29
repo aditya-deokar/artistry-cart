@@ -1,4 +1,4 @@
-import { imagekit as sharedImageKit } from '../../../../packages/libs/imageKit';
+import { imagekit as sharedImageKit } from '@artistry-cart/libs/imageKit';
 import { logger } from '../utils/logger';
 
 // ============================================

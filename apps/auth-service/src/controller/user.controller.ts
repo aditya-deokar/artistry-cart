@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
-import prisma from '../../../../packages/libs/prisma';
-import { imagekit } from '../../../../packages/libs/imageKit';
+import prisma from '@artistry-cart/libs/prisma';
+import { imagekit } from '@artistry-cart/libs/imageKit';
 
 
 // --- PROFILE DETAILS ---

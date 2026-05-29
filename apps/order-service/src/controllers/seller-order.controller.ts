@@ -1,5 +1,5 @@
 import { NextFunction, Response } from "express";
-import prisma from "../../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 
 // Get orders for a specific seller/shop
 export const getSellerOrders = async (
