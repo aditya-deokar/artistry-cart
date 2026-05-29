@@ -33,7 +33,7 @@ const { prismaMock, redisMockInstance, stripeMocks, authState } = vi.hoisted(() 
     users: mm(), sellers: mm(), shops: mm(), products: mm(),
     orders: mm(), orderItem: mm(), addresses: mm(),
     payments: mm(), payouts: mm(), refunds: mm(),
-    productAnalytics: mm(), userAnalytics: mm(),
+    productAnalytics: mm(), userAnalytics: mm(), analyticsOutbox: mm(),
     notification: mm(),
     $transaction: vi.fn(async (cb: any) => cb(prismaMock)),
   };

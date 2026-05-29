@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { ArtProduct, ImageInfo } from '@/types/products';
 import { formatPrice } from '@/lib/formatters';
 import { useStore } from '@/store';
+import useAnalytics from '@/hooks/useAnalytics';
 
 // Components
 import { Bounded } from '@/components/common/Bounded';
@@ -30,6 +32,7 @@ export function ProductPageClient({ product, validImages }: ProductPageClientPro
   // Get cart and wishlist state
   const cartItems = useStore((state) => state.cart);
   const wishlistItems = useStore((state) => state.wishlist);
+  const { trackEventOnce } = useAnalytics();
 
   const isInCart = cartItems.some((item) => item.id === product.id);
   const isWishlisted = wishlistItems.some((item) => item.id === product.id);
@@ -38,6 +41,20 @@ export function ProductPageClient({ product, validImages }: ProductPageClientPro
   const hasActiveEvent = product.event && product.event.is_active && product.event.ending_date;
   const eventEndDate = hasActiveEvent && product.event ? new Date(product.event.ending_date) : null;
   const isEventActive = eventEndDate ? eventEndDate > new Date() : false;
+
+  useEffect(() => {
+    if (!product.id) {
+      return;
+    }
+
+    void trackEventOnce({
+      dedupeKey: `product_view:${product.id}`,
+      action: 'product_view',
+      productId: product.id,
+      shopId: product.Shop?.id,
+      source: 'user-ui.product-page',
+    });
+  }, [product.id, product.Shop?.id, trackEventOnce]);
 
   return (
     <Bounded className="py-12 md:py-20 mt-4">

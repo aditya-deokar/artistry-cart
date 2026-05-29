@@ -89,8 +89,10 @@ Important characteristics:
 Important characteristics:
 
 - `UserAnalytics.actions` stores JSON action history
+- `UserAnalytics.processedEventKeys` supports idempotent Kafka retries
 - `UserAnalytics.recommendations` stores cached recommendation ids
 - `productAnalytics` stores materialized counters for views and intent signals
+- `shopAnalytics` is now keyed explicitly by `shopId`
 
 ### AI Vision
 
@@ -201,8 +203,12 @@ Represents the recommendation-ready user activity read model.
 Important fields:
 
 - `actions`
+- `processedEventKeys`
 - `recommendations`
 - `lastTrained`
+- `country`
+- `city`
+- `device`
 
 ### `Concept`
 

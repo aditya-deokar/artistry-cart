@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, notFound } from 'next/navigation';
 import axiosInstance from '@/utils/axiosinstance';
+import useAnalytics from '@/hooks/useAnalytics';
 
 // --- Import your new components ---
 import { ShopHeader } from '@/components/shops/single-shop/ShopHeader';
@@ -72,6 +73,7 @@ const TabbedContent: React.FC<{ shop: ShopData }> = ({ shop }) => {
 export default function SingleShopPage() {
     const params = useParams();
     const slug = typeof params.slug === 'string' ? params.slug : '';
+    const { trackEventOnce } = useAnalytics();
 
     // Main query to get the shop's core details
     const { data: shop, isLoading, isError } = useQuery<ShopData>({
@@ -83,14 +85,25 @@ export default function SingleShopPage() {
         enabled: !!slug,
     });
 
+    useEffect(() => {
+        if (!shop?.id) {
+            return;
+        }
+
+        void trackEventOnce({
+            dedupeKey: `shop_visit:${shop.id}`,
+            action: 'shop_visit',
+            shopId: shop.id,
+            source: 'user-ui.shop-page',
+        });
+    }, [shop?.id, trackEventOnce]);
+
     // The initial loading is handled by loading.tsx, so we can return null here
     if (isLoading) return null;
 
     if (isError || !shop) {
         return notFound();
     }
-
-    console.log(shop)
 
     return (
         <>

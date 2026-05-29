@@ -10,6 +10,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
+    "test:kafka": "vitest run --project kafka-service",
     "test:product": "vitest run --project product-service",
     "test:auth": "vitest run --project auth-service",
     "test:order": "vitest run --project order-service",

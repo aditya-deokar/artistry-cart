@@ -102,8 +102,34 @@ These are primarily used by `api-gateway` and become especially important in Doc
 - `KAFKA_USER_EVENTS_TOPIC`
   - `.env.example` default: `user-events`
 
-- `KAFKA_CONSUMER_BATCH_INTERVAL_MS`
-  - `.env.example` default: `3000`
+- `KAFKA_DLQ_TOPIC`
+  - `.env.example` default: `user-events.dlq`
+  - optional dead-letter topic for invalid or exhausted events
+
+- `KAFKA_BATCH_SIZE`
+  - `.env.example` default: `100`
+  - max number of fetched messages the worker processes before committing offsets
+
+- `KAFKA_MAX_RETRIES`
+  - `.env.example` default: `3`
+
+- `KAFKA_RETRY_BASE_DELAY_MS`
+  - `.env.example` default: `250`
+
+- `KAFKA_RETRY_MAX_DELAY_MS`
+  - `.env.example` default: `5000`
+
+- `KAFKA_PARTITIONS_CONCURRENCY`
+  - `.env.example` default: `1`
+
+- `KAFKA_FETCH_MIN_BYTES`
+  - `.env.example` default: `1`
+
+- `KAFKA_FETCH_MAX_BYTES_PER_PARTITION`
+  - `.env.example` default: `1048576`
+
+- `KAFKA_FETCH_MAX_WAIT_MS`
+  - `.env.example` default: `5000`
 
 ## Stripe Variables
 
@@ -203,7 +229,21 @@ KAFKA_SASL_PASSWORD=""
 KAFKA_SASL_MECHANISM="plain"
 KAFKA_CONSUMER_GROUP_ID="user-events-group"
 KAFKA_USER_EVENTS_TOPIC="user-events"
-KAFKA_CONSUMER_BATCH_INTERVAL_MS="3000"
+KAFKA_ANALYTICS_SOURCE="artistry-cart"
+KAFKA_DLQ_TOPIC="user-events.dlq"
+KAFKA_BATCH_SIZE="100"
+KAFKA_MAX_RETRIES="3"
+KAFKA_RETRY_BASE_DELAY_MS="250"
+KAFKA_RETRY_MAX_DELAY_MS="5000"
+KAFKA_PARTITIONS_CONCURRENCY="1"
+KAFKA_FETCH_MIN_BYTES="1"
+KAFKA_FETCH_MAX_BYTES_PER_PARTITION="1048576"
+KAFKA_FETCH_MAX_WAIT_MS="5000"
+ORDER_ANALYTICS_OUTBOX_ENABLED="true"
+ORDER_ANALYTICS_OUTBOX_BATCH_SIZE="25"
+ORDER_ANALYTICS_OUTBOX_INTERVAL_MS="5000"
+ORDER_ANALYTICS_OUTBOX_MAX_ATTEMPTS="8"
+ORDER_ANALYTICS_OUTBOX_LOCK_TIMEOUT_MS="60000"
 OAUTH_REDIRECT_BASE_URL="http://localhost:6001"
 NEXT_PUBLIC_SERVER_URI="http://localhost:8080"
 INTERNAL_SERVER_URI="http://localhost:8080"

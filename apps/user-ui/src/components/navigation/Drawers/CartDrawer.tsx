@@ -13,6 +13,7 @@ import { formatPrice } from '@/lib/formatters';
 import axiosInstance from '@/utils/axiosinstance';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
+import useAnalytics from '@/hooks/useAnalytics';
 
 interface CartDrawerProps {
     isOpen: boolean;
@@ -168,6 +169,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     const appliedCoupon = useStore((state) => state.appliedCoupon);
     const updateQuantity = useStore((state) => state.actions.updateQuantity);
     const removeFromCart = useStore((state) => state.actions.removeFromCart);
+    const { trackEvent } = useAnalytics();
 
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
     const [isLoading, setIsLoading] = useState(false);
@@ -246,10 +248,38 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         return { subtotal, discount, total, itemCount };
     }, [cart, appliedCoupon]);
 
+    const handleUpdateQuantity = (productId: string, newQuantity: number) => {
+        const existingItem = cart.find((item) => item.id === productId);
+        if (!existingItem || newQuantity === existingItem.quantity) {
+            return;
+        }
+
+        updateQuantity(productId, newQuantity);
+
+        const quantityDelta = Math.abs(newQuantity - existingItem.quantity);
+        void trackEvent({
+            action: newQuantity > existingItem.quantity ? 'add_to_cart' : 'remove_from_cart',
+            productId: existingItem.id,
+            shopId: existingItem.Shop?.id,
+            quantity: quantityDelta,
+            source: 'user-ui.cart-drawer',
+        });
+    };
+
     const handleRemove = (productId: string) => {
-        // Note: The full signature requires user, location, deviceInfo for analytics
-        // For drawer, we'll use simplified version
-        removeFromCart(productId, null, null, '');
+        const existingItem = cart.find((item) => item.id === productId);
+        if (!existingItem) {
+            return;
+        }
+
+        removeFromCart(productId);
+        void trackEvent({
+            action: 'remove_from_cart',
+            productId: existingItem.id,
+            shopId: existingItem.Shop?.id,
+            quantity: existingItem.quantity,
+            source: 'user-ui.cart-drawer',
+        });
     };
 
     return (
@@ -313,7 +343,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                                             <DrawerCartItem
                                                 key={item.id}
                                                 item={item}
-                                                onUpdateQuantity={updateQuantity}
+                                                onUpdateQuantity={handleUpdateQuantity}
                                                 onRemove={handleRemove}
                                             />
                                         ))}

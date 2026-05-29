@@ -69,6 +69,7 @@ export function createPrismaMock(): Record<string, any> {
 
     // User analytics & Notifications
     userAnalytics: createModelMock(),
+    analyticsOutbox: createModelMock(),
     notification: createModelMock(),
 
     // AI Vision models

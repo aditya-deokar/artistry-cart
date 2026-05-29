@@ -9,6 +9,7 @@ import { X, Heart, ShoppingCart, Trash2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStore, type CartItem } from '@/store';
 import { formatPrice } from '@/lib/formatters';
+import useAnalytics from '@/hooks/useAnalytics';
 
 interface WishlistDrawerProps {
     isOpen: boolean;
@@ -143,6 +144,7 @@ export function WishlistDrawer({ isOpen, onClose }: WishlistDrawerProps) {
     const wishlist = useStore((state) => state.wishlist);
     const removeFromWishlist = useStore((state) => state.actions.removeFromWishlist);
     const addToCart = useStore((state) => state.actions.addToCart);
+    const { trackEvent } = useAnalytics();
 
     // Prevent body scroll when drawer is open
     useEffect(() => {
@@ -157,14 +159,39 @@ export function WishlistDrawer({ isOpen, onClose }: WishlistDrawerProps) {
     }, [isOpen]);
 
     const handleRemove = (productId: string) => {
-        // Note: The full signature requires user, location, deviceInfo for analytics
-        removeFromWishlist(productId, null, null, '');
+        const existingItem = wishlist.find((item) => item.id === productId);
+        if (!existingItem) {
+            return;
+        }
+
+        removeFromWishlist(productId);
+        void trackEvent({
+            action: 'remove_from_wishlist',
+            productId: existingItem.id,
+            shopId: existingItem.Shop?.id,
+            quantity: existingItem.quantity,
+            source: 'user-ui.wishlist-drawer',
+        });
     };
 
     const handleMoveToCart = (item: CartItem) => {
         // Add to cart and remove from wishlist
-        addToCart(item, null, null, '');
-        removeFromWishlist(item.id, null, null, '');
+        addToCart(item);
+        removeFromWishlist(item.id);
+        void trackEvent({
+            action: 'add_to_cart',
+            productId: item.id,
+            shopId: item.Shop?.id,
+            quantity: item.quantity,
+            source: 'user-ui.wishlist-drawer',
+        });
+        void trackEvent({
+            action: 'remove_from_wishlist',
+            productId: item.id,
+            shopId: item.Shop?.id,
+            quantity: item.quantity,
+            source: 'user-ui.wishlist-drawer',
+        });
     };
 
     return (
@@ -258,8 +285,22 @@ export function WishlistDrawer({ isOpen, onClose }: WishlistDrawerProps) {
                                         <Button
                                             onClick={() => {
                                                 wishlist.forEach((item) => {
-                                                    addToCart(item, null, null, '');
-                                                    removeFromWishlist(item.id, null, null, '');
+                                                    addToCart(item);
+                                                    removeFromWishlist(item.id);
+                                                    void trackEvent({
+                                                        action: 'add_to_cart',
+                                                        productId: item.id,
+                                                        shopId: item.Shop?.id,
+                                                        quantity: item.quantity,
+                                                        source: 'user-ui.wishlist-drawer',
+                                                    });
+                                                    void trackEvent({
+                                                        action: 'remove_from_wishlist',
+                                                        productId: item.id,
+                                                        shopId: item.Shop?.id,
+                                                        quantity: item.quantity,
+                                                        source: 'user-ui.wishlist-drawer',
+                                                    });
                                                 });
                                             }}
                                             className="w-full h-12 group bg-[var(--ac-charcoal)] dark:bg-[var(--ac-pearl)] text-[var(--ac-pearl)] dark:text-[var(--ac-charcoal)] hover:bg-[var(--ac-gold)] text-sm font-medium tracking-wide transition-all duration-300"

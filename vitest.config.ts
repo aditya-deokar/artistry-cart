@@ -3,6 +3,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     projects: [
+      'apps/kafka-service/vitest.config.ts',
       'apps/product-service/vitest.config.ts',
       'apps/auth-service/vitest.config.ts',
       'apps/order-service/vitest.config.ts',

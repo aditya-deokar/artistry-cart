@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kafka is currently used for asynchronous user-activity ingestion that feeds analytics and recommendation workflows.
+Kafka is used for asynchronous user-activity ingestion that feeds analytics and recommendation workflows.
 
 ## Current Producer And Consumer Roles
 
@@ -27,30 +27,26 @@ The Kafka consumer uses:
 - `KAFKA_USER_EVENTS_TOPIC`
 - default fallback: `user-events`
 
-### Hardcoded producer topic
+### Optional dead-letter topic
 
-The inspected producer sends to:
+The worker can publish rejected or exhausted events to:
 
-- `user-events`
-
-## Important Note
-
-The producer and the consumer default now align on:
-
-- `user-events`
+- `KAFKA_DLQ_TOPIC`
+- recommended default: `user-events.dlq`
 
 ## Event Shape
 
-The event payload currently supports:
+The current analytics payload supports:
 
+- `eventId` optional
 - `userId`
-- `productId`
-- `shopId`
+- `productId` for all non-shop events
+- `shopId` optional when it can be derived from `productId`
 - `action`
 - `device`
 - `country`
 - `city`
-- optional `timestamp`
+- `timestamp` optional
 
 ## Action Vocabulary
 
@@ -66,37 +62,44 @@ Recognized actions include:
 
 ## Consumer Semantics
 
-The consumer:
+The consumer now:
 
-- buffers events in memory
-- processes them on a timer
-- ignores invalid actions
-- skips `shop_visit` expansion for now
+- validates event payloads before persistence
+- processes Kafka batches with manual offset commits
+- retries transient failures with bounded backoff
+- dead-letters invalid events when configured
+- dead-letters exhausted transient failures when configured
+- stores recent processed event keys on analytics documents so retries stay idempotent
 - updates:
   - `UserAnalytics`
   - `productAnalytics`
+  - `shopAnalytics`
+  - `uniqueShopVisitor`
 
 ## Read-Side Impact
 
-This event stream ultimately supports:
+This event stream supports:
 
 - recommendation inputs
 - product engagement metrics
+- shop visit analytics
 - user behavior history
 
 ## Design Strengths
 
 - async capture protects buyer-facing latency
-- event payload shape is compact and domain-relevant
-- materialized analytics records are directly useful downstream
+- the consumer no longer acknowledges offsets before persistence
+- event payload validation is explicit instead of best-effort
+- DLQ support gives operators a place to inspect poison messages
 
 ## Design Constraints
 
-- event schema governance is code-driven rather than formalized
-- in-memory batching means crash-before-flush is a possible data-loss scenario
+- some producer paths in the repo still do not emit the full action set
+- purchase analytics are not yet fully standardized on the Kafka path across services
+- topic governance still lives in code and docs rather than a dedicated schema registry
 
 ## Recommended Future Contract Hardening
 
-- version or formalize event schemas
-- document replay and failure-handling expectations
-- add lag and delivery monitoring
+- standardize all producers on the same event contract module
+- add a versioned event envelope once multiple producers are active
+- add lag dashboards and autoscaling around consumer group lag
