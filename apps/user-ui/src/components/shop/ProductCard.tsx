@@ -10,9 +10,7 @@ import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { ArtProduct } from '@/types/products';
 import { useStore } from '@/store';
-import useUser from '@/hooks/useUser';
-import useLocationTracking from '@/hooks/useLocationTracking';
-import useDeviceTracking from '@/hooks/useDeviceTracking';
+import useAnalytics from '@/hooks/useAnalytics';
 import WishlistButton from '../products/WishlistButton';
 
 // Define framer-motion card variants with correct typing
@@ -27,11 +25,7 @@ const useCountdown = (endDate?: string | null) => {
 }
 
 export const ProductCard = ({ product }: { product: ArtProduct }) => {
-
-  const { user }=useUser();
-  const  location= useLocationTracking();
-  const deviceInfo = useDeviceTracking();
-
+  const { trackEvent } = useAnalytics();
 
   const primaryImage = product.images.find(img => img !== null);
   const isLimited = product.stock <= 5 && product.stock > 0;
@@ -45,6 +39,20 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
 
   // Select actions from the nested 'actions' object
   const { addToCart } = useStore((state) => state.actions);
+  const handleAddToCart = () => {
+    if (isInCart) {
+      return;
+    }
+
+    addToCart({ ...product, quantity: 1 } as any);
+    void trackEvent({
+      action: 'add_to_cart',
+      productId: product.id,
+      shopId: product.Shop?.id,
+      quantity: 1,
+      source: 'user-ui.shop-product-card',
+    });
+  };
 
   // Check if product is in cart to control button behavior
   const isInCart = cartItems.some((item) => item.id === product.id);
@@ -82,7 +90,7 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
             
             <WishlistButton product={product} productId={product.id}/>
             <Button
-            onClick={()=> !isInCart && addToCart({...product, quantity:1 }, user, location, deviceInfo)}
+            onClick={handleAddToCart}
             variant="outline" 
             size="icon" 
             className="bg-background rounded-full shadow-md hover:bg-background"

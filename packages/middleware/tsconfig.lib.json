@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "tsBuildInfoFile": "./dist/tsconfig.lib.tsbuildinfo",
+    "types": [
+      "node",
+      "express"
+    ]
+  },
+  "include": [
+    "*.ts"
+  ],
+  "exclude": [
+    "*.spec.ts",
+    "*.test.ts",
+    "dist"
+  ],
+  "references": [
+    {
+      "path": "../libs/tsconfig.lib.json"
+    },
+    {
+      "path": "../error-handler/tsconfig.lib.json"
+    }
+  ]
+}

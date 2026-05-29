@@ -1,10 +1,10 @@
 import cron from "node-cron";
 
-import prisma from "../../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 import {
   createLogger,
   type AppLogger,
-} from "../../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 
 export type ProductCleanupResult = {
   checkedProducts: number;

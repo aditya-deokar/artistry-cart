@@ -8,6 +8,21 @@ importers:
 
   .:
     dependencies:
+      '@artistry-cart/error-handler':
+        specifier: workspace:*
+        version: link:packages/error-handler
+      '@artistry-cart/libs':
+        specifier: workspace:*
+        version: link:packages/libs
+      '@artistry-cart/middleware':
+        specifier: workspace:*
+        version: link:packages/middleware
+      '@artistry-cart/test-utils':
+        specifier: workspace:*
+        version: link:packages/test-utils
+      '@artistry-cart/utils':
+        specifier: workspace:*
+        version: link:packages/utils
       '@google/generative-ai':
         specifier: ^0.24.1
         version: 0.24.1
@@ -346,31 +361,101 @@ importers:
         specifier: ^5.1.4
         version: 5.1.4(webpack-dev-server@5.2.2)(webpack@5.99.9)
 
-  apps/ai-vision: {}
-
-  apps/aivision-service: {}
+  apps/aivision-service:
+    dependencies:
+      '@artistry-cart/error-handler':
+        specifier: workspace:*
+        version: link:../../packages/error-handler
+      '@artistry-cart/libs':
+        specifier: workspace:*
+        version: link:../../packages/libs
+      '@artistry-cart/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
 
   apps/aivision-service-e2e: {}
 
-  apps/api-gateway: {}
+  apps/api-gateway:
+    dependencies:
+      '@artistry-cart/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
 
   apps/api-gateway-e2e: {}
 
-  apps/auth-service: {}
+  apps/auth-service:
+    dependencies:
+      '@artistry-cart/error-handler':
+        specifier: workspace:*
+        version: link:../../packages/error-handler
+      '@artistry-cart/libs':
+        specifier: workspace:*
+        version: link:../../packages/libs
+      '@artistry-cart/middleware':
+        specifier: workspace:*
+        version: link:../../packages/middleware
+      '@artistry-cart/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
 
   apps/auth-service-e2e: {}
 
-  apps/kafka-service: {}
+  apps/kafka-service:
+    dependencies:
+      '@artistry-cart/libs':
+        specifier: workspace:*
+        version: link:../../packages/libs
+      '@artistry-cart/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
 
   apps/kafka-service-e2e: {}
 
-  apps/order-service: {}
+  apps/order-service:
+    dependencies:
+      '@artistry-cart/error-handler':
+        specifier: workspace:*
+        version: link:../../packages/error-handler
+      '@artistry-cart/libs':
+        specifier: workspace:*
+        version: link:../../packages/libs
+      '@artistry-cart/middleware':
+        specifier: workspace:*
+        version: link:../../packages/middleware
+      '@artistry-cart/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
 
-  apps/product-service: {}
+  apps/order-service-e2e: {}
+
+  apps/product-service:
+    dependencies:
+      '@artistry-cart/error-handler':
+        specifier: workspace:*
+        version: link:../../packages/error-handler
+      '@artistry-cart/libs':
+        specifier: workspace:*
+        version: link:../../packages/libs
+      '@artistry-cart/middleware':
+        specifier: workspace:*
+        version: link:../../packages/middleware
+      '@artistry-cart/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
 
   apps/product-service-e2e: {}
 
-  apps/recommendation-service: {}
+  apps/recommendation-service:
+    dependencies:
+      '@artistry-cart/libs':
+        specifier: workspace:*
+        version: link:../../packages/libs
+      '@artistry-cart/middleware':
+        specifier: workspace:*
+        version: link:../../packages/middleware
+      '@artistry-cart/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
 
   apps/recommendation-service-e2e: {}
 
@@ -482,6 +567,12 @@ importers:
 
   apps/user-ui:
     dependencies:
+      '@artistry-cart/libs':
+        specifier: workspace:*
+        version: link:../../packages/libs
+      '@artistry-cart/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@gsap/react':
         specifier: ^2.1.2
         version: 2.1.2(gsap@3.13.0)(react@19.0.0)
@@ -612,6 +703,23 @@ importers:
       tw-animate-css:
         specifier: ^1.3.5
         version: 1.3.5
+
+  packages/error-handler: {}
+
+  packages/libs: {}
+
+  packages/middleware:
+    dependencies:
+      '@artistry-cart/error-handler':
+        specifier: workspace:*
+        version: link:../error-handler
+      '@artistry-cart/libs':
+        specifier: workspace:*
+        version: link:../libs
+
+  packages/test-utils: {}
+
+  packages/utils: {}
 
 packages:
 

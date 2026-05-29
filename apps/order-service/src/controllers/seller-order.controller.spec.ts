@@ -14,10 +14,10 @@ import {
   createMockShop,
   createMockOrder,
   resetFactoryCounter,
-} from '../../../../packages/test-utils';
+} from '@artistry-cart/test-utils';
 
 // ── Module mocks ──
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   default: prismaMock,
 }));
 

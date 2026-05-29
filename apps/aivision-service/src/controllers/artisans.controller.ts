@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 import { Prisma } from '@prisma/client';
 import { findMatchingArtisans, updateArtisanResponse, getConceptMatches } from '../services/artisan-matching.service';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';

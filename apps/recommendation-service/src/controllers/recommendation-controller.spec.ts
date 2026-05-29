@@ -17,7 +17,7 @@ import {
   mockResponse,
   mockNext,
   resetFactoryCounter,
-} from '../../../../packages/test-utils';
+} from '@artistry-cart/test-utils';
 
 // ── Hoisted mocks ──
 const { mockRecommendProducts } = vi.hoisted(() => ({
@@ -25,7 +25,7 @@ const { mockRecommendProducts } = vi.hoisted(() => ({
 }));
 
 // ── Module mocks ──
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   default: prismaMock,
 }));
 

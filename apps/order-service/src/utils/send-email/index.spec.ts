@@ -9,7 +9,7 @@ import {
   nodemailerMock,
   transporterMock,
   resetNodemailerMock,
-} from '../../../../../packages/test-utils';
+} from '@artistry-cart/test-utils';
 
 // ── Module mocks ──
 vi.mock('nodemailer', () => ({

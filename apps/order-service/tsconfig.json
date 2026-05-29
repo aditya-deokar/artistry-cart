@@ -4,6 +4,21 @@
   "include": [],
   "references": [
     {
+      "path": "../../packages/test-utils"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/middleware"
+    },
+    {
+      "path": "../../packages/libs"
+    },
+    {
+      "path": "../../packages/error-handler"
+    },
+    {
       "path": "./tsconfig.app.json"
     }
   ]

@@ -1,11 +1,14 @@
 import { NextFunction, Response } from "express";
 import Stripe from "stripe";
 import Redis from "ioredis";
-import { ValidationError } from "../../../../packages/error-handler";
-import prisma from "../../../../packages/libs/prisma";
+import { ValidationError } from "@artistry-cart/error-handler";
+import prisma from "@artistry-cart/libs/prisma";
 import crypto from "crypto";
-import { Prisma } from "@prisma/client";
 import { sendEmail } from "../utils/send-email";
+import {
+  enqueuePurchaseAnalyticsEvents,
+  scheduleAnalyticsOutboxDrain,
+} from "../services/analytics-outbox";
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY!, {
   apiVersion: "2025-06-30.basil",
 });
@@ -196,6 +199,56 @@ export const verifyingPaymentSession = async (
   }
 };
 
+export const createOrder = async (
+  req: any,
+  res: Response,
+  next: NextFunction,
+) => {
+  const signature = req.headers["stripe-signature"];
+
+  if (!signature) {
+    return res.status(400).send("Missing Stripe Signature");
+  }
+
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.rawBody ?? req.body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!,
+    );
+  } catch (error: any) {
+    return res.status(400).send(`Webhook Error: ${error.message}`);
+  }
+
+  try {
+    switch (event.type) {
+      case "payment_intent.succeeded":
+        await handlePaymentSucceeded(event.data.object as Stripe.PaymentIntent);
+        break;
+      case "payment_intent.payment_failed":
+        await handlePaymentFailed(event.data.object as Stripe.PaymentIntent);
+        break;
+      case "charge.refunded":
+        await handleChargeRefunded(event.data.object as Stripe.Charge);
+        break;
+      case "account.updated":
+        await handleAccountUpdated(event.data.object as Stripe.Account);
+        break;
+      case "transfer.created":
+        await handleTransferCreated(event.data.object as Stripe.Transfer);
+        break;
+      default:
+        return res.status(200).send(`Skipping unhandled event type: ${event.type}`);
+    }
+
+    return res.status(200).json({ received: true });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 // create order
 export const handlePaymentSucceeded = async (
   paymentIntent: Stripe.PaymentIntent
@@ -231,6 +284,7 @@ export const handlePaymentSucceeded = async (
       acc[item.shopId].push(item);
       return acc;
     }, {});
+    const createdShopIds = Object.keys(shopGrouped);
 
     for (const shopId in shopGrouped) {
       const orderItems = shopGrouped[shopId];
@@ -268,181 +322,127 @@ export const handlePaymentSucceeded = async (
       const platformFee = Math.floor(customerAmount * 0.1); // 10% admin margin
       const sellerAmount = customerAmount - platformFee;
 
-      // create order with payment record
-      const createdOrder = await prisma.orders.create({
-        data: {
-          userId,
-          shopId: shopId,
-          totalAmount: orderTotal,
-          status: "PAID",
-          shippingAddressId: shippingAddressId || null,
-          couponCode: coupon?.code || null,
-          discountAmount: coupon?.discountAmount || 0,
-          items: {
-            create: orderItems.map((item: any) => ({
-              productId: item.id,
-              quantity: item.quantity,
-              price: item.sale_price,
-              selectedOptions: item.selectedOptions,
-            }))
-          },
-          // Create payment record
-          payment: {
-            create: {
-              stripePaymentIntent: paymentIntent.id,
-              stripeChargeId: paymentIntent.latest_charge as string || null,
-              amount: customerAmount / 100, // Store in dollars
-              currency: paymentIntent.currency || "usd",
-              platformFee: platformFee / 100, // 10% admin margin in dollars
-              sellerAmount: sellerAmount / 100, // 90% seller amount in dollars
-              status: "SUCCEEDED",
-              paymentMethod: paymentIntent.payment_method_types?.[0] || "card",
-              metadata: {
-                sessionId,
-                userId,
-                shopId,
-              },
-            }
-          }
-        }
-      });
-
-
-      // update product and Analytics
-      for (const item of orderItems) {
-        const { id: productId, quantity } = item;
-
-        await prisma.products.update({
-          where: {
-            id: productId
-          },
+      await prisma.$transaction(async (tx) => {
+        await tx.orders.create({
           data: {
-            stock: {
-              decrement: quantity
-            },
-            totalSales: {
-              increment: quantity
-            },
-
-          },
-
-        })
-
-        await prisma.productAnalytics.upsert({
-          where: {
-            id: productId
-          },
-          create: {
-            productId,
+            userId,
             shopId,
-            purchases: quantity,
-            lastViewedAt: new Date(),
-
+            totalAmount: orderTotal,
+            status: "PAID",
+            shippingAddressId: shippingAddressId || null,
+            couponCode: coupon?.code || null,
+            discountAmount: coupon?.discountAmount || 0,
+            items: {
+              create: orderItems.map((item: any) => ({
+                productId: item.id,
+                quantity: item.quantity,
+                price: item.sale_price,
+                selectedOptions: item.selectedOptions,
+              })),
+            },
+            payment: {
+              create: {
+                stripePaymentIntent: paymentIntent.id,
+                stripeChargeId: paymentIntent.latest_charge as string || null,
+                amount: customerAmount / 100,
+                currency: paymentIntent.currency || "usd",
+                platformFee: platformFee / 100,
+                sellerAmount: sellerAmount / 100,
+                status: "SUCCEEDED",
+                paymentMethod: paymentIntent.payment_method_types?.[0] || "card",
+                metadata: {
+                  sessionId,
+                  userId,
+                  shopId,
+                },
+              },
+            },
           },
-          update: {
-            purchases: { increment: quantity }
-          }
-        })
+        });
 
-
-        const existingAnalytics = await prisma.userAnalytics.findUnique({
-          where: {
-            userId
-          }
-        })
-
-        const newAction = {
-          productId,
-          shopId,
-          action: "purchase",
-          timeStamp: Date.now(),
-        };
-
-        const currentActions = Array.isArray(existingAnalytics?.actions) ? (existingAnalytics.actions as Prisma.JsonArray) : [];
-
-        if (existingAnalytics) {
-          await prisma.userAnalytics.update({
+        for (const item of orderItems) {
+          await tx.products.update({
             where: {
-              userId
+              id: item.id,
             },
             data: {
-              lastVisited: new Date(),
-              actions: [...currentActions, newAction],
+              stock: {
+                decrement: item.quantity,
+              },
+              totalSales: {
+                increment: item.quantity,
+              },
             },
-          })
-        } else {
-          await prisma.userAnalytics.create({
-            data: {
-              userId,
-              lastVisited: new Date(),
-              actions: [newAction],
-            },
-          })
+          });
         }
 
+        await enqueuePurchaseAnalyticsEvents(
+          {
+            userId,
+            source: "order-service.payment-webhook",
+            items: orderItems.map((item: any) => ({
+              productId: item.id,
+              shopId,
+              quantity: item.quantity,
+            })),
+          },
+          tx,
+        );
+      });
+    }
+
+    await sendEmail(
+      email,
+      "Your Artistry Cart Order Confirmation",
+      "order-confirmation",
+      {
+        name,
+        cart,
+        totalAmount: coupon?.discountAmount ? totalAmount - coupon?.discountAmount : totalAmount,
+        trackingUrl: `https://artistry.com/order/${sessionId}`,
       }
+    );
 
-      // send email for user
-      await sendEmail(
-        email,
-        "Your Artistry Cart Order Confirmation",
-        "order-confirmation",
-        {
-          name,
-          cart,
-          totalAmount: coupon?.discountAmount ? totalAmount - coupon?.discountAmount : totalAmount,
-          trackingUrl: `https://artistry.com/order/${sessionId}`,
-        }
-      )
-
-
-      // Create notification for sellers
-      const createedShopIds = Object.keys(shopGrouped);
-      const sellerShops = await prisma.shops.findMany({
-        where: {
-          id: {
-            in: createedShopIds
-          }
+    const sellerShops = await prisma.shops.findMany({
+      where: {
+        id: {
+          in: createdShopIds,
         },
-        select: {
-          id: true,
-          sellerId: true,
-          name: true,
-        }
-      })
+      },
+      select: {
+        id: true,
+        sellerId: true,
+        name: true,
+      },
+    });
 
-      // Notification for Shop
-      for (const shop of sellerShops) {
-        const firstProduct = shopGrouped[shop.id][0];
-        const productTitle = firstProduct?.title || "new item";
-
-        await prisma.notification.create({
-          data: {
-            title: "New Order Received",
-            message: `A Customer just ordered ${productTitle} from your shop.`,
-            createrId: userId,
-            recieverId: shop.sellerId,
-            redirect_link: `https://artistry.com/order/${sessionId}`
-          }
-        })
-      }
-
-      // Notification for Admin
+    for (const shop of sellerShops) {
+      const firstProduct = shopGrouped[shop.id][0];
+      const productTitle = firstProduct?.title || "new item";
 
       await prisma.notification.create({
         data: {
-          title: "Platform Order Alert",
-          message: `A New Order was placed by ${name}.`,
+          title: "New Order Received",
+          message: `A Customer just ordered ${productTitle} from your shop.`,
           createrId: userId,
-          recieverId: "admin",
-          redirect_link: `https://artistry.com/order/${sessionId}`
-        }
-      })
-
-      await redisClient.del(sessionKey)
-
-
+          recieverId: shop.sellerId,
+          redirect_link: `https://artistry.com/order/${sessionId}`,
+        },
+      });
     }
+
+    await prisma.notification.create({
+      data: {
+        title: "Platform Order Alert",
+        message: `A New Order was placed by ${name}.`,
+        createrId: userId,
+        recieverId: "admin",
+        redirect_link: `https://artistry.com/order/${sessionId}`,
+      },
+    });
+
+    await redisClient.del(sessionKey);
+    void scheduleAnalyticsOutboxDrain("payment_intent.succeeded");
   } catch (error) {
     console.log(error);
     throw error;

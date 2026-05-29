@@ -8,6 +8,21 @@
   "files": [],
   "references": [
     {
+      "path": "./packages/error-handler"
+    },
+    {
+      "path": "./packages/middleware"
+    },
+    {
+      "path": "./packages/test-utils"
+    },
+    {
+      "path": "./packages/utils"
+    },
+    {
+      "path": "./packages/libs"
+    },
+    {
       "path": "./apps/auth-service-e2e"
     },
     {

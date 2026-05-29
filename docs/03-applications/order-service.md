@@ -17,6 +17,7 @@ It is the most operationally sensitive service in the platform because it handle
 - seller order management and order status updates
 - receive and process Stripe webhooks
 - send order-related emails
+- enqueue purchase analytics into the Kafka analytics outbox
 
 ## Inbound Interfaces
 
@@ -50,6 +51,7 @@ Webhook endpoint:
 - Stripe
 - Redis
 - SMTP
+- Kafka via the shared analytics producer
 - shared auth and seller-role middleware
 - shared error middleware
 
@@ -72,6 +74,7 @@ Primary models include:
 - `orders`
 - `OrderItem`
 - `payments`
+- `analyticsOutbox`
 - `payouts`
 - discount-usage relationships tied to order state
 
@@ -83,6 +86,8 @@ Primary models include:
 - validates authenticated user or seller access through shared middleware
 
 The raw-body webhook placement is an important implementation detail because Stripe signature verification depends on it.
+
+Purchase analytics are now written to `analyticsOutbox` during webhook processing and published asynchronously to Kafka by the in-process outbox publisher. That keeps order persistence decoupled from Kafka availability while still exercising the analytics worker contract end to end.
 
 ## Tests
 
@@ -112,3 +117,4 @@ This service includes:
 - formalize payout and refund state-machine behavior
 - consider explicit read models for seller analytics if those views grow more complex
 - standardize secret naming, especially around Stripe configuration
+- expose outbox lag and failure metrics alongside webhook health

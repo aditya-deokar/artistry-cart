@@ -1,193 +1,491 @@
 import { Prisma } from "@prisma/client";
 
-import prisma from "../../../../packages/libs/prisma";
-import { createLogger } from "../../../../packages/utils/runtime";
+import prisma from "@artistry-cart/libs/prisma";
+import type { AnalyticsEvent, UserAction } from "./events";
+import { PermanentEventError } from "./events";
 
-export type UserAction =
-    | "add_to_wishlist"
-    | "add_to_cart"
-    | "product_view"
-    | "remove_from_wishlist"
-    | "remove_from_cart"
-    | "purchase"
-    | "shop_visit";
-
-export interface AnalyticsEvent {
-    action?: UserAction;
-    userId: string;
-    productId?: string;
-    shopId?: string;
-    country?: string;
-    city?: string;
-    device?: string;
-    timestamp?: string;
-}
+const ACTION_HISTORY_LIMIT = 250;
+const PROCESSED_EVENT_KEY_LIMIT = 500;
 
 type StoredAction = {
-    action: Exclude<UserAction, "shop_visit">;
-    timestamp: string;
-    productId?: string;
-    shopId?: string;
+  action: Exclude<UserAction, "shop_visit">;
+  eventKey: string;
+  source?: string;
+  timestamp: string;
+  productId?: string;
+  shopId?: string;
+  country?: string;
+  city?: string;
+  device?: string;
+  quantity?: number;
 };
 
-const logger = createLogger("kafka-service");
+type AnalyticsPrismaClient = Pick<
+  typeof prisma,
+  "productAnalytics" | "products" | "shopAnalytics" | "uniqueShopVisitor" | "userAnalytics"
+>;
 
-export const updateUserAnalytics = async (event: AnalyticsEvent) => {
-    try {
-        if (!event.userId) return;
+function getEventDate(event: AnalyticsEvent): Date {
+  return event.timestamp ? new Date(event.timestamp) : new Date();
+}
 
-        const existingData = await prisma.userAnalytics.findUnique({
-            where: {
-                userId: event.userId,
-            },
-            select: { actions: true },
-        });
+function normalizeProcessedEventKeys(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
 
-        const actions = (existingData?.actions as StoredAction[] | undefined) ?? [];
-        const now = new Date().toISOString();
+  return value.filter((entry): entry is string => typeof entry === "string" && entry.length > 0);
+}
 
-        const findAction = (action: StoredAction["action"]) =>
-            actions.find(
-                (entry) => entry.productId === event.productId && entry.action === action,
-            );
+function appendProcessedEventKey(existing: unknown, eventKey: string): string[] {
+  const keys = normalizeProcessedEventKeys(existing);
 
-            const pushAction = (action: StoredAction["action"]) => {
-                const payload: StoredAction = {
-                    action,
-                    timestamp: now,
-                };
+  if (keys.includes(eventKey)) {
+    return keys;
+  }
 
-                if (event.productId) {
-                    payload.productId = event.productId;
-                }
+  const nextKeys = [...keys, eventKey];
 
-                if (event.shopId) {
-                    payload.shopId = event.shopId;
-                }
+  if (nextKeys.length > PROCESSED_EVENT_KEY_LIMIT) {
+    nextKeys.splice(0, nextKeys.length - PROCESSED_EVENT_KEY_LIMIT);
+  }
 
-                actions.push(payload);
-            };
+  return nextKeys;
+}
 
-            if (event.action === "product_view") {
-                pushAction("product_view");
-            } else if (event.action === "add_to_cart" && !findAction("add_to_cart")) {
-                pushAction("add_to_cart");
-            } else if (event.action === "add_to_wishlist" && !findAction("add_to_wishlist")) {
-                pushAction("add_to_wishlist");
-        } else if (event.action === "remove_from_cart") {
-            const index = actions.findIndex(
-                (entry) => entry.productId === event.productId && entry.action === "add_to_cart",
-            );
-            if (index >= 0) actions.splice(index, 1);
-        } else if (event.action === "remove_from_wishlist") {
-            const index = actions.findIndex(
-                (entry) => entry.productId === event.productId && entry.action === "add_to_wishlist",
-            );
-            if (index >= 0) actions.splice(index, 1);
-        }
+function toStoredAction(value: unknown): StoredAction | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
 
-        if (actions.length > 100) {
-            actions.splice(0, actions.length - 100);
-        }
+  const rawAction = (value as Record<string, unknown>).action;
+  const rawTimestamp = (value as Record<string, unknown>).timestamp;
+  const rawEventKey = (value as Record<string, unknown>).eventKey;
+  const rawSource = (value as Record<string, unknown>).source;
+  const rawQuantity = (value as Record<string, unknown>).quantity;
 
-        const extraFields: Record<string, string> = {};
+  if (
+    typeof rawAction !== "string" ||
+    rawAction === "shop_visit" ||
+    typeof rawTimestamp !== "string" ||
+    typeof rawEventKey !== "string"
+  ) {
+    return null;
+  }
 
-        if (event.country) {
-            extraFields.country = event.country;
-        }
+  const action = rawAction as StoredAction["action"];
+  const storedAction: StoredAction = {
+    action,
+    eventKey: rawEventKey,
+    timestamp: rawTimestamp,
+    ...(typeof rawSource === "string" && rawSource.trim().length > 0
+      ? { source: rawSource.trim() }
+      : {}),
+    ...(typeof rawQuantity === "number" && Number.isFinite(rawQuantity) && rawQuantity > 0
+      ? { quantity: rawQuantity }
+      : {}),
+  };
 
-        if (event.city) {
-            extraFields.city = event.city;
-        }
+  for (const key of ["productId", "shopId", "country", "city", "device"] as const) {
+    const valueForKey = (value as Record<string, unknown>)[key];
 
-        if (event.device) {
-            extraFields.device = event.device;
-        }
-
-                    const serializedActions = actions.map<Prisma.InputJsonValue>((entry) => ({
-                        action: entry.action,
-                        timestamp: entry.timestamp,
-                        ...(entry.productId ? { productId: entry.productId } : {}),
-                        ...(entry.shopId ? { shopId: entry.shopId } : {}),
-                    }));
-
-            await prisma.userAnalytics.upsert({
-            where: { userId: event.userId },
-            update: {
-                lastVisited: new Date(),
-                    actions: serializedActions,
-                ...extraFields,
-            },
-            create: {
-                userId: event.userId,
-                lastVisited: new Date(),
-                    actions: serializedActions,
-                ...extraFields,
-            },
-        });
-
-        await updateProductAnalytics(event);
-    } catch (error) {
-        logger.error("Error in storing user analytics", { error, event });
+    if (typeof valueForKey === "string" && valueForKey.trim().length > 0) {
+      storedAction[key] = valueForKey.trim();
     }
-};
+  }
 
-export const updateProductAnalytics = async (event: AnalyticsEvent) => {
-    try {
-        if (!event.productId) return;
+  return storedAction;
+}
 
-        const now = new Date();
+function normalizeStoredActions(value: unknown): StoredAction[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
 
-        let shopId = event.shopId;
+  return value
+    .map((entry) => toStoredAction(entry))
+    .filter((entry): entry is StoredAction => entry !== null);
+}
 
-        if (!shopId) {
-            const product = await prisma.products.findUnique({
-                where: { id: event.productId },
-                select: { shopId: true },
-            });
+function trimActionHistory(actions: StoredAction[]): StoredAction[] {
+  if (actions.length <= ACTION_HISTORY_LIMIT) {
+    return actions;
+  }
 
-            shopId = product?.shopId;
-        }
+  return actions.slice(actions.length - ACTION_HISTORY_LIMIT);
+}
 
-        if (!shopId) return;
+function findLatestActionIndex(
+  actions: StoredAction[],
+  action: StoredAction["action"],
+  productId?: string,
+): number {
+  for (let index = actions.length - 1; index >= 0; index -= 1) {
+    const entry = actions[index];
 
-        await prisma.productAnalytics.upsert({
-            where: {
-                productId: event.productId,
-            },
-            update: {
-                shopId,
-                lastViewedAt: now,
-                ...(event.action === "product_view"
-                    ? { views: { increment: 1 } }
-                    : {}),
-                ...(event.action === "add_to_cart"
-                    ? { cartAdds: { increment: 1 } }
-                    : {}),
-                ...(event.action === "add_to_wishlist"
-                    ? { wishlistAdds: { increment: 1 } }
-                    : {}),
-                ...(event.action === "purchase"
-                    ? { purchases: { increment: 1 } }
-                    : {}),
-                ...(event.action === "remove_from_cart"
-                    ? { cartAdds: { decrement: 1 } }
-                    : {}),
-                ...(event.action === "remove_from_wishlist"
-                    ? { wishlistAdds: { decrement: 1 } }
-                    : {}),
-            },
-            create: {
-                productId: event.productId,
-                        shopId,
-                views: event.action === "product_view" ? 1 : 0,
-                cartAdds: event.action === "add_to_cart" ? 1 : 0,
-                wishlistAdds: event.action === "add_to_wishlist" ? 1 : 0,
-                purchases: event.action === "purchase" ? 1 : 0,
-                lastViewedAt: now,
-            },
-        });
-    } catch (error) {
-        logger.error("Error in product analytics", { error, event });
+    if (entry?.action === action && entry.productId === productId) {
+      return index;
     }
-};
+  }
+
+  return -1;
+}
+
+function serializeStoredActions(actions: StoredAction[]): Prisma.InputJsonValue[] {
+  return actions.map<Prisma.InputJsonValue>((entry) => ({
+    action: entry.action,
+    eventKey: entry.eventKey,
+    timestamp: entry.timestamp,
+    ...(entry.productId ? { productId: entry.productId } : {}),
+    ...(entry.shopId ? { shopId: entry.shopId } : {}),
+    ...(entry.country ? { country: entry.country } : {}),
+    ...(entry.city ? { city: entry.city } : {}),
+    ...(entry.device ? { device: entry.device } : {}),
+    ...(entry.source ? { source: entry.source } : {}),
+    ...(entry.quantity ? { quantity: entry.quantity } : {}),
+  }));
+}
+
+function normalizeCountMap(value: unknown): Record<string, number> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  return Object.entries(value as Record<string, unknown>).reduce<Record<string, number>>(
+    (result, [key, entryValue]) => {
+      if (typeof entryValue === "number" && Number.isFinite(entryValue)) {
+        result[key] = entryValue;
+      }
+
+      return result;
+    },
+    {},
+  );
+}
+
+function incrementCount(map: Record<string, number>, key?: string): Record<string, number> {
+  if (!key) {
+    return map;
+  }
+
+  const normalizedKey = key.trim();
+
+  if (!normalizedKey) {
+    return map;
+  }
+
+  return {
+    ...map,
+    [normalizedKey]: (map[normalizedKey] ?? 0) + 1,
+  };
+}
+
+function clampAtZero(value: number): number {
+  return value < 0 ? 0 : value;
+}
+
+function isKnownUniqueConstraintError(error: unknown): boolean {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  );
+}
+
+async function resolveShopId(
+  event: AnalyticsEvent,
+  db: AnalyticsPrismaClient,
+): Promise<string | undefined> {
+  if (event.shopId) {
+    return event.shopId;
+  }
+
+  if (!event.productId) {
+    return undefined;
+  }
+
+  const product = await db.products.findUnique({
+    where: { id: event.productId },
+    select: { shopId: true },
+  });
+
+  return product?.shopId;
+}
+
+export async function updateUserAnalytics(
+  event: AnalyticsEvent,
+  eventKey: string,
+  db: AnalyticsPrismaClient = prisma,
+): Promise<void> {
+  const eventDate = getEventDate(event);
+  const eventTimestamp = eventDate.toISOString();
+  const existingData = await db.userAnalytics.findUnique({
+    where: { userId: event.userId },
+    select: {
+      actions: true,
+      processedEventKeys: true,
+    },
+  });
+
+  if (normalizeProcessedEventKeys(existingData?.processedEventKeys).includes(eventKey)) {
+    return;
+  }
+
+  const actions = normalizeStoredActions(existingData?.actions);
+
+  const pushAction = (action: StoredAction["action"]) => {
+    actions.push({
+      action,
+      eventKey,
+      timestamp: eventTimestamp,
+      ...(event.productId ? { productId: event.productId } : {}),
+      ...(event.shopId ? { shopId: event.shopId } : {}),
+      ...(event.country ? { country: event.country } : {}),
+      ...(event.city ? { city: event.city } : {}),
+      ...(event.device ? { device: event.device } : {}),
+      ...(event.source ? { source: event.source } : {}),
+      ...(event.quantity && event.quantity > 0 ? { quantity: event.quantity } : {}),
+    });
+  };
+
+  if (event.action === "product_view") {
+    pushAction("product_view");
+  } else if (event.action === "purchase") {
+    pushAction("purchase");
+  } else if (
+    event.action === "add_to_cart" &&
+    findLatestActionIndex(actions, "add_to_cart", event.productId) === -1
+  ) {
+    pushAction("add_to_cart");
+  } else if (
+    event.action === "add_to_wishlist" &&
+    findLatestActionIndex(actions, "add_to_wishlist", event.productId) === -1
+  ) {
+    pushAction("add_to_wishlist");
+  } else if (event.action === "remove_from_cart") {
+    const actionIndex = findLatestActionIndex(actions, "add_to_cart", event.productId);
+
+    if (actionIndex >= 0) {
+      actions.splice(actionIndex, 1);
+    }
+  } else if (event.action === "remove_from_wishlist") {
+    const actionIndex = findLatestActionIndex(actions, "add_to_wishlist", event.productId);
+
+    if (actionIndex >= 0) {
+      actions.splice(actionIndex, 1);
+    }
+  }
+
+  const data = {
+    lastVisited: eventDate,
+    actions: serializeStoredActions(trimActionHistory(actions)),
+    processedEventKeys: appendProcessedEventKey(
+      existingData?.processedEventKeys,
+      eventKey,
+    ),
+    ...(event.country ? { country: event.country } : {}),
+    ...(event.city ? { city: event.city } : {}),
+    ...(event.device ? { device: event.device } : {}),
+  };
+
+  if (existingData) {
+    await db.userAnalytics.update({
+      where: { userId: event.userId },
+      data,
+    });
+
+    return;
+  }
+
+  await db.userAnalytics.create({
+    data: {
+      userId: event.userId,
+      recommendations: [],
+      ...data,
+    },
+  });
+}
+
+export async function updateProductAnalytics(
+  event: AnalyticsEvent,
+  eventKey: string,
+  db: AnalyticsPrismaClient = prisma,
+): Promise<void> {
+  if (!event.productId || event.action === "shop_visit") {
+    return;
+  }
+
+  const shopId = await resolveShopId(event, db);
+
+  if (!shopId) {
+    throw new PermanentEventError("Unable to resolve shopId for product analytics update", {
+      event,
+    });
+  }
+
+  const eventDate = getEventDate(event);
+  const existingData = await db.productAnalytics.findUnique({
+    where: { productId: event.productId },
+    select: {
+      views: true,
+      cartAdds: true,
+      wishlistAdds: true,
+      purchases: true,
+      processedEventKeys: true,
+    },
+  });
+
+  if (normalizeProcessedEventKeys(existingData?.processedEventKeys).includes(eventKey)) {
+    return;
+  }
+
+  const nextValues = {
+    views: existingData?.views ?? 0,
+    cartAdds: existingData?.cartAdds ?? 0,
+    wishlistAdds: existingData?.wishlistAdds ?? 0,
+    purchases: existingData?.purchases ?? 0,
+  };
+
+  if (event.action === "product_view") {
+    nextValues.views += 1;
+  } else if (event.action === "add_to_cart") {
+    nextValues.cartAdds += event.quantity ?? 1;
+  } else if (event.action === "add_to_wishlist") {
+    nextValues.wishlistAdds += 1;
+  } else if (event.action === "purchase") {
+    nextValues.purchases += event.quantity ?? 1;
+  } else if (event.action === "remove_from_cart") {
+    nextValues.cartAdds = clampAtZero(nextValues.cartAdds - (event.quantity ?? 1));
+  } else if (event.action === "remove_from_wishlist") {
+    nextValues.wishlistAdds = clampAtZero(nextValues.wishlistAdds - 1);
+  }
+
+  const data = {
+    shopId,
+    views: nextValues.views,
+    cartAdds: nextValues.cartAdds,
+    wishlistAdds: nextValues.wishlistAdds,
+    purchases: nextValues.purchases,
+    lastViewedAt: eventDate,
+    processedEventKeys: appendProcessedEventKey(
+      existingData?.processedEventKeys,
+      eventKey,
+    ),
+  };
+
+  const hasSignals =
+    data.views > 0 ||
+    data.cartAdds > 0 ||
+    data.wishlistAdds > 0 ||
+    data.purchases > 0;
+
+  if (!existingData && !hasSignals) {
+    return;
+  }
+
+  await db.productAnalytics.upsert({
+    where: { productId: event.productId },
+    update: data,
+    create: {
+      productId: event.productId,
+      ...data,
+    },
+  });
+}
+
+export async function updateShopAnalytics(
+  event: AnalyticsEvent,
+  eventKey: string,
+  db: AnalyticsPrismaClient = prisma,
+): Promise<void> {
+  if (event.action !== "shop_visit") {
+    return;
+  }
+
+  const shopId = await resolveShopId(event, db);
+
+  if (!shopId) {
+    throw new PermanentEventError("Unable to resolve shopId for shop analytics update", {
+      event,
+    });
+  }
+
+  const eventDate = getEventDate(event);
+  const existingData = await db.shopAnalytics.findUnique({
+    where: { shopId },
+    select: {
+      totalVisitors: true,
+      countryStats: true,
+      cityStats: true,
+      deviceStats: true,
+      processedEventKeys: true,
+    },
+  });
+
+  if (normalizeProcessedEventKeys(existingData?.processedEventKeys).includes(eventKey)) {
+    return;
+  }
+
+  let isNewVisitor = false;
+
+  const existingVisitor = await db.uniqueShopVisitor.findFirst({
+    where: {
+      shopId,
+      userId: event.userId,
+    },
+    select: { id: true },
+  });
+
+  if (!existingVisitor) {
+    try {
+      await db.uniqueShopVisitor.create({
+        data: {
+          shopId,
+          userId: event.userId,
+          visitedAt: eventDate,
+        },
+      });
+      isNewVisitor = true;
+    } catch (error) {
+      if (!isKnownUniqueConstraintError(error)) {
+        throw error;
+      }
+    }
+  }
+
+  const data = {
+    totalVisitors: (existingData?.totalVisitors ?? 0) + (isNewVisitor ? 1 : 0),
+    countryStats: incrementCount(
+      normalizeCountMap(existingData?.countryStats),
+      event.country,
+    ),
+    cityStats: incrementCount(normalizeCountMap(existingData?.cityStats), event.city),
+    deviceStats: incrementCount(
+      normalizeCountMap(existingData?.deviceStats),
+      event.device,
+    ),
+    lastVisitedAt: eventDate,
+    processedEventKeys: appendProcessedEventKey(
+      existingData?.processedEventKeys,
+      eventKey,
+    ),
+  };
+
+  await db.shopAnalytics.upsert({
+    where: { shopId },
+    update: data,
+    create: {
+      shopId,
+      ...data,
+    },
+  });
+}
+
+export async function processAnalyticsEvent(
+  event: AnalyticsEvent,
+  eventKey: string,
+  db: AnalyticsPrismaClient = prisma,
+): Promise<void> {
+  await updateUserAnalytics(event, eventKey, db);
+  await updateProductAnalytics(event, eventKey, db);
+  await updateShopAnalytics(event, eventKey, db);
+}

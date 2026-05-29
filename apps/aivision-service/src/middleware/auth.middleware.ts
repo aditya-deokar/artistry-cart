@@ -2,7 +2,7 @@ import { Request, RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 
 interface TokenPayload {

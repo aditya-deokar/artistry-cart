@@ -1,5 +1,5 @@
 import { NextFunction, Response } from "express";
-import { AuthError } from "../error-handler";
+import { AuthError } from "@artistry-cart/error-handler";
 
 export const isSeller = async(req:any, res: Response, next:NextFunction)=>{
     if(req.role !== "seller"){

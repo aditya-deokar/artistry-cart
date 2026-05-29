@@ -9,9 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/formatters';
 import { useStore } from '@/store';
-import useUser from '@/hooks/useUser';
-import useLocationTracking from '@/hooks/useLocationTracking';
-import useDeviceTracking from '@/hooks/useDeviceTracking';
+import useAnalytics from '@/hooks/useAnalytics';
 import WishlistButton from '../products/WishlistButton';
 
 interface SearchProductCardProps {
@@ -51,9 +49,7 @@ export const SearchProductCard: React.FC<SearchProductCardProps> = ({
   const [imageLoaded, setImageLoaded] = React.useState(false);
 
   // Store hooks
-  const { user } = useUser();
-  const location = useLocationTracking();
-  const deviceInfo = useDeviceTracking();
+  const { trackEvent } = useAnalytics();
   const cartItems = useStore((state) => state.cart);
   const { addToCart } = useStore((state) => state.actions);
 
@@ -77,11 +73,15 @@ export const SearchProductCard: React.FC<SearchProductCardProps> = ({
           ...product, 
           quantity: 1,
           sale_price: product.current_price,
-        } as any, 
-        user, 
-        location, 
-        deviceInfo
+        } as any,
       );
+      void trackEvent({
+        action: 'add_to_cart',
+        productId: product.id,
+        shopId: product.Shop?.id,
+        quantity: 1,
+        source: 'user-ui.search-product-card',
+      });
     }
   };
 

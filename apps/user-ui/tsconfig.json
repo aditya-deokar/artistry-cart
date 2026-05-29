@@ -28,8 +28,8 @@
       ]
     },
     "outDir": "dist",
-    "rootDir": "../../",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "baseUrl": "."
   },
   "include": [
     "../../apps/user-ui/.next/types/**/*.ts",
@@ -39,8 +39,7 @@
     "src/**/*.jsx",
     "src/**/*.ts",
     "src/**/*.tsx",
-    ".next/types/**/*.ts",
-    "../../packages/**/*.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "out-tsc",
@@ -50,5 +49,13 @@
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
     ".next"
+  ],
+  "references": [
+    {
+      "path": "../../packages/libs"
+    },
+    {
+      "path": "../../packages/utils"
+    }
   ]
 }

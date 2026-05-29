@@ -127,6 +127,11 @@ Interview-ready storytelling and deep-dive prompts:
 - [System Design Walkthrough](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/09-interview-prep/system-design-walkthrough.md>)
 - [Tradeoff Talking Points](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/09-interview-prep/tradeoff-talking-points.md>)
 - [Deep-Dive Questions](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/09-interview-prep/deep-dive-questions.md>)
+- [Kafka Senior Prep Pack](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/09-interview-prep/kafka-senior-prep/README.md>)
+- [Kafka Fundamentals To Advanced](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/09-interview-prep/kafka-senior-prep/kafka-fundamentals-to-advanced.md>)
+- [Kafka Round By Round Practice](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/09-interview-prep/kafka-senior-prep/kafka-round-by-round-practice.md>)
+- [Kafka Interview Question Bank](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/09-interview-prep/kafka-senior-prep/kafka-interview-question-bank.md>)
+- [Artistry Cart Kafka Service System Design](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/09-interview-prep/kafka-senior-prep/artistry-cart-kafka-service-system-design.md>)
 
 ### `10-features`
 

@@ -1,6 +1,6 @@
 import { EventProductDiscount, events, products } from "@prisma/client";
 
-import prisma from "../../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 
 export interface EventDiscountContext {
   product: Pick<products, "id" | "regular_price" | "sale_price" | "current_price">;

@@ -3,7 +3,7 @@
 
 import { NextFunction, Response } from "express";
 import { recommendProducts } from "../services/recommendation-service";
-import prisma from "../../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 
 export const getRecommendedProducts = async (req: any, res: Response, next:NextFunction) => {
     try {

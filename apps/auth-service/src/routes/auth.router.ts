@@ -1,7 +1,7 @@
 import  express,  { Router }  from "express";
 import { createShop, createStripeConnection, getSeller, getUser, loginSeller, loginUser, logoutUser, refreshToken, registerSeller, resetUserPassword, userForgotPassword, userRegistration, verifySeller, verifyUser, verifyUserForgotPassword } from "../controller/auth.controller";
-import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
-import { isSeller } from "../../../../packages/middleware/authorizedRoles";
+import isAuthenticated from "@artistry-cart/middleware/isAuthenticated";
+import { isSeller } from "@artistry-cart/middleware/authorizedRoles";
 import { createAddress, deleteAddress, getCurrentUser, getOrderDetails, getUserAddresses, getUserOrders, updateAddress, updateUserDetails } from "../controller/user.controller";
 
 

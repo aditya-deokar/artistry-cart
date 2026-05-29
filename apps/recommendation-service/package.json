@@ -25,5 +25,10 @@
         }
       }
     }
+  },
+  "dependencies": {
+    "@artistry-cart/libs": "workspace:*",
+    "@artistry-cart/middleware": "workspace:*",
+    "@artistry-cart/utils": "workspace:*"
   }
 }

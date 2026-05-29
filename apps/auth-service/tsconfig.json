@@ -8,6 +8,18 @@
   "include": [],
   "references": [
     {
+      "path": "../../packages/error-handler"
+    },
+    {
+      "path": "../../packages/libs"
+    },
+    {
+      "path": "../../packages/middleware"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
       "path": "./tsconfig.app.json"
     }
   ]

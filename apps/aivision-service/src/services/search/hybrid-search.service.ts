@@ -1,4 +1,4 @@
-import prisma from '../../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 import { generateTextEmbedding, cosineSimilarity } from '../embedding.service';
 import { visualSearch, SearchResult } from './visual-search.service';
 import { logger } from '../../utils/logger';

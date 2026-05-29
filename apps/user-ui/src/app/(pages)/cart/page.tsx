@@ -8,6 +8,7 @@ import { Bounded } from '@/components/common/Bounded';
 import { EmptyCart } from '@/components/cart/EmptyCart';
 import { CartItem } from '@/components/cart/CartItem';
 import { OrderSummary } from '@/components/cart/OrderSummary';
+import useAnalytics from '@/hooks/useAnalytics';
 
 
 const CartPage = () => {
@@ -15,9 +16,38 @@ const CartPage = () => {
     // Select state and actions from the Zustand store
     const cart = useStore((state) => state.cart);
     const { removeFromCart, updateQuantity } = useStore((state) => state.actions);
+    const { trackEvent } = useAnalytics();
     
     const handleRemoveFromCart = (productId: string) => {
-        removeFromCart(productId, null, null, '');
+        const existingItem = cart.find((item) => item.id === productId);
+        if (!existingItem) {
+            return;
+        }
+
+        removeFromCart(productId);
+        void trackEvent({
+            action: 'remove_from_cart',
+            productId: existingItem.id,
+            shopId: existingItem.Shop?.id,
+            quantity: existingItem.quantity,
+            source: 'user-ui.cart-page',
+        });
+    };
+
+    const handleUpdateQuantity = (productId: string, newQuantity: number) => {
+        const existingItem = cart.find((item) => item.id === productId);
+        if (!existingItem || newQuantity === existingItem.quantity) {
+            return;
+        }
+
+        updateQuantity(productId, newQuantity);
+        void trackEvent({
+            action: newQuantity > existingItem.quantity ? 'add_to_cart' : 'remove_from_cart',
+            productId: existingItem.id,
+            shopId: existingItem.Shop?.id,
+            quantity: Math.abs(newQuantity - existingItem.quantity),
+            source: 'user-ui.cart-page',
+        });
     };
 
     // Calculate subtotal, memoized for performance.
@@ -55,7 +85,7 @@ const CartPage = () => {
                                             key={item.id}
                                             item={item}
                                             onRemove={handleRemoveFromCart}
-                                            onUpdateQuantity={updateQuantity}
+                                            onUpdateQuantity={handleUpdateQuantity}
                                         />
                                     ))}
                                 </AnimatePresence>

@@ -1,7 +1,7 @@
 import Agenda, { Job } from 'agenda';
 import { config } from '../config';
 import { logger } from '../utils/logger';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 let agenda: Agenda | null = null;
 

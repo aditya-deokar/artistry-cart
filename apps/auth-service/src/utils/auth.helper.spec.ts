@@ -14,16 +14,16 @@ import {
   handleForgotPassword,
   verifyForgotPasswordOTP
 } from './auth.helper';
-import { ValidationError } from '../../../../packages/error-handler';
+import { ValidationError } from '@artistry-cart/error-handler';
 import { redisMock, resetRedisMock, setRedisKey, hasRedisKey } from '../__tests__/mocks/redis.mock';
 import { prismaMock, createMockUser, resetPrismaMock } from '../__tests__/mocks/prisma.mock';
 
 // Mock dependencies
-vi.mock('../../../../packages/libs/redis', async () => {
+vi.mock('@artistry-cart/libs/redis', async () => {
   const { redisMock } = await import('../__tests__/mocks/redis.mock');
   return { default: redisMock };
 });
-vi.mock('../../../../packages/libs/prisma', async () => {
+vi.mock('@artistry-cart/libs/prisma', async () => {
   const { prismaMock } = await import('../__tests__/mocks/prisma.mock');
   return { default: prismaMock };
 });

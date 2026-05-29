@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import prisma from "../../../../packages/libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 import {
   AuthError,
   ValidationError,
-} from "../../../../packages/error-handler";
-import { imagekit } from "../../../../packages/libs/imageKit";
+} from "@artistry-cart/error-handler";
+import { imagekit } from "@artistry-cart/libs/imageKit";
 import { Prisma, productStatus } from "@prisma/client";
 import { z } from "zod";
 import { PricingService } from "../lib/pricing.service";

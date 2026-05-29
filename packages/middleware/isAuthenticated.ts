@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
-import prisma from "../libs/prisma";
+import prisma from "@artistry-cart/libs/prisma";
 
 interface TokenPayload {
     id: string;

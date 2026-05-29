@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 // Helper to build advanced search conditions splitting by terms
 const buildSearchQuery = (query: string): Prisma.productsWhereInput => {

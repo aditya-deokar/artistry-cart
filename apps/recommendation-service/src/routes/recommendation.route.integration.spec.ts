@@ -35,12 +35,12 @@ const { prismaMock, authState, mockRecommendProducts } = vi.hoisted(() => {
 });
 
 // ── Module mocks ──
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   __esModule: true,
   default: prismaMock,
 }));
 
-vi.mock('../../../../packages/middleware/isAuthenticated', () => ({
+vi.mock('@artistry-cart/middleware/isAuthenticated', () => ({
   __esModule: true,
   default: vi.fn((req: any, res: any, next: any) => {
     if (!authState.user) {

@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { AuthError } from '../error-handler';
+import { AuthError } from '@artistry-cart/error-handler';
 
 /**
  * Middleware to check if authenticated user has admin role

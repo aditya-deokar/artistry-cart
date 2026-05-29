@@ -1,0 +1,50 @@
+{
+  "name": "@artistry-cart/middleware",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./index.ts",
+  "dependencies": {
+    "@artistry-cart/error-handler": "workspace:*",
+    "@artistry-cart/libs": "workspace:*"
+  },
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./authorizedRoles": {
+      "types": "./authorizedRoles.ts",
+      "default": "./dist/authorizedRoles.js",
+      "require": "./dist/authorizedRoles.js"
+    },
+    "./isAdmin": {
+      "types": "./isAdmin.ts",
+      "default": "./dist/isAdmin.js",
+      "require": "./dist/isAdmin.js"
+    },
+    "./isAuthenticated": {
+      "types": "./isAuthenticated.ts",
+      "default": "./dist/isAuthenticated.js",
+      "require": "./dist/isAuthenticated.js"
+    }
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "@nx/js:tsc",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "options": {
+          "main": "packages/middleware/index.ts",
+          "outputPath": "packages/middleware/dist",
+          "tsConfig": "packages/middleware/tsconfig.lib.json",
+          "clean": true,
+          "generatePackageJson": false
+        }
+      }
+    }
+  }
+}

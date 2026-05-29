@@ -19,7 +19,7 @@ const { prismaMock } = vi.hoisted(() => {
   };
 });
 
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   __esModule: true,
   default: prismaMock,
 }));

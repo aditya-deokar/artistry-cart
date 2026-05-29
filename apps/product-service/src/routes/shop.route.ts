@@ -8,7 +8,7 @@ import {
   getShopCategories
 } from "../controllers/shop.controller";
 
-import isAuthenticated from "../../../../packages/middleware/isAuthenticated";
+import isAuthenticated from "@artistry-cart/middleware/isAuthenticated";
 
 const shopRouter: Router = express.Router();
 

@@ -10,23 +10,53 @@ import { Bounded } from '@/components/common/Bounded';
 
 import { EmptyWishlist } from '@/components/wishlist/EmptyWishlist';
 import { WishlistItem } from '@/components/wishlist/WishlistItem';
+import useAnalytics from '@/hooks/useAnalytics';
 
 const WishlistPage = () => {
 
 
     // Select state slices
     const wishlistItems = useStore((state) => state.wishlist);
+    const { trackEvent } = useAnalytics();
 
     // Select actions from the nested 'actions' object
     const { addToCart, removeFromWishlist } = useStore((state) => state.actions);
 
     const handleRemoveFromWishlist = (productId: string) => {
-        removeFromWishlist(productId, null, null, '');
+        const existingItem = wishlistItems.find((item) => item.id === productId);
+        if (!existingItem) {
+            return;
+        }
+
+        removeFromWishlist(productId);
+        void trackEvent({
+            action: 'remove_from_wishlist',
+            productId: existingItem.id,
+            shopId: existingItem.Shop?.id,
+            quantity: existingItem.quantity,
+            source: 'user-ui.wishlist-page',
+        });
     };
 
     const handleMoveToCart = (product: ArtProduct) => {
-        addToCart({ ...product, quantity: 1 }, null, null, '');
-        removeFromWishlist(product.id, null, null, '');
+        const quantity = (product as { quantity?: number }).quantity ?? 1;
+
+        addToCart({ ...product, quantity } as any);
+        removeFromWishlist(product.id);
+        void trackEvent({
+            action: 'add_to_cart',
+            productId: product.id,
+            shopId: product.Shop?.id,
+            quantity,
+            source: 'user-ui.wishlist-page',
+        });
+        void trackEvent({
+            action: 'remove_from_wishlist',
+            productId: product.id,
+            shopId: product.Shop?.id,
+            quantity,
+            source: 'user-ui.wishlist-page',
+        });
     };
 
     return (

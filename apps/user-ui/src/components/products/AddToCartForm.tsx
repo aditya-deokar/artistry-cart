@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import { useStore } from '@/store';
-import useUser from '@/hooks/useUser';
-import useLocationTracking from '@/hooks/useLocationTracking';
-import useDeviceTracking from '@/hooks/useDeviceTracking';
+import useAnalytics from '@/hooks/useAnalytics';
 import { ArtProduct } from '@/types/products';
 import { ShoppingCart, Check } from 'lucide-react';
 
@@ -20,9 +18,7 @@ export const AddToCartForm: React.FC<AddToCartFormProps> = ({ product, isInCart 
   const isLowStock = stock > 0 && stock < 10;
 
   // Store hooks
-  const { user } = useUser();
-  const location = useLocationTracking();
-  const deviceInfo = useDeviceTracking();
+  const { trackEvent } = useAnalytics();
   const { addToCart, updateQuantity } = useStore((state) => state.actions);
   const cartItems = useStore((state) => state.cart);
 
@@ -39,6 +35,13 @@ export const AddToCartForm: React.FC<AddToCartFormProps> = ({ product, isInCart 
       const cartItem = cartItems.find(item => item.id === product.id);
       if (cartItem) {
         updateQuantity(product.id, cartItem.quantity + quantity);
+        void trackEvent({
+          action: 'add_to_cart',
+          productId: product.id,
+          shopId: product.Shop?.id,
+          quantity,
+          source: 'user-ui.product-page',
+        });
       }
     } else {
       // Add new item to cart
@@ -48,11 +51,15 @@ export const AddToCartForm: React.FC<AddToCartFormProps> = ({ product, isInCart 
             ...product, 
             quantity: quantity,
             sale_price: product.current_price ?? product.sale_price ?? product.regular_price
-          } as any, 
-          user, 
-          location, 
-          deviceInfo
+          } as any,
         );
+        void trackEvent({
+          action: 'add_to_cart',
+          productId: product.id,
+          shopId: product.Shop?.id,
+          quantity,
+          source: 'user-ui.product-page',
+        });
       }
     }
 };

@@ -1,0 +1,56 @@
+{
+  "name": "@artistry-cart/utils",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./runtime/index.ts",
+      "default": "./dist/runtime/index.js",
+      "require": "./dist/runtime/index.js"
+    },
+    "./kafka": {
+      "types": "./kafka/index.ts",
+      "default": "./dist/kafka/index.js",
+      "require": "./dist/kafka/index.js"
+    },
+    "./kafka/analytics-contract": {
+      "types": "./kafka/analytics-contract.ts",
+      "default": "./dist/kafka/analytics-contract.js",
+      "require": "./dist/kafka/analytics-contract.js"
+    },
+    "./kafka/analytics-producer": {
+      "types": "./kafka/analytics-producer.ts",
+      "default": "./dist/kafka/analytics-producer.js",
+      "require": "./dist/kafka/analytics-producer.js"
+    },
+    "./kafka/client": {
+      "types": "./kafka/client.ts",
+      "default": "./dist/kafka/client.js",
+      "require": "./dist/kafka/client.js"
+    }
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "@nx/js:tsc",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "options": {
+          "main": "packages/utils/index.ts",
+          "outputPath": "packages/utils/dist",
+          "tsConfig": "packages/utils/tsconfig.lib.json",
+          "clean": true,
+          "generatePackageJson": false
+        }
+      }
+    }
+  }
+}

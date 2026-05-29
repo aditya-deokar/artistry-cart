@@ -4,46 +4,6 @@
   "private": true,
   "nx": {
     "targets": {
-      "build": {
-        "executor": "@nx/esbuild:esbuild",
-        "outputs": [
-          "{options.outputPath}"
-        ],
-        "defaultConfiguration": "production",
-        "options": {
-          "platform": "node",
-          "outputPath": "apps/auth-service/dist",
-          "format": [
-            "cjs"
-          ],
-          "bundle": false,
-          "generatePackageJson": true,
-          "main": "apps/auth-service/src/main.ts",
-          "tsConfig": "apps/auth-service/tsconfig.app.json",
-          "assets": [
-            "apps/auth-service/src/assets",
-            "apps/auth-service/src/swagger-output.json"
-          ],
-          "esbuildOptions": {
-            "sourcemap": true,
-            "outExtension": {
-              ".js": ".js"
-            }
-          }
-        },
-        "configurations": {
-          "development": {},
-          "production": {
-            "generateLockfile": true,
-            "esbuildOptions": {
-              "sourcemap": false,
-              "outExtension": {
-                ".js": ".js"
-              }
-            }
-          }
-        }
-      },
       "serve": {
         "continuous": true,
         "executor": "@nx/js:node",
@@ -76,5 +36,11 @@
         "command": "docker build -f docker/backend.Dockerfile . --build-arg APP_NAME=auth-service --build-arg BUILD_OUTPUT=apps/auth-service/dist --build-arg APP_PORT=6001 -t artistry-cart-auth-service"
       }
     }
+  },
+  "dependencies": {
+    "@artistry-cart/error-handler": "workspace:*",
+    "@artistry-cart/libs": "workspace:*",
+    "@artistry-cart/middleware": "workspace:*",
+    "@artistry-cart/utils": "workspace:*"
   }
 }

@@ -35,7 +35,7 @@ const { prismaMock, cronMock } = vi.hoisted(() => {
   return { prismaMock, cronMock, txMock };
 });
 
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   __esModule: true,
   default: prismaMock,
 }));

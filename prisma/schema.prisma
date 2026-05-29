@@ -148,6 +148,7 @@ model shops {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  analytics shopAnalytics?
   products products[]
   orders   orders[]
 }
@@ -379,6 +380,7 @@ model productAnalytics {
   wishlistAdds Int      @default(0)
   purchases    Int      @default(0)
   lastViewedAt DateTime
+  processedEventKeys String[] @default([])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -386,11 +388,14 @@ model productAnalytics {
 
 model shopAnalytics {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  shopId        String   @unique @db.ObjectId
+  shop          shops    @relation(fields: [shopId], references: [id])
   totalVisitors Int      @default(0)
   countryStats  Json?
   cityStats     Json?
   deviceStats   Json?
   lastVisitedAt DateTime
+  processedEventKeys String[] @default([])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -413,14 +418,38 @@ model UserAnalytics {
   user   users  @relation(fields: [userId], references: [id])
 
   lastVisited DateTime
+  country     String?
+  city        String?
+  device      String?
 
   // The Json type is perfectly suited for MongoDB's flexible schema
   actions         Json[]
+  processedEventKeys String[] @default([])
   recommendations String[]
   lastTrained     DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model analyticsOutbox {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  eventId       String   @unique
+  topic         String
+  payload       Json
+  status        String   @default("PENDING")
+  attempts      Int      @default(0)
+  availableAt   DateTime @default(now())
+  lastAttemptAt DateTime?
+  publishedAt   DateTime?
+  lockedAt      DateTime?
+  lastError     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, availableAt])
+  @@index([lockedAt])
 }
 
 model Notification {

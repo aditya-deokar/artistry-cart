@@ -44,7 +44,7 @@ const { prismaMock, pricingServiceMock } = vi.hoisted(() => {
   return { prismaMock, pricingServiceMock };
 });
 
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   __esModule: true,
   default: prismaMock,
 }));
@@ -67,7 +67,7 @@ import {
   createEventWithProduct,
 } from './eventsController';
 
-import { mockRequest, mockResponse, mockNext } from '../../../../packages/test-utils';
+import { mockRequest, mockResponse, mockNext } from '@artistry-cart/test-utils';
 
 function req(data: Record<string, unknown> = {}) { return mockRequest(data); }
 function res() { return mockResponse(); }

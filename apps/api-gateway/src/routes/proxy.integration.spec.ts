@@ -53,7 +53,7 @@ describe("api-gateway runtime config", () => {
     const [{ createGatewayApp }, { getGatewayConfig }, { createLogger }] = await Promise.all([
       import("../app.js"),
       import("../config.js"),
-      import("../../../../packages/utils/runtime/index.js"),
+      import("@artistry-cart/utils/runtime"),
     ]);
 
     return createGatewayApp(getGatewayConfig(), createLogger("api-gateway-test"));

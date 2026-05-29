@@ -95,13 +95,13 @@ const { prismaMock, imagekitMock, authUser } = vi.hoisted(() => {
 // ── Module mocks (paths relative to this file at apps/product-service/src/) ──
 
 // Mock Prisma — ../../../ goes to workspace root
-vi.mock('../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   __esModule: true,
   default: prismaMock,
 }));
 
 // Mock ImageKit
-vi.mock('../../../packages/libs/imageKit', () => ({
+vi.mock('@artistry-cart/libs/imageKit', () => ({
   __esModule: true,
   imagekit: imagekitMock,
 }));
@@ -117,7 +117,7 @@ vi.mock('./lib/pricing.service', () => ({
 }));
 
 // Mock error-handler — provide all named exports used by controllers
-vi.mock('../../../packages/error-handler', () => {
+vi.mock('@artistry-cart/error-handler', () => {
   class AppError extends Error {
     statusCode: number;
     constructor(msg: string, code = 500) {
@@ -154,7 +154,7 @@ vi.mock('../../../packages/error-handler', () => {
 });
 
 // Also mock the error middleware imported in app.ts
-vi.mock('../../../packages/error-handler/error-middelware', () => ({
+vi.mock('@artistry-cart/error-handler/error-middelware', () => ({
   __esModule: true,
   errorMiddleware: (err: any, _req: any, res: any, _next: any) => {
     const status = err.statusCode || 500;
@@ -163,7 +163,7 @@ vi.mock('../../../packages/error-handler/error-middelware', () => ({
 }));
 
 // Mock isAuthenticated — injects authUser onto req
-vi.mock('../../../packages/middleware/isAuthenticated', () => ({
+vi.mock('@artistry-cart/middleware/isAuthenticated', () => ({
   __esModule: true,
   default: vi.fn((req: any, _res: any, next: any) => {
     if (!authUser.value) {
@@ -176,7 +176,7 @@ vi.mock('../../../packages/middleware/isAuthenticated', () => ({
 }));
 
 // Mock isAdmin — checks req.role
-vi.mock('../../../packages/middleware/isAdmin', () => ({
+vi.mock('@artistry-cart/middleware/isAdmin', () => ({
   __esModule: true,
   default: vi.fn((req: any, res: any, next: any) => {
     if (req.role !== 'admin') {

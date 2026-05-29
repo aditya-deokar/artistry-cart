@@ -1,13 +1,10 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.e2e.json",
   "compilerOptions": {
-    "outDir": "out-tsc/@artistry-cart/aivision-service-e2e",
-    "esModuleInterop": true,
-    "noUnusedLocals": false,
-    "noImplicitAny": false
+    "outDir": "out-tsc/@artistry-cart/aivision-service-e2e"
   },
   "include": [
-    "jest.config.ts",
+    "vitest.config.ts",
     "src/**/*.ts"
   ],
   "references": []

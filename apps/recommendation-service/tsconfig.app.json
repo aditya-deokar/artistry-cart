@@ -6,12 +6,25 @@
       "node",
       "express"
     ],
-    "rootDir": "../../",
+    "rootDir": "src",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo"
   },
   "include": [
-    "src/**/*.ts",
-    "../../packages/**/*.ts"
+    "src/**/*.ts"
   ],
-  "exclude": []
+  "exclude": [],
+  "references": [
+    {
+      "path": "../../packages/test-utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/middleware/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/libs/tsconfig.lib.json"
+    }
+  ]
 }

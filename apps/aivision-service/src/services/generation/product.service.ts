@@ -4,7 +4,7 @@ import { productGenModel } from '../../config/gemini';
 import { safeParseLLMResponse, GeneratedProductSchema, GeneratedProductData } from '../../validators/schemas';
 import { withRetry } from '../../utils/retry';
 import { logger } from '../../utils/logger';
-import prisma from '../../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 
 export interface ProductGenerationResult {
     success: boolean;

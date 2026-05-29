@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "tsBuildInfoFile": "./dist/tsconfig.lib.tsbuildinfo",
+    "types": [
+      "node",
+      "vitest/globals"
+    ]
+  },
+  "include": [
+    "index.ts",
+    "helpers/**/*.ts",
+    "mocks/**/*.ts",
+    "setup/**/*.ts",
+    "types.d.ts"
+  ],
+  "exclude": [
+    "*.spec.ts",
+    "*.test.ts",
+    "dist"
+  ]
+}

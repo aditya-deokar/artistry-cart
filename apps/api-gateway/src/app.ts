@@ -9,7 +9,7 @@ import {
   registerHealthEndpoints,
   setupHttpObservability,
   type AppLogger,
-} from "../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 import type { GatewayConfig } from "./config";
 
 export function createGatewayApp(config: GatewayConfig, logger: AppLogger): Express {

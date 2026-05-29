@@ -26,7 +26,7 @@ import {
   createMockRefund,
   createMockOrderItem,
   resetFactoryCounter,
-} from '../../../../packages/test-utils';
+} from '@artistry-cart/test-utils';
 
 // ── Module-level mocks ──
 vi.mock('stripe', () => {
@@ -42,7 +42,7 @@ vi.mock('ioredis', () => {
   return { default: function (..._args: any[]) { return redisMock; } };
 });
 
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   default: prismaMock,
 }));
 
@@ -404,9 +404,7 @@ describe('createOrder', () => {
     prismaMock.users.findUnique.mockResolvedValueOnce(user);
     prismaMock.orders.create.mockResolvedValueOnce(createMockOrder({ id: 'order-1' }));
     prismaMock.products.update.mockResolvedValue({});
-    prismaMock.productAnalytics.upsert.mockResolvedValue({});
-    prismaMock.userAnalytics.findUnique.mockResolvedValueOnce(null);
-    prismaMock.userAnalytics.create.mockResolvedValue({});
+    prismaMock.analyticsOutbox.create.mockResolvedValue({});
     prismaMock.shops.findMany.mockResolvedValueOnce([
       { id: 'shop-1', sellerId: 'seller-1', name: 'Art Shop' },
     ]);
@@ -423,7 +421,7 @@ describe('createOrder', () => {
 
     expect(prismaMock.orders.create).toHaveBeenCalled();
     expect(prismaMock.products.update).toHaveBeenCalled();
-    expect(prismaMock.productAnalytics.upsert).toHaveBeenCalled();
+    expect(prismaMock.analyticsOutbox.create).toHaveBeenCalled();
     expect(sendEmail).toHaveBeenCalledWith(
       'test@e.com',
       expect.stringContaining('Order Confirmation'),
@@ -463,9 +461,7 @@ describe('createOrder', () => {
     prismaMock.users.findUnique.mockResolvedValueOnce(createMockUser({ id: 'user-1' }));
     prismaMock.orders.create.mockResolvedValueOnce(createMockOrder());
     prismaMock.products.update.mockResolvedValue({});
-    prismaMock.productAnalytics.upsert.mockResolvedValue({});
-    prismaMock.userAnalytics.findUnique.mockResolvedValueOnce(null);
-    prismaMock.userAnalytics.create.mockResolvedValue({});
+    prismaMock.analyticsOutbox.create.mockResolvedValue({});
     prismaMock.shops.findMany.mockResolvedValueOnce([]);
     prismaMock.notification.create.mockResolvedValue({});
 
@@ -484,7 +480,7 @@ describe('createOrder', () => {
     expect(createArgs.data.couponCode).toBe('SAVE20');
   });
 
-  it('should update existing user analytics instead of creating new', async () => {
+  it('should enqueue purchase analytics events into the outbox', async () => {
     const sessionData = {
       cart: [{ id: 'p1', quantity: 1, sale_price: 50, shopId: 'shop-1', title: 'X' }],
       totalAmount: 50,
@@ -498,12 +494,7 @@ describe('createOrder', () => {
     );
     prismaMock.orders.create.mockResolvedValueOnce(createMockOrder());
     prismaMock.products.update.mockResolvedValue({});
-    prismaMock.productAnalytics.upsert.mockResolvedValue({});
-    prismaMock.userAnalytics.findUnique.mockResolvedValueOnce({
-      userId: 'user-1',
-      actions: [{ productId: 'old', action: 'view' }],
-    });
-    prismaMock.userAnalytics.update.mockResolvedValue({});
+    prismaMock.analyticsOutbox.create.mockResolvedValue({});
     prismaMock.shops.findMany.mockResolvedValueOnce([]);
     prismaMock.notification.create.mockResolvedValue({});
 
@@ -516,8 +507,14 @@ describe('createOrder', () => {
 
     await createOrder(req, res, next);
 
-    expect(prismaMock.userAnalytics.update).toHaveBeenCalled();
-    expect(prismaMock.userAnalytics.create).not.toHaveBeenCalled();
+    expect(prismaMock.analyticsOutbox.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: 'PENDING',
+          topic: expect.any(String),
+        }),
+      }),
+    );
   });
 });
 

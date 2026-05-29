@@ -11,7 +11,7 @@ import {
   registerGracefulShutdown,
   registerHealthEndpoints,
   setupHttpObservability,
-} from "../../../packages/utils/runtime";
+} from "@artistry-cart/utils/runtime";
 import router from "./routes/recommendation.routes";
 
 const app = express();

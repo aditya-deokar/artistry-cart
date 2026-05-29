@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
-import isAuthenticated from '../../../../packages/middleware/isAuthenticated';
-import { isSeller } from '../../../../packages/middleware/authorizedRoles';
+import isAuthenticated from '@artistry-cart/middleware/isAuthenticated';
+import { isSeller } from '@artistry-cart/middleware/authorizedRoles';
 import {
     createPaymentIntent,
     createPaymentSession,

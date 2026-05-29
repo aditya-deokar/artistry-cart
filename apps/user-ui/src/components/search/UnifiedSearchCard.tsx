@@ -17,9 +17,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/formatters';
 import { useStore } from '@/store';
-import useUser from '@/hooks/useUser';
-import useLocationTracking from '@/hooks/useLocationTracking';
-import useDeviceTracking from '@/hooks/useDeviceTracking';
+import useAnalytics from '@/hooks/useAnalytics';
 import WishlistButton from '../products/WishlistButton';
 
 // Unified product type that covers all search contexts
@@ -36,6 +34,7 @@ export interface UnifiedProduct {
     ratings?: number;
     stock?: number;
     Shop?: {
+        id?: string;
         name: string;
         slug: string;
         avatar?: { url: string } | null;
@@ -68,9 +67,7 @@ export const UnifiedSearchCard: React.FC<UnifiedSearchCardProps> = ({
     const [imageLoaded, setImageLoaded] = React.useState(false);
 
     // Store hooks for add to cart
-    const { user } = useUser();
-    const location = useLocationTracking();
-    const deviceInfo = useDeviceTracking();
+    const { trackEvent } = useAnalytics();
     const cartItems = useStore((state) => state.cart);
     const { addToCart } = useStore((state) => state.actions);
 
@@ -92,10 +89,14 @@ export const UnifiedSearchCard: React.FC<UnifiedSearchCardProps> = ({
                     quantity: 1,
                     sale_price: price,
                 } as any,
-                user,
-                location,
-                deviceInfo
             );
+            void trackEvent({
+                action: 'add_to_cart',
+                productId: product.id,
+                shopId: product.Shop?.id,
+                quantity: 1,
+                source: 'user-ui.unified-search-card',
+            });
         }
     };
 

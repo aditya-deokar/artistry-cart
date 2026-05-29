@@ -108,9 +108,9 @@ const mocks = vi.hoisted(() => {
 });
 
 // Mock dependencies using hoisted values
-vi.mock('../../../../packages/libs/redis', () => mocks.mockRedis);
+vi.mock('@artistry-cart/libs/redis', () => mocks.mockRedis);
 
-vi.mock('../../../../packages/libs/prisma', () => ({
+vi.mock('@artistry-cart/libs/prisma', () => ({
   default: mocks.mockPrisma,
 }));
 
@@ -151,7 +151,7 @@ import {
   loginSeller,
   getSeller,
 } from './auth.controller';
-import { ValidationError, AuthError } from '../../../../packages/error-handler';
+import { ValidationError, AuthError } from '@artistry-cart/error-handler';
 
 // Use hoisted mocks directly
 const prisma = mocks.mockPrisma;

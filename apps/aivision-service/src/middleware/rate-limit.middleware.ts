@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import prisma from '../../../../packages/libs/prisma';
+import prisma from '@artistry-cart/libs/prisma';
 import { config } from '../config';
 import { AuthenticatedRequest } from './auth.middleware';
 
