@@ -76,7 +76,7 @@
     "motion": "^12.23.6",
     "next": "~15.2.4",
     "next-themes": "^0.4.6",
-    "next-view-transitions": "^0.3.4",
+    "next-view-transitions": "^0.3.5",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.5",
     "prisma": "^6.11.1",
