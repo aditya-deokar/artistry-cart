@@ -10,12 +10,8 @@
       "e2e": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "npx vitest run --config apps/kafka-service-e2e/vitest.config.ts"
-        },
-        "dependsOn": [
-          "@artistry-cart/kafka-service:build",
-          "@artistry-cart/kafka-service:serve"
-        ]
+          "command": "node tools/e2e/run-suites.mjs kafka-service-e2e"
+        }
       }
     }
   }

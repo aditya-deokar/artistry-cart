@@ -1,11 +1,12 @@
 import { Response, NextFunction } from 'express';
 import { AuthError } from '@artistry-cart/error-handler';
+import type { AuthenticatedRequest } from './auth-contract';
 
 /**
  * Middleware to check if authenticated user has admin role
  * Should be used after isAuthenticated middleware
  */
-export const isAdmin = (req: any, res: Response, next: NextFunction) => {
+export const isAdmin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     // Check if user exists (should be set by isAuthenticated middleware)
     if (!req.user) {

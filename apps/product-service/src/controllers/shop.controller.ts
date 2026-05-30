@@ -3,14 +3,6 @@ import prisma from "@artistry-cart/libs/prisma";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
-// Interfaces
-interface ShopFilters {
-  category?: string;
-  rating?: number;
-  location?: string;
-  search?: string;
-}
-
 // Validation schemas
 const reviewSchema = z.object({
   shopId: z.string(),
@@ -224,7 +216,7 @@ export const getShopBySlug = async (req: Request, res: Response, next: NextFunct
       take: 8
     });
 
-    res.status(200).json({ 
+    return res.status(200).json({ 
       success: true, 
       data: {
         shop: {
@@ -235,7 +227,7 @@ export const getShopBySlug = async (req: Request, res: Response, next: NextFunct
     });
 
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -486,7 +478,7 @@ export const createShopReview = async (req: any, res: Response, next: NextFuncti
       return [createdReview];
     });
 
-    res.status(201).json({ 
+    return res.status(201).json({ 
       success: true, 
       message: "Review created successfully",
       data: newReview 
@@ -500,7 +492,7 @@ export const createShopReview = async (req: any, res: Response, next: NextFuncti
         errors: error
       });
     }
-    next(error);
+    return next(error);
   }
 };
 

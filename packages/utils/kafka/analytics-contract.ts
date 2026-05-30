@@ -7,6 +7,31 @@ const trimmedOptionalString = z
   .max(255)
   .optional();
 
+const analyticsEventContextRules = (
+  event: {
+    action: string;
+    productId?: string;
+    shopId?: string;
+  },
+  context: z.RefinementCtx,
+) => {
+  if (event.action === "shop_visit" && !event.shopId && !event.productId) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "shop_visit events require shopId or productId",
+      path: ["shopId"],
+    });
+  }
+
+  if (event.action !== "shop_visit" && !event.productId) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `${event.action} events require productId`,
+      path: ["productId"],
+    });
+  }
+};
+
 export const ANALYTICS_EVENT_SCHEMA_VERSION = 1;
 
 export const ANALYTICS_USER_ACTIONS = [
@@ -21,45 +46,33 @@ export const ANALYTICS_USER_ACTIONS = [
 
 export const analyticsActionSchema = z.enum(ANALYTICS_USER_ACTIONS);
 
-export const analyticsTrackRequestSchema = z
-  .object({
-    action: analyticsActionSchema,
-    productId: trimmedOptionalString,
-    shopId: trimmedOptionalString,
-    quantity: z.number().int().min(1).max(1000).optional(),
-    country: trimmedOptionalString,
-    city: trimmedOptionalString,
-    device: trimmedOptionalString,
-    source: z.string().trim().min(1).max(120).optional(),
-  })
-  .superRefine((event, context) => {
-    if (event.action === "shop_visit" && !event.shopId && !event.productId) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "shop_visit events require shopId or productId",
-        path: ["shopId"],
-      });
-    }
-
-    if (event.action !== "shop_visit" && !event.productId) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `${event.action} events require productId`,
-        path: ["productId"],
-      });
-    }
-  });
-
-export const analyticsEventSchema = analyticsTrackRequestSchema.extend({
-  eventId: z.string().trim().min(1).max(255),
-  schemaVersion: z.literal(ANALYTICS_EVENT_SCHEMA_VERSION),
-  source: z.string().trim().min(1).max(120),
-  timestamp: z
-    .string()
-    .trim()
-    .refine((value) => !Number.isNaN(Date.parse(value)), "timestamp must be an ISO date"),
-  userId: z.string().trim().min(1).max(255),
+const analyticsTrackRequestBaseSchema = z.object({
+  action: analyticsActionSchema,
+  productId: trimmedOptionalString,
+  shopId: trimmedOptionalString,
+  quantity: z.number().int().min(1).max(1000).optional(),
+  country: trimmedOptionalString,
+  city: trimmedOptionalString,
+  device: trimmedOptionalString,
+  source: z.string().trim().min(1).max(120).optional(),
 });
+
+export const analyticsTrackRequestSchema = analyticsTrackRequestBaseSchema.superRefine(
+  analyticsEventContextRules,
+);
+
+export const analyticsEventSchema = analyticsTrackRequestBaseSchema
+  .extend({
+    eventId: z.string().trim().min(1).max(255),
+    schemaVersion: z.literal(ANALYTICS_EVENT_SCHEMA_VERSION),
+    source: z.string().trim().min(1).max(120),
+    timestamp: z
+      .string()
+      .trim()
+      .refine((value) => !Number.isNaN(Date.parse(value)), "timestamp must be an ISO date"),
+    userId: z.string().trim().min(1).max(255),
+  })
+  .superRefine(analyticsEventContextRules);
 
 export type AnalyticsUserAction = (typeof ANALYTICS_USER_ACTIONS)[number];
 export type AnalyticsTrackRequest = z.infer<typeof analyticsTrackRequestSchema>;

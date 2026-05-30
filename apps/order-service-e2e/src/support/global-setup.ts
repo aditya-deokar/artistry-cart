@@ -1,26 +1,24 @@
-/**
- * Global Setup for Order Service E2E Tests
- *
- * Waits for the order service to be available before running tests.
- * Start the service first: npx nx serve order-service
- */
 export default async function setup() {
-  const host = process.env.HOST ?? 'localhost';
-  const port = process.env.PORT ? Number(process.env.PORT) : 6004;
+  const baseUrl = process.env.ORDER_SERVICE_URL ?? 'http://localhost:6004';
+  const readyUrl = new URL('/readyz', `${baseUrl}/`).toString();
 
-  console.log(`\n⏳ Waiting for order-service at ${host}:${port}...\n`);
+  console.log(`\nWaiting for order-service at ${readyUrl}...\n`);
 
   const maxWait = 30_000;
   const start = Date.now();
   while (Date.now() - start < maxWait) {
     try {
-      const res = await fetch(`http://${host}:${port}/`);
+      const res = await fetch(readyUrl);
       if (res.ok) {
-        console.log('✅ Order service is ready\n');
+        console.log('Order service is ready\n');
         return;
       }
-    } catch { /* not ready yet */ }
-    await new Promise(r => setTimeout(r, 500));
+    } catch {
+      // not ready yet
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
-  throw new Error(`Order service not available at ${host}:${port} after ${maxWait}ms`);
+
+  throw new Error(`Order service not available at ${readyUrl} after ${maxWait}ms`);
 }

@@ -27,7 +27,6 @@ vi.mock('@artistry-cart/libs/prisma', () => ({
 import {
   PricingService,
   type EventDiscountContext,
-  type DiscountComputationResult,
 } from './pricing.service';
 
 // ── Helpers ──

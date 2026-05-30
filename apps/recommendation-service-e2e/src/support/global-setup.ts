@@ -1,14 +1,14 @@
 export default async function setup() {
-  const host = process.env.HOST ?? "localhost";
-  const port = process.env.PORT ? Number(process.env.PORT) : 6005;
+  const baseUrl = process.env.RECOMMENDATION_SERVICE_URL ?? "http://localhost:6005";
+  const readyUrl = new URL("/readyz", `${baseUrl}/`).toString();
 
-  console.log(`\nWaiting for recommendation-service at ${host}:${port}...\n`);
+  console.log(`\nWaiting for recommendation-service at ${readyUrl}...\n`);
 
   const maxWait = 30_000;
   const start = Date.now();
   while (Date.now() - start < maxWait) {
     try {
-      const res = await fetch(`http://${host}:${port}/readyz`);
+      const res = await fetch(readyUrl);
       if (res.ok) {
         console.log("Recommendation service is ready\n");
         return;
@@ -18,5 +18,5 @@ export default async function setup() {
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
-  throw new Error(`Recommendation service not available at ${host}:${port} after ${maxWait}ms`);
+  throw new Error(`Recommendation service not available at ${readyUrl} after ${maxWait}ms`);
 }

@@ -2,7 +2,7 @@
  * Seed script for AI Vision service
  * Creates sample sessions, concepts, and generated products for testing
  */
-import { PrismaClient, VisionMode, SessionStatus, ConceptStatus, MatchStatus } from '@prisma/client';
+import { PrismaClient, VisionMode, SessionStatus, ConceptStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -128,7 +128,7 @@ async function seedAIVision() {
             data: {
                 conceptId: concept.id,
                 originalUrl: concept.primaryImageUrl,
-                thumbnailUrl: concept.thumbnailUrl,
+                thumbnailUrl: concept.thumbnailUrl ?? concept.primaryImageUrl,
                 fileId: `file_${concept.id}_1`,
                 filePath: `/concepts/${concept.id}/image_1.jpg`,
                 fileSize: 256000,

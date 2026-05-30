@@ -11,23 +11,33 @@
   "exports": {
     ".": {
       "types": "./index.ts",
-      "default": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./auth-contract": {
+      "types": "./auth-contract.ts",
+      "import": "./dist/auth-contract.js",
+      "require": "./dist/auth-contract.js",
+      "default": "./dist/auth-contract.js"
     },
     "./authorizedRoles": {
       "types": "./authorizedRoles.ts",
-      "default": "./dist/authorizedRoles.js",
-      "require": "./dist/authorizedRoles.js"
+      "import": "./dist/authorizedRoles.js",
+      "require": "./dist/authorizedRoles.js",
+      "default": "./dist/authorizedRoles.js"
     },
     "./isAdmin": {
       "types": "./isAdmin.ts",
-      "default": "./dist/isAdmin.js",
-      "require": "./dist/isAdmin.js"
+      "import": "./dist/isAdmin.js",
+      "require": "./dist/isAdmin.js",
+      "default": "./dist/isAdmin.js"
     },
     "./isAuthenticated": {
       "types": "./isAuthenticated.ts",
-      "default": "./dist/isAuthenticated.js",
-      "require": "./dist/isAuthenticated.js"
+      "import": "./dist/isAuthenticated.js",
+      "require": "./dist/isAuthenticated.js",
+      "default": "./dist/isAuthenticated.js"
     }
   },
   "nx": {

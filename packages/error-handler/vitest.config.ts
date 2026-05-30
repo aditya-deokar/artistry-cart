@@ -1,6 +1,16 @@
 import { defineConfig } from 'vitest/config';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const configDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  root: configDir,
+  resolve: {
+    alias: {
+      '@artistry-cart/test-utils': path.resolve(configDir, '../test-utils/index.ts'),
+    },
+  },
   test: {
     name: 'error-handler',
     globals: true,
@@ -8,8 +18,8 @@ export default defineConfig({
     include: ['**/*.spec.ts', '**/*.test.ts'],
     exclude: ['node_modules', 'dist'],
     setupFiles: [
-      '../test-utils/setup/global-setup.ts',
-      '../test-utils/setup/custom-matchers.ts',
+      path.resolve(configDir, '../test-utils/setup/global-setup.ts'),
+      path.resolve(configDir, '../test-utils/setup/custom-matchers.ts'),
     ],
     coverage: {
       provider: 'v8',

@@ -7,23 +7,27 @@
   "exports": {
     ".": {
       "types": "./index.ts",
-      "default": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./imageKit": {
       "types": "./imageKit/index.ts",
-      "default": "./dist/imageKit/index.js",
-      "require": "./dist/imageKit/index.js"
+      "import": "./dist/imageKit/index.js",
+      "require": "./dist/imageKit/index.js",
+      "default": "./dist/imageKit/index.js"
     },
     "./prisma": {
       "types": "./prisma/index.ts",
-      "default": "./dist/prisma/index.js",
-      "require": "./dist/prisma/index.js"
+      "import": "./dist/prisma/index.js",
+      "require": "./dist/prisma/index.js",
+      "default": "./dist/prisma/index.js"
     },
     "./redis": {
       "types": "./redis/index.ts",
-      "default": "./dist/redis/index.js",
-      "require": "./dist/redis/index.js"
+      "import": "./dist/redis/index.js",
+      "require": "./dist/redis/index.js",
+      "default": "./dist/redis/index.js"
     }
   },
   "nx": {

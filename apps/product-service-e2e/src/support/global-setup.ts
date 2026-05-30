@@ -1,28 +1,24 @@
-/**
- * Global Setup for Product Service E2E Tests
- *
- * Waits for the product service to be available before running tests.
- * Start the service first: npx nx serve product-service
- */
 export default async function setup() {
-  const host = process.env.HOST ?? 'localhost';
-  const port = process.env.PORT ? Number(process.env.PORT) : 6002;
+  const baseUrl = process.env.PRODUCT_SERVICE_URL ?? 'http://localhost:6002';
+  const readyUrl = new URL('/readyz', `${baseUrl}/`).toString();
 
-  console.log(`\n⏳ Waiting for product-service at ${host}:${port}...\n`);
+  console.log(`\nWaiting for product-service at ${readyUrl}...\n`);
 
-  // Poll until service is ready (max 30s)
   const maxWait = 30_000;
   const start = Date.now();
   while (Date.now() - start < maxWait) {
     try {
-      const res = await fetch(`http://${host}:${port}/`);
+      const res = await fetch(readyUrl);
       if (res.ok) {
-        console.log('✅ Product service is ready\n');
+        console.log('Product service is ready\n');
         return;
       }
-    } catch { /* not ready yet */ }
-    await new Promise(r => setTimeout(r, 500));
-  }
-  throw new Error(`Product service not available at ${host}:${port} after ${maxWait}ms`);
-};
+    } catch {
+      // not ready yet
+    }
 
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  throw new Error(`Product service not available at ${readyUrl} after ${maxWait}ms`);
+}

@@ -1,9 +1,13 @@
 import { defineConfig } from 'vitest/config';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const configDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  root: __dirname,
+  root: configDir,
   test: {
-    globals: false,
+    globals: true,
     include: ['src/**/*.e2e-spec.ts', 'src/**/*.spec.ts'],
     setupFiles: ['./src/support/test-setup.ts'],
     globalSetup: ['./src/support/global-setup.ts'],

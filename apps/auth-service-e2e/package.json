@@ -10,12 +10,8 @@
       "e2e": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "npx vitest run --config apps/auth-service-e2e/vitest.config.ts"
-        },
-        "dependsOn": [
-          "@artistry-cart/auth-service:build",
-          "@artistry-cart/auth-service:serve"
-        ]
+          "command": "node tools/e2e/run-suites.mjs auth-service-e2e"
+        }
       }
     }
   }

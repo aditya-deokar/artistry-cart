@@ -1,15 +1,24 @@
-import { killPort, waitForPortOpen } from '@nx/node/utils';
-
 export default async function setup() {
-  console.log('\nSetting up...\n');
+  const baseUrl = process.env.KAFKA_SERVICE_URL ?? 'http://localhost:3000';
+  const readyUrl = new URL('/healthz', `${baseUrl}/`).toString();
 
-  const host = process.env.HOST ?? 'localhost';
-  const port = process.env.PORT ? Number(process.env.PORT) : 3000;
-  await waitForPortOpen(port, { host });
+  console.log(`\nWaiting for kafka-service at ${readyUrl}...\n`);
 
-  return async () => {
-    await killPort(port);
-    console.log('\nTearing down...\n');
-  };
+  const maxWait = 30_000;
+  const start = Date.now();
+  while (Date.now() - start < maxWait) {
+    try {
+      const res = await fetch(readyUrl);
+      if (res.ok) {
+        console.log('Kafka service is ready\n');
+        return;
+      }
+    } catch {
+      // not ready yet
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  throw new Error(`Kafka service not available at ${readyUrl} after ${maxWait}ms`);
 }
-

@@ -4,21 +4,69 @@
   "private": true,
   "main": "./dist/index.js",
   "types": "./index.ts",
+  "dependencies": {
+    "@artistry-cart/middleware": "workspace:*"
+  },
   "exports": {
     ".": {
       "types": "./index.ts",
-      "default": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./setup/custom-matchers": {
       "types": "./setup/custom-matchers.ts",
-      "default": "./dist/setup/custom-matchers.js",
-      "require": "./dist/setup/custom-matchers.js"
+      "import": "./dist/setup/custom-matchers.js",
+      "default": "./dist/setup/custom-matchers.js"
     },
     "./setup/global-setup": {
       "types": "./setup/global-setup.ts",
-      "default": "./dist/setup/global-setup.js",
-      "require": "./dist/setup/global-setup.js"
+      "import": "./dist/setup/global-setup.js",
+      "default": "./dist/setup/global-setup.js"
+    },
+    "./helpers/request.helper": {
+      "types": "./helpers/request.helper.ts",
+      "import": "./dist/helpers/request.helper.js",
+      "default": "./dist/helpers/request.helper.js"
+    },
+    "./helpers/auth.helper": {
+      "types": "./helpers/auth.helper.ts",
+      "import": "./dist/helpers/auth.helper.js",
+      "default": "./dist/helpers/auth.helper.js"
+    },
+    "./helpers/data-factories": {
+      "types": "./helpers/data-factories.ts",
+      "import": "./dist/helpers/data-factories.js",
+      "default": "./dist/helpers/data-factories.js"
+    },
+    "./mocks/prisma.mock": {
+      "types": "./mocks/prisma.mock.ts",
+      "import": "./dist/mocks/prisma.mock.js",
+      "default": "./dist/mocks/prisma.mock.js"
+    },
+    "./mocks/redis.mock": {
+      "types": "./mocks/redis.mock.ts",
+      "import": "./dist/mocks/redis.mock.js",
+      "default": "./dist/mocks/redis.mock.js"
+    },
+    "./mocks/imagekit.mock": {
+      "types": "./mocks/imagekit.mock.ts",
+      "import": "./dist/mocks/imagekit.mock.js",
+      "default": "./dist/mocks/imagekit.mock.js"
+    },
+    "./mocks/stripe.mock": {
+      "types": "./mocks/stripe.mock.ts",
+      "import": "./dist/mocks/stripe.mock.js",
+      "default": "./dist/mocks/stripe.mock.js"
+    },
+    "./mocks/kafka.mock": {
+      "types": "./mocks/kafka.mock.ts",
+      "import": "./dist/mocks/kafka.mock.js",
+      "default": "./dist/mocks/kafka.mock.js"
+    },
+    "./mocks/nodemailer.mock": {
+      "types": "./mocks/nodemailer.mock.ts",
+      "import": "./dist/mocks/nodemailer.mock.js",
+      "default": "./dist/mocks/nodemailer.mock.js"
     },
     "./types": {
       "types": "./types.d.ts",

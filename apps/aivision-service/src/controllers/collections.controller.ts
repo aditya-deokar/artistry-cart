@@ -1,11 +1,46 @@
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Response } from 'express';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import { logger } from '../utils/logger';
 
 const prisma = new PrismaClient();
 
-// Validation schemas
+type CollectionPermission = 'view' | 'edit' | 'admin';
+
+const isJsonObject = (
+  value: Prisma.JsonValue | null | undefined,
+): value is Prisma.JsonObject => typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const getCollectionPermission = (
+  permissions: Prisma.JsonValue | null | undefined,
+  userId: string,
+): CollectionPermission | undefined => {
+  if (!isJsonObject(permissions)) {
+    return undefined;
+  }
+
+  const value = permissions[userId];
+  if (value === 'view' || value === 'edit' || value === 'admin') {
+    return value;
+  }
+
+  return undefined;
+};
+
+const canEditCollection = (
+  collection: { userId: string; permissions: Prisma.JsonValue | null | undefined },
+  userId: string,
+) => {
+  const permission = getCollectionPermission(collection.permissions, userId);
+  return collection.userId === userId || permission === 'edit' || permission === 'admin';
+};
+
+const isCollectionAdmin = (
+  collection: { userId: string; permissions: Prisma.JsonValue | null | undefined },
+  userId: string,
+) => collection.userId === userId || getCollectionPermission(collection.permissions, userId) === 'admin';
+
 const createCollectionSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
@@ -30,19 +65,19 @@ const inviteCollaboratorSchema = z.object({
   permission: z.enum(['view', 'edit', 'admin']).default('view'),
 });
 
-/**
- * Create a new collection
- */
-export const createCollection = async (req: Request, res: Response) => {
+export const createCollection = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).json({ success: false, error: 'Authentication required' });
+      res.status(401).json({ success: false, error: 'Authentication required' });
+      return;
     }
 
     const validatedData = createCollectionSchema.parse(req.body);
 
-    // Check if collection name already exists for this user
     const existing = await prisma.conceptCollection.findUnique({
       where: {
         userId_name: {
@@ -53,13 +88,13 @@ export const createCollection = async (req: Request, res: Response) => {
     });
 
     if (existing) {
-      return res.status(409).json({
+      res.status(409).json({
         success: false,
         error: 'A collection with this name already exists',
       });
+      return;
     }
 
-    // Verify concepts belong to user if provided
     if (validatedData.conceptIds.length > 0) {
       const concepts = await prisma.concept.findMany({
         where: {
@@ -69,10 +104,11 @@ export const createCollection = async (req: Request, res: Response) => {
       });
 
       if (concepts.length !== validatedData.conceptIds.length) {
-        return res.status(403).json({
+        res.status(403).json({
           success: false,
           error: 'Some concepts do not belong to you',
         });
+        return;
       }
     }
 
@@ -95,52 +131,47 @@ export const createCollection = async (req: Request, res: Response) => {
     res.status(201).json({ success: true, data: collection });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: error.errors });
+      res.status(400).json({ success: false, error: error.issues });
+      return;
     }
+
     logger.error('Create collection failed', { error });
     res.status(500).json({ success: false, error: 'Failed to create collection' });
   }
 };
 
-/**
- * List user's collections
- */
-export const listCollections = async (req: Request, res: Response) => {
+export const listCollections = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).json({ success: false, error: 'Authentication required' });
+      res.status(401).json({ success: false, error: 'Authentication required' });
+      return;
     }
 
-    const { includeShared } = req.query;
-
-    const where: any = {
-      OR: [{ userId }],
-    };
-
-    // Include collections where user is a collaborator
-    if (includeShared === 'true') {
-      where.OR.push({ collaboratorIds: { has: userId } });
-    }
+    const where: Prisma.ConceptCollectionWhereInput =
+      req.query.includeShared === 'true'
+        ? { OR: [{ userId }, { collaboratorIds: { has: userId } }] }
+        : { OR: [{ userId }] };
 
     const collections = await prisma.conceptCollection.findMany({
       where,
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
     });
 
-    // Get concept counts and cover images
     const enrichedCollections = await Promise.all(
       collections.map(async (collection) => {
         const conceptCount = collection.conceptIds.length;
         let coverImageUrl = collection.coverImage;
 
-        // If no cover image set, use first concept's image
         if (!coverImageUrl && collection.conceptIds.length > 0) {
           const firstConcept = await prisma.concept.findUnique({
             where: { id: collection.conceptIds[0] },
             select: { primaryImageUrl: true },
           });
-          coverImageUrl = firstConcept?.primaryImageUrl || null;
+          coverImageUrl = firstConcept?.primaryImageUrl ?? null;
         }
 
         return {
@@ -149,7 +180,7 @@ export const listCollections = async (req: Request, res: Response) => {
           coverImageUrl,
           isOwner: collection.userId === userId,
         };
-      })
+      }),
     );
 
     res.json({ success: true, data: enrichedCollections });
@@ -159,10 +190,10 @@ export const listCollections = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Get single collection with concepts
- */
-export const getCollection = async (req: Request, res: Response) => {
+export const getCollection = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     const { id } = req.params;
@@ -172,20 +203,20 @@ export const getCollection = async (req: Request, res: Response) => {
     });
 
     if (!collection) {
-      return res.status(404).json({ success: false, error: 'Collection not found' });
+      res.status(404).json({ success: false, error: 'Collection not found' });
+      return;
     }
 
-    // Check access permissions
     const hasAccess =
       collection.isPublic ||
       collection.userId === userId ||
-      collection.collaboratorIds.includes(userId || '');
+      (userId ? collection.collaboratorIds.includes(userId) : false);
 
     if (!hasAccess) {
-      return res.status(403).json({ success: false, error: 'Access denied' });
+      res.status(403).json({ success: false, error: 'Access denied' });
+      return;
     }
 
-    // Fetch concepts
     const concepts = await prisma.concept.findMany({
       where: { id: { in: collection.conceptIds } },
       include: {
@@ -200,16 +231,15 @@ export const getCollection = async (req: Request, res: Response) => {
       orderBy: { createdAt: 'desc' },
     });
 
+    const permission = userId ? getCollectionPermission(collection.permissions, userId) : undefined;
+
     res.json({
       success: true,
       data: {
         ...collection,
         concepts,
         isOwner: collection.userId === userId,
-        canEdit:
-          collection.userId === userId ||
-          (collection.permissions as any)?.[userId || ''] === 'edit' ||
-          (collection.permissions as any)?.[userId || ''] === 'admin',
+        canEdit: collection.userId === userId || permission === 'edit' || permission === 'admin',
       },
     });
   } catch (error) {
@@ -218,14 +248,15 @@ export const getCollection = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Update collection
- */
-export const updateCollection = async (req: Request, res: Response) => {
+export const updateCollection = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).json({ success: false, error: 'Authentication required' });
+      res.status(401).json({ success: false, error: 'Authentication required' });
+      return;
     }
 
     const { id } = req.params;
@@ -236,20 +267,15 @@ export const updateCollection = async (req: Request, res: Response) => {
     });
 
     if (!collection) {
-      return res.status(404).json({ success: false, error: 'Collection not found' });
+      res.status(404).json({ success: false, error: 'Collection not found' });
+      return;
     }
 
-    // Check edit permissions
-    const canEdit =
-      collection.userId === userId ||
-      (collection.permissions as any)?.[userId] === 'edit' ||
-      (collection.permissions as any)?.[userId] === 'admin';
-
-    if (!canEdit) {
-      return res.status(403).json({ success: false, error: 'No permission to edit' });
+    if (!canEditCollection(collection, userId)) {
+      res.status(403).json({ success: false, error: 'No permission to edit' });
+      return;
     }
 
-    // Check name uniqueness if changing name
     if (validatedData.name && validatedData.name !== collection.name) {
       const existing = await prisma.conceptCollection.findUnique({
         where: {
@@ -261,10 +287,11 @@ export const updateCollection = async (req: Request, res: Response) => {
       });
 
       if (existing) {
-        return res.status(409).json({
+        res.status(409).json({
           success: false,
           error: 'A collection with this name already exists',
         });
+        return;
       }
     }
 
@@ -278,21 +305,24 @@ export const updateCollection = async (req: Request, res: Response) => {
     res.json({ success: true, data: updated });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: error.errors });
+      res.status(400).json({ success: false, error: error.issues });
+      return;
     }
+
     logger.error('Update collection failed', { error });
     res.status(500).json({ success: false, error: 'Failed to update collection' });
   }
 };
 
-/**
- * Delete collection
- */
-export const deleteCollection = async (req: Request, res: Response) => {
+export const deleteCollection = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).json({ success: false, error: 'Authentication required' });
+      res.status(401).json({ success: false, error: 'Authentication required' });
+      return;
     }
 
     const { id } = req.params;
@@ -302,12 +332,13 @@ export const deleteCollection = async (req: Request, res: Response) => {
     });
 
     if (!collection) {
-      return res.status(404).json({ success: false, error: 'Collection not found' });
+      res.status(404).json({ success: false, error: 'Collection not found' });
+      return;
     }
 
-    // Only owner can delete
     if (collection.userId !== userId) {
-      return res.status(403).json({ success: false, error: 'Only owner can delete' });
+      res.status(403).json({ success: false, error: 'Only owner can delete' });
+      return;
     }
 
     await prisma.conceptCollection.delete({ where: { id } });
@@ -321,14 +352,15 @@ export const deleteCollection = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Add concepts to collection
- */
-export const addConcepts = async (req: Request, res: Response) => {
+export const addConcepts = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).json({ success: false, error: 'Authentication required' });
+      res.status(401).json({ success: false, error: 'Authentication required' });
+      return;
     }
 
     const { id } = req.params;
@@ -339,29 +371,24 @@ export const addConcepts = async (req: Request, res: Response) => {
     });
 
     if (!collection) {
-      return res.status(404).json({ success: false, error: 'Collection not found' });
+      res.status(404).json({ success: false, error: 'Collection not found' });
+      return;
     }
 
-    // Check edit permissions
-    const canEdit =
-      collection.userId === userId ||
-      (collection.permissions as any)?.[userId] === 'edit' ||
-      (collection.permissions as any)?.[userId] === 'admin';
-
-    if (!canEdit) {
-      return res.status(403).json({ success: false, error: 'No permission to edit' });
+    if (!canEditCollection(collection, userId)) {
+      res.status(403).json({ success: false, error: 'No permission to edit' });
+      return;
     }
 
-    // Verify concepts exist
     const concepts = await prisma.concept.findMany({
       where: { id: { in: conceptIds } },
     });
 
     if (concepts.length !== conceptIds.length) {
-      return res.status(404).json({ success: false, error: 'Some concepts not found' });
+      res.status(404).json({ success: false, error: 'Some concepts not found' });
+      return;
     }
 
-    // Add concepts (avoid duplicates)
     const newConceptIds = Array.from(new Set([...collection.conceptIds, ...conceptIds]));
 
     const updated = await prisma.conceptCollection.update({
@@ -377,21 +404,24 @@ export const addConcepts = async (req: Request, res: Response) => {
     res.json({ success: true, data: updated });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: error.errors });
+      res.status(400).json({ success: false, error: error.issues });
+      return;
     }
+
     logger.error('Add concepts failed', { error });
     res.status(500).json({ success: false, error: 'Failed to add concepts' });
   }
 };
 
-/**
- * Remove concept from collection
- */
-export const removeConcept = async (req: Request, res: Response) => {
+export const removeConcept = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).json({ success: false, error: 'Authentication required' });
+      res.status(401).json({ success: false, error: 'Authentication required' });
+      return;
     }
 
     const { id, conceptId } = req.params;
@@ -401,20 +431,16 @@ export const removeConcept = async (req: Request, res: Response) => {
     });
 
     if (!collection) {
-      return res.status(404).json({ success: false, error: 'Collection not found' });
+      res.status(404).json({ success: false, error: 'Collection not found' });
+      return;
     }
 
-    // Check edit permissions
-    const canEdit =
-      collection.userId === userId ||
-      (collection.permissions as any)?.[userId] === 'edit' ||
-      (collection.permissions as any)?.[userId] === 'admin';
-
-    if (!canEdit) {
-      return res.status(403).json({ success: false, error: 'No permission to edit' });
+    if (!canEditCollection(collection, userId)) {
+      res.status(403).json({ success: false, error: 'No permission to edit' });
+      return;
     }
 
-    const newConceptIds = collection.conceptIds.filter((cId) => cId !== conceptId);
+    const newConceptIds = collection.conceptIds.filter((storedConceptId) => storedConceptId !== conceptId);
 
     const updated = await prisma.conceptCollection.update({
       where: { id },
@@ -430,14 +456,15 @@ export const removeConcept = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Invite collaborator to collection
- */
-export const inviteCollaborator = async (req: Request, res: Response) => {
+export const inviteCollaborator = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).json({ success: false, error: 'Authentication required' });
+      res.status(401).json({ success: false, error: 'Authentication required' });
+      return;
     }
 
     const { id } = req.params;
@@ -448,30 +475,29 @@ export const inviteCollaborator = async (req: Request, res: Response) => {
     });
 
     if (!collection) {
-      return res.status(404).json({ success: false, error: 'Collection not found' });
+      res.status(404).json({ success: false, error: 'Collection not found' });
+      return;
     }
 
-    // Only owner and admins can invite
-    const canInvite =
-      collection.userId === userId || (collection.permissions as any)?.[userId] === 'admin';
-
-    if (!canInvite) {
-      return res.status(403).json({ success: false, error: 'No permission to invite' });
+    if (!isCollectionAdmin(collection, userId)) {
+      res.status(403).json({ success: false, error: 'No permission to invite' });
+      return;
     }
 
-    // Verify collaborator exists
     const collaborator = await prisma.users.findUnique({
       where: { id: collaboratorId },
     });
 
     if (!collaborator) {
-      return res.status(404).json({ success: false, error: 'User not found' });
+      res.status(404).json({ success: false, error: 'User not found' });
+      return;
     }
 
-    // Add to collaborators
     const newCollaboratorIds = Array.from(new Set([...collection.collaboratorIds, collaboratorId]));
+    const permissions: Prisma.JsonObject = isJsonObject(collection.permissions)
+      ? { ...collection.permissions }
+      : {};
 
-    const permissions = (collection.permissions as any) || {};
     permissions[collaboratorId] = permission;
 
     const updated = await prisma.conceptCollection.update({
@@ -491,21 +517,24 @@ export const inviteCollaborator = async (req: Request, res: Response) => {
     res.json({ success: true, data: updated });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: error.errors });
+      res.status(400).json({ success: false, error: error.issues });
+      return;
     }
+
     logger.error('Invite collaborator failed', { error });
     res.status(500).json({ success: false, error: 'Failed to invite collaborator' });
   }
 };
 
-/**
- * Remove collaborator from collection
- */
-export const removeCollaborator = async (req: Request, res: Response) => {
+export const removeCollaborator = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).json({ success: false, error: 'Authentication required' });
+      res.status(401).json({ success: false, error: 'Authentication required' });
+      return;
     }
 
     const { id, collaboratorId } = req.params;
@@ -515,20 +544,20 @@ export const removeCollaborator = async (req: Request, res: Response) => {
     });
 
     if (!collection) {
-      return res.status(404).json({ success: false, error: 'Collection not found' });
+      res.status(404).json({ success: false, error: 'Collection not found' });
+      return;
     }
 
-    // Only owner and admins can remove
-    const canRemove =
-      collection.userId === userId || (collection.permissions as any)?.[userId] === 'admin';
-
-    if (!canRemove) {
-      return res.status(403).json({ success: false, error: 'No permission to remove' });
+    if (!isCollectionAdmin(collection, userId)) {
+      res.status(403).json({ success: false, error: 'No permission to remove' });
+      return;
     }
 
-    const newCollaboratorIds = collection.collaboratorIds.filter((cId) => cId !== collaboratorId);
+    const newCollaboratorIds = collection.collaboratorIds.filter((storedId) => storedId !== collaboratorId);
+    const permissions: Prisma.JsonObject = isJsonObject(collection.permissions)
+      ? { ...collection.permissions }
+      : {};
 
-    const permissions = (collection.permissions as any) || {};
     delete permissions[collaboratorId];
 
     const updated = await prisma.conceptCollection.update({

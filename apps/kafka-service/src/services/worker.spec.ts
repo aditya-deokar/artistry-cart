@@ -39,6 +39,19 @@ function createBatchPayload(messages: Array<Record<string, unknown>>) {
   } as any;
 }
 
+function createRawAnalyticsEvent(overrides: Record<string, unknown> = {}) {
+  return {
+    eventId: "evt-1",
+    schemaVersion: 1,
+    source: "kafka-service.worker.spec",
+    timestamp: "2026-05-29T00:00:00.000Z",
+    userId: "user-1",
+    productId: "product-1",
+    action: "product_view",
+    ...overrides,
+  };
+}
+
 describe("processKafkaBatch", () => {
   let logger: {
     error: ReturnType<typeof vi.fn>;
@@ -67,13 +80,7 @@ describe("processKafkaBatch", () => {
       {
         offset: "1",
         timestamp: String(Date.parse("2026-05-29T00:00:00.000Z")),
-        value: Buffer.from(
-          JSON.stringify({
-            userId: "user-1",
-            productId: "product-1",
-            action: "product_view",
-          }),
-        ),
+        value: Buffer.from(JSON.stringify(createRawAnalyticsEvent())),
       },
     ]);
     const handleEvent = vi.fn().mockResolvedValue(undefined);
@@ -118,10 +125,12 @@ describe("processKafkaBatch", () => {
         offset: "2",
         timestamp: String(Date.parse("2026-05-29T00:00:00.000Z")),
         value: Buffer.from(
-          JSON.stringify({
-            userId: "user-1",
-            action: "add_to_cart",
-          }),
+          JSON.stringify(
+            createRawAnalyticsEvent({
+              action: "add_to_cart",
+              productId: undefined,
+            }),
+          ),
         ),
       },
     ]);
@@ -161,13 +170,7 @@ describe("processKafkaBatch", () => {
       {
         offset: "3",
         timestamp: String(Date.parse("2026-05-29T00:00:00.000Z")),
-        value: Buffer.from(
-          JSON.stringify({
-            userId: "user-1",
-            productId: "product-1",
-            action: "product_view",
-          }),
-        ),
+        value: Buffer.from(JSON.stringify(createRawAnalyticsEvent())),
       },
     ]);
     const handleEvent = vi.fn().mockRejectedValue(new Error("database unavailable"));
@@ -206,13 +209,7 @@ describe("processKafkaBatch", () => {
       {
         offset: "4",
         timestamp: String(Date.parse("2026-05-29T00:00:00.000Z")),
-        value: Buffer.from(
-          JSON.stringify({
-            userId: "user-1",
-            productId: "product-1",
-            action: "product_view",
-          }),
-        ),
+        value: Buffer.from(JSON.stringify(createRawAnalyticsEvent())),
       },
     ]);
     const handleEvent = vi.fn().mockRejectedValue(new Error("database unavailable"));

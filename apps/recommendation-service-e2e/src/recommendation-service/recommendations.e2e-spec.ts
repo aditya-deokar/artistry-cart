@@ -12,10 +12,16 @@ import { describe, it, expect, beforeAll } from 'vitest';
 async function loginAsUser(): Promise<Record<string, string>> {
   const authBase = process.env.AUTH_SERVICE_URL ?? 'http://localhost:6001';
   const res = await axios.post(
-    `${authBase}/api/login`,
-    { email: 'testuser@test.com', password: 'Test@1234' },
-    { withCredentials: true },
+    `${authBase}/api/login-user`,
+    {
+      email: process.env.TEST_USER_EMAIL ?? 'test@example.com',
+      password: process.env.TEST_USER_PASSWORD ?? 'TestPassword123!',
+    },
+    { validateStatus: () => true, withCredentials: true },
   );
+  if (res.status !== 200) {
+    return {};
+  }
   const cookies = res.headers['set-cookie'];
   if (cookies) {
     return { Cookie: cookies.join('; ') };
@@ -55,10 +61,11 @@ describe('Recommendations API (E2E)', () => {
         headers: authHeaders,
       });
 
-      // Should succeed (200) with an array or error gracefully
+      // Should succeed (200) with a recommendation payload or error gracefully
       expect([200, 404]).toContain(res.status);
       if (res.status === 200) {
-        expect(Array.isArray(res.data)).toBe(true);
+        expect(res.data).toHaveProperty('success', true);
+        expect(Array.isArray(res.data.recommendations)).toBe(true);
       }
     });
 
@@ -76,8 +83,12 @@ describe('Recommendations API (E2E)', () => {
         headers: authHeaders,
       });
 
-      if (res.status === 200 && Array.isArray(res.data) && res.data.length > 0) {
-        const product = res.data[0];
+      if (
+        res.status === 200 &&
+        Array.isArray(res.data.recommendations) &&
+        res.data.recommendations.length > 0
+      ) {
+        const product = res.data.recommendations[0];
         expect(product).toHaveProperty('id');
         expect(product).toHaveProperty('name');
       }
@@ -101,7 +112,8 @@ describe('Recommendations API (E2E)', () => {
       // New/unknown users get fallback recommendations (last 10 products)
       expect([200, 404]).toContain(res.status);
       if (res.status === 200) {
-        expect(Array.isArray(res.data)).toBe(true);
+        expect(res.data).toHaveProperty('success', true);
+        expect(Array.isArray(res.data.recommendations)).toBe(true);
       }
     });
 

@@ -1,7 +1,4 @@
 import axios from 'axios';
 
-const host = process.env.HOST ?? 'localhost';
-const port = process.env.PORT ?? '3000';
-
-axios.defaults.baseURL = `http://${host}:${port}`;
+axios.defaults.baseURL = process.env.KAFKA_SERVICE_URL ?? 'http://localhost:3000';
 axios.defaults.validateStatus = () => true;

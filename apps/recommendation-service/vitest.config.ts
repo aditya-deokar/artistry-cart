@@ -1,7 +1,16 @@
 import { defineConfig } from 'vitest/config';
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const configDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  root: configDir,
+  resolve: {
+    alias: {
+      '@artistry-cart/test-utils': path.resolve(configDir, '../../packages/test-utils/index.ts'),
+    },
+  },
   test: {
     name: 'recommendation-service',
     globals: true,
@@ -9,8 +18,8 @@ export default defineConfig({
     include: ['src/**/*.spec.ts', 'src/**/*.test.ts'],
     exclude: ['node_modules', 'dist', 'out-tsc'],
     setupFiles: [
-      path.resolve(__dirname, '../../packages/test-utils/setup/global-setup.ts'),
-      path.resolve(__dirname, '../../packages/test-utils/setup/custom-matchers.ts'),
+      path.resolve(configDir, '../../packages/test-utils/setup/global-setup.ts'),
+      path.resolve(configDir, '../../packages/test-utils/setup/custom-matchers.ts'),
     ],
     coverage: {
       provider: 'v8',

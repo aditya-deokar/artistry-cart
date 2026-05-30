@@ -446,7 +446,8 @@ describe('createOrder', () => {
     await createOrder(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.send).toHaveBeenCalledWith(expect.stringContaining('Skipping'));
+    expect(prismaMock.orders.create).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith({ received: true });
   });
 
   it('should apply coupon discount when applicable', async () => {

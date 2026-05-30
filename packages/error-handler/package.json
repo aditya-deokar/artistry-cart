@@ -7,13 +7,15 @@
   "exports": {
     ".": {
       "types": "./index.ts",
-      "default": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./error-middelware": {
       "types": "./error-middelware.ts",
-      "default": "./dist/error-middelware.js",
-      "require": "./dist/error-middelware.js"
+      "import": "./dist/error-middelware.js",
+      "require": "./dist/error-middelware.js",
+      "default": "./dist/error-middelware.js"
     }
   },
   "nx": {
