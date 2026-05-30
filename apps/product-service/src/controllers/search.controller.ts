@@ -2,6 +2,23 @@ import { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
 import prisma from '@artistry-cart/libs/prisma';
 
+const getJsonUrl = (value: Prisma.JsonValue | null | undefined): string | null => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+
+  const url = value.url;
+  return typeof url === 'string' ? url : null;
+};
+
+const getFirstImageUrl = (images: Prisma.JsonValue[] | null | undefined): string | null => {
+  if (!images || images.length === 0) {
+    return null;
+  }
+
+  return getJsonUrl(images[0]);
+};
+
 // Helper to build advanced search conditions splitting by terms
 const buildSearchQuery = (query: string): Prisma.productsWhereInput => {
   if (!query) return {};
@@ -167,13 +184,13 @@ export const liveSearch = async (req: Request, res: Response, next: NextFunction
       })
     ]);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: { products, shops, events }
     });
 
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -368,7 +385,7 @@ export const fullSearch = async (req: Request, res: Response, next: NextFunction
         .filter(cat => cat.toLowerCase().includes(query.toLowerCase().substring(0, 3)));
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         products,
@@ -399,7 +416,7 @@ export const fullSearch = async (req: Request, res: Response, next: NextFunction
       }
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -733,7 +750,7 @@ export const getSearchSuggestions = async (req: Request, res: Response, next: Ne
         value: p.title,
         slug: p.slug,
         category: p.category,
-        image: p.images?.[0]?.url || null
+        image: getFirstImageUrl(p.images)
       })),
       ...categorySuggestions.map(c => ({
         type: 'category' as const,
@@ -744,7 +761,7 @@ export const getSearchSuggestions = async (req: Request, res: Response, next: Ne
         type: 'shop' as const,
         value: s.name,
         slug: s.slug,
-        avatar: s.avatar?.url || null
+        avatar: getJsonUrl(s.avatar)
       }))
     ];
 
@@ -815,7 +832,7 @@ export const sellerSearch = async (req: Request, res: Response, next: NextFuncti
         description: `${product.category} - ${product.stock} in stock`,
         category: 'products' as const,
         url: `/dashboard/all-products/${product.slug}`,
-        imageUrl: product.images?.[0]?.url || null,
+        imageUrl: getFirstImageUrl(product.images),
         metadata: {
           status: product.status,
           price: `$${product.current_price}`,
@@ -866,9 +883,7 @@ export const sellerSearch = async (req: Request, res: Response, next: NextFuncti
         description: `${event.event_type} - ${event._count.products} products`,
         category: 'events' as const,
         url: `/dashboard/events/${event.id}`,
-        imageUrl: typeof event.banner_image === 'object' && event.banner_image !== null
-          ? (event.banner_image as any).url
-          : event.banner_image || null,
+        imageUrl: getJsonUrl(event.banner_image),
         metadata: {
           status: event.is_active && event.ending_date > now ? 'Active' : 'Inactive',
           type: event.event_type,

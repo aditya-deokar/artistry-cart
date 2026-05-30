@@ -17,8 +17,8 @@
 }
 
 @theme {
-  --font-poppins: var(--font-poppins), sans-serif;
-  --font-roboto: var(--font-roboto), sans-serif;
+  --font-poppins: "Avenir Next", "Segoe UI", sans-serif;
+  --font-roboto: "Helvetica Neue", Arial, sans-serif;
 }
 
 body::-webkit-scrollbar {
@@ -67,6 +67,13 @@ body::-webkit-scrollbar {
 
 
 :root {
+  --font-playfair: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-cormorant: "Baskerville", "Times New Roman", serif;
+  --font-inter: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-space-mono: "Courier New", "SFMono-Regular", monospace;
+  --font-raleway: "Gill Sans", "Trebuchet MS", sans-serif;
+  --font-poppins: "Avenir Next", "Segoe UI", sans-serif;
+  --font-roboto: "Helvetica Neue", Arial, sans-serif;
   --radius: 0.5rem;
 
   /* ═══════════════════════════════════════════════════════════════════════

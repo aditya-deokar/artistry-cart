@@ -2,7 +2,6 @@
 import './global.css';
 import localFont from "next/font/local";
 import { ViewTransitions } from "next-view-transitions";
-import { Poppins, Raleway, Roboto, Playfair_Display, Cormorant_Garamond, Inter } from "next/font/google"
 import Providers from './Providers';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { ReactLenis } from 'lenis/react';
@@ -14,47 +13,6 @@ export const metadata = {
   title: 'Artistry Cart | Where Imagination Meets Craftsmanship',
   description: 'Discover unique handcrafted creations by master artisans, or bring your vision to life with AI-powered custom orders.',
 }
-
-// Premium Luxury Fonts
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-playfair",
-  display: "swap",
-});
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-// Legacy Fonts (keeping for backward compatibility)
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-roboto",
-})
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins",
-})
-
-const raleway = Raleway({
-  variable: "--font-raleway",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 const gambarino = localFont({
   src: "./gambarino.woff2",
@@ -72,7 +30,7 @@ export default function RootLayout({
   return (
     <ViewTransitions>
       <html lang="en" suppressHydrationWarning>
-        <body className={`${playfair.variable} ${cormorant.variable} ${inter.variable} ${roboto.variable} ${poppins.variable} ${raleway.variable} ${gambarino.variable} antialiased`} suppressHydrationWarning>
+        <body className={`${gambarino.variable} antialiased`} suppressHydrationWarning>
 
           <ReactLenis
             root

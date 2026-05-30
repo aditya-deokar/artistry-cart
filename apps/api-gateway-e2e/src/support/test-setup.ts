@@ -1,7 +1,4 @@
 import axios from 'axios';
 
-const host = process.env.HOST ?? 'localhost';
-const port = process.env.PORT ?? '8080';
-
-axios.defaults.baseURL = `http://${host}:${port}`;
+axios.defaults.baseURL = process.env.API_GATEWAY_URL ?? 'http://localhost:8080';
 axios.defaults.validateStatus = () => true; // Don't throw on non-2xx

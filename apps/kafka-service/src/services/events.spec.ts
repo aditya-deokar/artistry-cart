@@ -6,14 +6,23 @@ import {
   parseAnalyticsEvent,
 } from "./events";
 
+function createRawAnalyticsEvent(overrides: Record<string, unknown> = {}) {
+  return {
+    eventId: "evt-1",
+    schemaVersion: 1,
+    source: "kafka-service.spec",
+    timestamp: "2026-05-29T00:00:00.000Z",
+    userId: "user-1",
+    productId: "product-1",
+    action: "product_view",
+    ...overrides,
+  };
+}
+
 describe("parseAnalyticsEvent", () => {
   it("parses a valid analytics event", () => {
     const event = parseAnalyticsEvent(
-      JSON.stringify({
-        userId: "user-1",
-        productId: "product-1",
-        action: "product_view",
-      }),
+      JSON.stringify(createRawAnalyticsEvent()),
       "2026-05-29T00:00:00.000Z",
     );
 
@@ -32,10 +41,12 @@ describe("parseAnalyticsEvent", () => {
   it("rejects non-shop events that do not include productId", () => {
     expect(() =>
       parseAnalyticsEvent(
-        JSON.stringify({
-          userId: "user-1",
-          action: "add_to_cart",
-        }),
+        JSON.stringify(
+          createRawAnalyticsEvent({
+            action: "add_to_cart",
+            productId: undefined,
+          }),
+        ),
       ),
     ).toThrow(PermanentEventError);
   });
@@ -43,10 +54,12 @@ describe("parseAnalyticsEvent", () => {
   it("rejects shop visits without a shopId or productId", () => {
     expect(() =>
       parseAnalyticsEvent(
-        JSON.stringify({
-          userId: "user-1",
-          action: "shop_visit",
-        }),
+        JSON.stringify(
+          createRawAnalyticsEvent({
+            action: "shop_visit",
+            productId: undefined,
+          }),
+        ),
       ),
     ).toThrow(PermanentEventError);
   });

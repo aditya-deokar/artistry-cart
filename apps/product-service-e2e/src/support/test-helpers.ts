@@ -4,10 +4,12 @@
 
 import axios from 'axios';
 
+const authBaseUrl = process.env.AUTH_SERVICE_URL ?? 'http://localhost:6001';
+
 /** Authenticate as a seller and return the access token cookie string */
 export async function loginAsSeller(): Promise<string | null> {
   try {
-    const res = await axios.post('http://localhost:6001/api/login-seller', {
+    const res = await axios.post(`${authBaseUrl}/api/login-seller`, {
       email: process.env.TEST_SELLER_EMAIL ?? 'seller@example.com',
       password: process.env.TEST_SELLER_PASSWORD ?? 'SellerPassword123!',
     });
@@ -25,7 +27,7 @@ export async function loginAsSeller(): Promise<string | null> {
 /** Authenticate as a regular user and return the access token cookie string */
 export async function loginAsUser(): Promise<string | null> {
   try {
-    const res = await axios.post('http://localhost:6001/api/login-user', {
+    const res = await axios.post(`${authBaseUrl}/api/login-user`, {
       email: process.env.TEST_USER_EMAIL ?? 'test@example.com',
       password: process.env.TEST_USER_PASSWORD ?? 'TestPassword123!',
     });

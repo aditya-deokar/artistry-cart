@@ -18,6 +18,9 @@
       "path": "../../packages/utils/tsconfig.lib.json"
     },
     {
+      "path": "../../packages/middleware/tsconfig.lib.json"
+    },
+    {
       "path": "../../packages/libs/tsconfig.lib.json"
     },
     {

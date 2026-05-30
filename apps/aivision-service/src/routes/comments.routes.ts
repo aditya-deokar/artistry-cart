@@ -8,7 +8,7 @@ import {
   getUserComments,
 } from '../controllers/comments.controller';
 
-const router = Router();
+const router: Router = Router();
 
 // All routes require authentication
 router.use(requireAuth);

@@ -7,33 +7,39 @@
   "exports": {
     ".": {
       "types": "./index.ts",
-      "default": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./runtime": {
       "types": "./runtime/index.ts",
-      "default": "./dist/runtime/index.js",
-      "require": "./dist/runtime/index.js"
+      "import": "./dist/runtime/index.js",
+      "require": "./dist/runtime/index.js",
+      "default": "./dist/runtime/index.js"
     },
     "./kafka": {
       "types": "./kafka/index.ts",
-      "default": "./dist/kafka/index.js",
-      "require": "./dist/kafka/index.js"
+      "import": "./dist/kafka/index.js",
+      "require": "./dist/kafka/index.js",
+      "default": "./dist/kafka/index.js"
     },
     "./kafka/analytics-contract": {
       "types": "./kafka/analytics-contract.ts",
-      "default": "./dist/kafka/analytics-contract.js",
-      "require": "./dist/kafka/analytics-contract.js"
+      "import": "./dist/kafka/analytics-contract.js",
+      "require": "./dist/kafka/analytics-contract.js",
+      "default": "./dist/kafka/analytics-contract.js"
     },
     "./kafka/analytics-producer": {
       "types": "./kafka/analytics-producer.ts",
-      "default": "./dist/kafka/analytics-producer.js",
-      "require": "./dist/kafka/analytics-producer.js"
+      "import": "./dist/kafka/analytics-producer.js",
+      "require": "./dist/kafka/analytics-producer.js",
+      "default": "./dist/kafka/analytics-producer.js"
     },
     "./kafka/client": {
       "types": "./kafka/client.ts",
-      "default": "./dist/kafka/client.js",
-      "require": "./dist/kafka/client.js"
+      "import": "./dist/kafka/client.js",
+      "require": "./dist/kafka/client.js",
+      "default": "./dist/kafka/client.js"
     }
   },
   "nx": {

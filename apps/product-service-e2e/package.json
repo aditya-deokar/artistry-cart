@@ -10,12 +10,8 @@
       "e2e": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "npx vitest run --config apps/product-service-e2e/vitest.config.ts"
-        },
-        "dependsOn": [
-          "@artistry-cart/product-service:build",
-          "@artistry-cart/product-service:serve"
-        ]
+          "command": "node tools/e2e/run-suites.mjs product-service-e2e"
+        }
       }
     }
   }

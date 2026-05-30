@@ -6,6 +6,9 @@
   "files": [],
   "references": [
     {
+      "path": "../middleware"
+    },
+    {
       "path": "./tsconfig.lib.json"
     }
   ]

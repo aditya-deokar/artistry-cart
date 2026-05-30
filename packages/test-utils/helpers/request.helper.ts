@@ -11,7 +11,12 @@
  * ```
  */
 import { vi } from 'vitest';
-import type { Request, Response, NextFunction } from 'express';
+import type { Response, NextFunction } from 'express';
+import type {
+  AuthenticatedAccount,
+  AuthenticatedRequest,
+  AuthenticatedRole,
+} from '@artistry-cart/middleware/auth-contract';
 
 interface MockRequestData {
   body?: Record<string, unknown>;
@@ -19,8 +24,8 @@ interface MockRequestData {
   query?: Record<string, unknown>;
   headers?: Record<string, unknown>;
   cookies?: Record<string, unknown>;
-  user?: Record<string, unknown>;
-  role?: string;
+  user?: AuthenticatedAccount;
+  role?: AuthenticatedRole;
   file?: unknown;
   files?: unknown[];
   ip?: string;
@@ -34,7 +39,7 @@ interface MockRequestData {
  * Create a mock Express Request object.
  * Pass overrides for body, params, query, headers, cookies, user, role, etc.
  */
-export function mockRequest(data: MockRequestData = {}): Request {
+export function mockRequest(data: MockRequestData = {}): AuthenticatedRequest {
   return {
     body: {},
     params: {},
@@ -49,7 +54,7 @@ export function mockRequest(data: MockRequestData = {}): Request {
     path: '/',
     get: vi.fn((name: string) => (data.headers as Record<string, string>)?.[name.toLowerCase()]),
     ...data,
-  } as unknown as Request;
+  } as unknown as AuthenticatedRequest;
 }
 
 /**

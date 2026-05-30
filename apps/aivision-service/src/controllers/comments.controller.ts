@@ -1,11 +1,15 @@
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Response } from 'express';
+import { ConceptComment, PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import { logger } from '../utils/logger';
 
 const prisma = new PrismaClient();
 
-// Validation schemas
+type CommentNode = ConceptComment & {
+  replies: CommentNode[];
+};
+
 const createCommentSchema = z.object({
   conceptId: z.string().min(1),
   content: z.string().min(1).max(2000),
@@ -16,50 +20,51 @@ const updateCommentSchema = z.object({
   content: z.string().min(1).max(2000),
 });
 
-/**
- * Create a new comment on a concept
- */
-export const createComment = async (req: Request, res: Response) => {
+export const createComment = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
-    const userId = (req as any).user?.id;
-    const userName = (req as any).user?.name || 'Anonymous';
-    const userAvatar = (req as any).user?.avatar;
+    const userId = req.user?.id;
+    const userName = req.user?.name ?? 'Anonymous';
+    const userAvatar = req.user?.avatar ?? undefined;
 
     if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
     }
 
     const validation = createCommentSchema.safeParse(req.body);
     if (!validation.success) {
-      return res.status(400).json({ 
-        error: 'Invalid input', 
-        details: validation.error.issues 
+      res.status(400).json({
+        error: 'Invalid input',
+        details: validation.error.issues,
       });
+      return;
     }
 
     const { conceptId, content, parentId } = validation.data;
 
-    // Verify concept exists
     const concept = await prisma.concept.findUnique({
       where: { id: conceptId },
     });
 
     if (!concept) {
-      return res.status(404).json({ error: 'Concept not found' });
+      res.status(404).json({ error: 'Concept not found' });
+      return;
     }
 
-    // If replying to a comment, verify parent exists
     if (parentId) {
       const parentComment = await prisma.conceptComment.findUnique({
         where: { id: parentId },
       });
 
       if (!parentComment || parentComment.conceptId !== conceptId) {
-        return res.status(404).json({ error: 'Parent comment not found' });
+        res.status(404).json({ error: 'Parent comment not found' });
+        return;
       }
     }
 
-    // Create comment
     const comment = await prisma.conceptComment.create({
       data: {
         conceptId,
@@ -79,33 +84,32 @@ export const createComment = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Get all comments for a concept (with nested replies)
- */
-export const getConceptComments = async (req: Request, res: Response) => {
+export const getConceptComments = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const { conceptId } = req.params;
     const { sortBy = 'recent' } = req.query;
 
-    // Get all comments for this concept
     const allComments = await prisma.conceptComment.findMany({
       where: { conceptId },
       orderBy: sortBy === 'oldest' ? { createdAt: 'asc' } : { createdAt: 'desc' },
     });
 
-    // Organize into tree structure
-    const commentMap = new Map();
-    const rootComments: any[] = [];
+    const commentMap = new Map<string, CommentNode>();
+    const rootComments: CommentNode[] = [];
 
-    // First pass: create map of all comments
     allComments.forEach((comment) => {
       commentMap.set(comment.id, { ...comment, replies: [] });
     });
 
-    // Second pass: build tree structure
     allComments.forEach((comment) => {
       const commentWithReplies = commentMap.get(comment.id);
-      
+      if (!commentWithReplies) {
+        return;
+      }
+
       if (comment.parentId) {
         const parent = commentMap.get(comment.parentId);
         if (parent) {
@@ -126,42 +130,44 @@ export const getConceptComments = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Update a comment
- */
-export const updateComment = async (req: Request, res: Response) => {
+export const updateComment = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const { commentId } = req.params;
-    const userId = (req as any).user?.id;
+    const userId = req.user?.id;
 
     if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
     }
 
     const validation = updateCommentSchema.safeParse(req.body);
     if (!validation.success) {
-      return res.status(400).json({ 
-        error: 'Invalid input', 
-        details: validation.error.issues 
+      res.status(400).json({
+        error: 'Invalid input',
+        details: validation.error.issues,
       });
+      return;
     }
 
     const { content } = validation.data;
 
-    // Check if comment exists and user owns it
     const existingComment = await prisma.conceptComment.findUnique({
       where: { id: commentId },
     });
 
     if (!existingComment) {
-      return res.status(404).json({ error: 'Comment not found' });
+      res.status(404).json({ error: 'Comment not found' });
+      return;
     }
 
     if (existingComment.userId !== userId) {
-      return res.status(403).json({ error: 'You can only edit your own comments' });
+      res.status(403).json({ error: 'You can only edit your own comments' });
+      return;
     }
 
-    // Update comment
     const updatedComment = await prisma.conceptComment.update({
       where: { id: commentId },
       data: { content },
@@ -175,41 +181,49 @@ export const updateComment = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Delete a comment
- */
-export const deleteComment = async (req: Request, res: Response) => {
+export const deleteComment = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const { commentId } = req.params;
-    const userId = (req as any).user?.id;
+    const userId = req.user?.id;
 
     if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
     }
 
-    // Check if comment exists and user owns it
     const existingComment = await prisma.conceptComment.findUnique({
       where: { id: commentId },
     });
 
     if (!existingComment) {
-      return res.status(404).json({ error: 'Comment not found' });
+      res.status(404).json({ error: 'Comment not found' });
+      return;
     }
 
-    // Check if user is owner or concept owner
     const concept = await prisma.concept.findUnique({
       where: { id: existingComment.conceptId },
+      select: {
+        session: {
+          select: {
+            userId: true,
+          },
+        },
+      },
     });
 
-    const canDelete = existingComment.userId === userId || concept?.userId === userId;
+    const canDelete =
+      existingComment.userId === userId || concept?.session.userId === userId;
 
     if (!canDelete) {
-      return res.status(403).json({ 
-        error: 'You can only delete your own comments or comments on your concepts' 
+      res.status(403).json({
+        error: 'You can only delete your own comments or comments on your concepts',
       });
+      return;
     }
 
-    // Delete comment and all its replies
     await prisma.conceptComment.deleteMany({
       where: {
         OR: [
@@ -227,46 +241,58 @@ export const deleteComment = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Get user's recent comments
- */
-export const getUserComments = async (req: Request, res: Response) => {
+export const getUserComments = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
-    const userId = (req as any).user?.id;
+    const userId = req.user?.id;
     const { limit = 20, page = 1 } = req.query;
 
     if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
     }
 
-    const skip = (Number(page) - 1) * Number(limit);
+    const take = Number(limit);
+    const currentPage = Number(page);
+    const skip = (currentPage - 1) * take;
 
     const [comments, total] = await Promise.all([
       prisma.conceptComment.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
-        take: Number(limit),
+        take,
         skip,
-        include: {
-          concept: {
-            select: {
-              id: true,
-              generatedProduct: true,
-              thumbnailUrl: true,
-            },
-          },
-        },
       }),
       prisma.conceptComment.count({ where: { userId } }),
     ]);
 
+    const conceptIds = Array.from(new Set(comments.map((comment) => comment.conceptId)));
+    const concepts = conceptIds.length
+      ? await prisma.concept.findMany({
+          where: { id: { in: conceptIds } },
+          select: {
+            id: true,
+            thumbnailUrl: true,
+            generatedProduct: true,
+          },
+        })
+      : [];
+
+    const conceptsById = new Map(concepts.map((concept) => [concept.id, concept]));
+    const commentsWithConcept = comments.map((comment) => ({
+      ...comment,
+      concept: conceptsById.get(comment.conceptId) ?? null,
+    }));
+
     res.json({
-      comments,
+      comments: commentsWithConcept,
       pagination: {
-        page: Number(page),
-        limit: Number(limit),
+        page: currentPage,
+        limit: take,
         total,
-        totalPages: Math.ceil(total / Number(limit)),
+        totalPages: Math.ceil(total / take),
       },
     });
   } catch (error) {

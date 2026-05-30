@@ -4,7 +4,6 @@
     "outDir": "out-tsc/@artistry-cart/kafka-service-e2e"
   },
   "include": [
-    "vitest.config.ts",
     "src/**/*.ts"
   ],
   "references": []

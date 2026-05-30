@@ -74,6 +74,7 @@ function res() { return mockResponse(); }
 function next() { return mockNext(); }
 
 const sellerAuth = { user: { id: 'seller1', shop: { id: 'shop1' } } };
+const futureIso = (daysFromNow: number) => new Date(Date.now() + daysFromNow * 24 * 60 * 60 * 1000).toISOString();
 
 // ═══════════════════════════════════════════════
 // getAllEvents
@@ -167,8 +168,8 @@ describe('createEvent', () => {
     title: 'Flash Sale',
     description: 'Big savings!',
     event_type: 'FLASH_SALE',
-    starting_date: '2026-03-01T00:00:00Z',
-    ending_date: '2026-03-31T23:59:59Z',
+    starting_date: futureIso(7),
+    ending_date: futureIso(37),
   };
 
   beforeEach(() => vi.clearAllMocks());
@@ -394,8 +395,8 @@ describe('createEventWithProduct', () => {
     title: 'Flash Sale',
     description: 'Amazing deals!',
     event_type: 'FLASH_SALE',
-    starting_date: '2026-03-01T00:00:00Z',
-    ending_date: '2026-03-31T23:59:59Z',
+    starting_date: futureIso(7),
+    ending_date: futureIso(37),
     product_ids: ['p1', 'p2'],
   };
 

@@ -10,12 +10,8 @@
       "e2e": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "npx vitest run --config apps/api-gateway-e2e/vitest.config.ts"
-        },
-        "dependsOn": [
-          "@artistry-cart/api-gateway:build",
-          "@artistry-cart/api-gateway:serve"
-        ]
+          "command": "node tools/e2e/run-suites.mjs api-gateway-e2e"
+        }
       }
     }
   }

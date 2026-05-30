@@ -5,9 +5,8 @@
  * We mock `node-cron` to capture the callback and test it directly.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// ── Hoisted mocks ──
 const { prismaMock, cronMock } = vi.hoisted(() => {
   const txMock = {
     productPricing: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
@@ -23,16 +22,15 @@ const { prismaMock, cronMock } = vi.hoisted(() => {
     $transaction: vi.fn((fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock)),
   };
 
-  // Capture the callback so we can invoke it from tests
   let capturedCallback: (() => Promise<void>) | null = null;
   const cronMock = {
-    schedule: vi.fn((_, cb) => {
-      capturedCallback = cb;
+    schedule: vi.fn((_: string, callback: () => Promise<void>) => {
+      capturedCallback = callback;
     }),
     getCallback: () => capturedCallback,
   };
 
-  return { prismaMock, cronMock, txMock };
+  return { prismaMock, cronMock };
 });
 
 vi.mock('@artistry-cart/libs/prisma', () => ({
@@ -46,18 +44,22 @@ vi.mock('node-cron', () => ({
   schedule: cronMock.schedule,
 }));
 
-// Import triggers side-effect registration of the cron job
-import './product-cron.job';
+import { registerProductCleanupCron } from './product-cron.job';
+
+const loggerMock = {
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  child: vi.fn(),
+};
 
 describe('Product Deletion Cron Job', () => {
-  // This test must come FIRST — before any beforeEach clears mock call counts.
-  // cron.schedule is called at import time as a side-effect.
-  it('registers a cron job with hourly schedule', () => {
-    expect(cronMock.schedule).toHaveBeenCalledWith('0 * * * *', expect.any(Function));
-  });
-
   beforeEach(() => {
-    // Only clear prisma mocks, NOT cronMock (schedule was called at import time)
+    cronMock.schedule.mockClear();
+    loggerMock.info.mockClear();
+    loggerMock.warn.mockClear();
+    loggerMock.error.mockClear();
+    loggerMock.child.mockClear();
     prismaMock.products.findMany.mockReset();
     prismaMock.$transaction.mockImplementation((fn: any) => {
       const txMock = {
@@ -66,8 +68,15 @@ describe('Product Deletion Cron Job', () => {
         productAnalytics: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
         products: { deleteMany: vi.fn().mockResolvedValue({ count: 2 }) },
       };
+
       return fn(txMock);
     });
+
+    registerProductCleanupCron(loggerMock as any);
+  });
+
+  it('registers a cron job with hourly schedule', () => {
+    expect(cronMock.schedule).toHaveBeenCalledWith('0 * * * *', expect.any(Function));
   });
 
   it('does nothing when no soft-deleted products exist', async () => {
@@ -90,17 +99,18 @@ describe('Product Deletion Cron Job', () => {
     await job!();
 
     expect(prismaMock.$transaction).toHaveBeenCalled();
-    // The transaction callback is called — verify via the mock implementation
   });
 
   it('handles errors gracefully without throwing', async () => {
     prismaMock.products.findMany.mockRejectedValue(new Error('DB down'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const job = cronMock.getCallback();
-    // Should not throw
     await expect(job!()).resolves.toBeUndefined();
-
-    consoleSpy.mockRestore();
+    expect(loggerMock.error).toHaveBeenCalledWith(
+      'Error in product deletion cron job',
+      expect.objectContaining({
+        error: expect.any(Error),
+      }),
+    );
   });
 });

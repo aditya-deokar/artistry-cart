@@ -5,6 +5,12 @@ describe('GET /', () => {
     const res = await axios.get(`/`);
 
     expect(res.status).toBe(200);
-    expect(res.data).toEqual({ message: 'Hello API' });
+    expect(res.data).toEqual(
+      expect.objectContaining({
+        message: 'AI Vision Service API',
+        version: '1.0.0',
+        status: 'healthy',
+      }),
+    );
   });
 })

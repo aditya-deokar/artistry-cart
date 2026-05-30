@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
 import prisma from "@artistry-cart/libs/prisma";
+import type { AuthenticatedAccount, AuthenticatedRequest } from "./auth-contract";
 
 interface TokenPayload {
     id: string;
@@ -9,7 +10,7 @@ interface TokenPayload {
     exp: number;
 }
 
-const isAuthenticated = async (req: any, res: Response, next: NextFunction) => {
+const isAuthenticated = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const token = req.cookies.access_token || req.headers.authorization?.split(" ")[1];
 
@@ -21,7 +22,7 @@ const isAuthenticated = async (req: any, res: Response, next: NextFunction) => {
 
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as TokenPayload;
 
-        let account;
+        let account: AuthenticatedAccount | null = null;
 
         if (decoded.role === "user") {
             account = await prisma.users.findUnique({

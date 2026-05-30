@@ -1,8 +1,9 @@
-import { Request, RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
 import prisma from '@artistry-cart/libs/prisma';
+import type { AuthenticatedRequest as SharedAuthenticatedRequest } from '@artistry-cart/middleware/auth-contract';
 
 
 interface TokenPayload {
@@ -11,15 +12,24 @@ interface TokenPayload {
     role: string;
 }
 
-export interface AuthenticatedRequest extends Request {
-    user?: {
-        id: string;
+export interface AuthenticatedRequest extends SharedAuthenticatedRequest {
+    user?: SharedAuthenticatedRequest['user'] & {
         email: string;
+        avatar?: string | null;
         role: string;
     };
     sessionToken?: string;
     requestId?: string;
 }
+
+const getJsonUrl = (value: unknown): string | null => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        return null;
+    }
+
+    const url = (value as Record<string, unknown>).url;
+    return typeof url === 'string' ? url : null;
+};
 
 /**
  * Auth middleware - supports both authenticated and anonymous users
@@ -47,13 +57,15 @@ export const authMiddleware: RequestHandler = async (req, _res, next): Promise<v
             // Verify user exists
             const user = await prisma.users.findUnique({
                 where: { id: decoded.id },
-                select: { id: true, email: true, role: true },
+                select: { id: true, email: true, name: true, avatar: true, role: true },
             });
 
             if (user) {
                 authReq.user = {
                     id: user.id,
                     email: user.email || '',
+                    name: user.name,
+                    avatar: getJsonUrl(user.avatar),
                     role: user.role,
                 };
             }

@@ -369,6 +369,9 @@ importers:
       '@artistry-cart/libs':
         specifier: workspace:*
         version: link:../../packages/libs
+      '@artistry-cart/middleware':
+        specifier: workspace:*
+        version: link:../../packages/middleware
       '@artistry-cart/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -717,7 +720,11 @@ importers:
         specifier: workspace:*
         version: link:../libs
 
-  packages/test-utils: {}
+  packages/test-utils:
+    dependencies:
+      '@artistry-cart/middleware':
+        specifier: workspace:*
+        version: link:../middleware
 
   packages/utils: {}
 

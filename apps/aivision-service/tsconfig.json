@@ -4,13 +4,16 @@
   "include": [],
   "references": [
     {
-      "path": "../../packages/error-handler"
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/middleware"
     },
     {
       "path": "../../packages/libs"
     },
     {
-      "path": "../../packages/utils"
+      "path": "../../packages/error-handler"
     },
     {
       "path": "./tsconfig.app.json"
