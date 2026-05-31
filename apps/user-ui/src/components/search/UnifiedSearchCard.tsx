@@ -341,7 +341,7 @@ export const UnifiedSearchCard: React.FC<UnifiedSearchCardProps> = ({
                     <Link
                         href={`/shops/${product.Shop.slug}`}
                         className="flex items-center gap-2 mb-2 text-xs text-muted-foreground hover:text-primary transition-colors"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.stopPropagation()}
                     >
                         {product.Shop.avatar?.url ? (
                             <div className="relative h-5 w-5 rounded-full overflow-hidden border border-border/30">

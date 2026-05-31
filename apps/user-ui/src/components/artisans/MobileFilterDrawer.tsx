@@ -99,7 +99,7 @@ export function MobileFilterDrawer({
             />
 
             {/* Drawer */}
-            <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] rounded-t-2xl overflow-hidden flex flex-col animate-slide-up">
+            <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] rounded-t-2xl overflow-hidden flex flex-col animate-mobile-filter-slide-up">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-[var(--ac-linen)] dark:border-[var(--ac-slate)]">
                     <div className="flex items-center gap-2">
@@ -209,8 +209,8 @@ export function MobileFilterDrawer({
             </div>
 
             {/* Animation Styles */}
-            <style jsx>{`
-                @keyframes slide-up {
+            <style>{`
+                @keyframes mobile-filter-slide-up {
                     from {
                         transform: translateY(100%);
                     }
@@ -218,8 +218,8 @@ export function MobileFilterDrawer({
                         transform: translateY(0);
                     }
                 }
-                .animate-slide-up {
-                    animation: slide-up 0.3s ease-out;
+                .animate-mobile-filter-slide-up {
+                    animation: mobile-filter-slide-up 0.3s ease-out;
                 }
                 .safe-area-bottom {
                     padding-bottom: max(1rem, env(safe-area-inset-bottom));

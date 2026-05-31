@@ -259,7 +259,7 @@ export function ArtisanMapExplorer({
 
                         {/* Selected Location Panel */}
                         {selectedLocation && (
-                            <div className="absolute top-4 right-4 w-72 bg-[var(--ac-cream)] dark:bg-[var(--ac-onyx)] border border-[var(--ac-linen)] dark:border-[var(--ac-slate)] shadow-lg animate-slideIn">
+                            <div className="absolute top-4 right-4 w-72 bg-[var(--ac-cream)] dark:bg-[var(--ac-onyx)] border border-[var(--ac-linen)] dark:border-[var(--ac-slate)] shadow-lg animate-artisan-map-slide-in">
                                 {/* Header */}
                                 <div className="flex items-center justify-between p-4 border-b border-[var(--ac-linen)] dark:border-[var(--ac-slate)]">
                                     <div>
@@ -342,8 +342,8 @@ export function ArtisanMapExplorer({
             </div>
 
             {/* Animation keyframes */}
-            <style jsx>{`
-                @keyframes slideIn {
+            <style>{`
+                @keyframes artisan-map-slide-in {
                     from {
                         opacity: 0;
                         transform: translateX(20px);
@@ -353,8 +353,8 @@ export function ArtisanMapExplorer({
                         transform: translateX(0);
                     }
                 }
-                .animate-slideIn {
-                    animation: slideIn 0.3s ease-out;
+                .animate-artisan-map-slide-in {
+                    animation: artisan-map-slide-in 0.3s ease-out;
                 }
             `}</style>
         </section>

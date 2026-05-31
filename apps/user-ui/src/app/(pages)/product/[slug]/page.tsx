@@ -6,16 +6,10 @@ import axiosInstance from '@/utils/axiosinstance';
 import { ArtProduct } from '@/types/products';
 import { ProductPageClient } from '@/components/products/ProductPageClient';
 
-// Client Component
-
-
-
-
-
 type ProductPageProps = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 
@@ -58,19 +52,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
   const product = await fetchProductDetails(slug);
 
-  
-  
-  // const otherProducts = await getOtherProducts(params.slug);
-
   if (!product) {
-    notFound();
+    return notFound();
   }
 
-  const validImages = product.images.filter((img: any) => img !== null);
+  const validImages = product.images.filter((img) => img !== null);
 
   return (
     <ProductPageClient product={product} validImages={validImages} />
-
   );
 }
 

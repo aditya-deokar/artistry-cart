@@ -149,7 +149,7 @@ export function ArtisanCollaboration({ conceptId, conceptTitle }: ArtisanCollabo
         >
             {/* Macro Background: Large text parallax */}
             <div className="absolute top-0 w-full overflow-hidden pointer-events-none opacity-[0.03]">
-                <h1 className="text-[15vw] font-bold text-white whitespace-nowrap leading-none select-none animate-[slide_60s_linear_infinite]">
+                <h1 className="text-[15vw] font-bold text-white whitespace-nowrap leading-none select-none animate-[artisan-collaboration-slide_60s_linear_infinite]">
                     COLLABORATION  CRAFTSMANSHIP  CONNECTION
                 </h1>
             </div>
@@ -316,8 +316,8 @@ export function ArtisanCollaboration({ conceptId, conceptTitle }: ArtisanCollabo
                 conceptTitle={conceptTitle}
             />
 
-            <style jsx>{`
-           @keyframes slide {
+            <style>{`
+           @keyframes artisan-collaboration-slide {
               0% { transform: translateX(0); }
               100% { transform: translateX(-50%); }
            }
