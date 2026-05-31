@@ -56,7 +56,7 @@ export function FeaturedCategories({
 }: FeaturedCategoriesProps) {
     const containerRef = useRef<HTMLElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
-    const cardsRef = useRef<HTMLDivElement[]>([]);
+    const cardsRef = useRef<(HTMLAnchorElement | null)[]>([]);
 
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
@@ -126,8 +126,8 @@ export function FeaturedCategories({
                         <Link
                             key={category.id}
                             href={category.href}
-                            ref={(el) => {
-                                if (el) cardsRef.current[index] = el as unknown as HTMLDivElement;
+                            ref={(el: HTMLAnchorElement | null) => {
+                                cardsRef.current[index] = el;
                             }}
                             className="group relative aspect-[3/4] md:aspect-[2/3] overflow-hidden cursor-pointer"
                         >

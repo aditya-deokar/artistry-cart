@@ -63,7 +63,7 @@ export default async function ArtisanPage({ params }: ArtisanPageProps) {
     const artisan = await getArtisanById(id);
 
     if (!artisan) {
-        notFound();
+        return notFound();
     }
 
     return (

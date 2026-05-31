@@ -32,14 +32,14 @@ export const Breadcrumbs = () => {
         </li>
 
         {/* Dynamic Segments */}
-        {segments.map((segment, index) => {
+        {segments.map((segment: string, index: number) => {
           const href = `/${segments.slice(0, index + 1).join('/')}`;
           const isLast = index === segments.length - 1;
 
           // Format the segment to be human-readable (e.g., 'classic-teak-cart' -> 'Classic Teak Cart')
           const label = segment
             .replace(/-/g, ' ')
-            .replace(/\b\w/g, char => char.toUpperCase());
+            .replace(/\b\w/g, (char: string) => char.toUpperCase());
 
           return (
             <Fragment key={href}>

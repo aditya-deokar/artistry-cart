@@ -12,6 +12,12 @@ export const ReadMoreDescription: React.FC<ReadMoreProps> = ({ htmlContent, maxH
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTruncated, setIsTruncated] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const collapsedStyles = !isExpanded && isTruncated
+    ? {
+        maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)',
+      }
+    : undefined;
 
   useEffect(() => {
     if (contentRef.current && contentRef.current.scrollHeight > maxHeight) {
@@ -24,10 +30,12 @@ export const ReadMoreDescription: React.FC<ReadMoreProps> = ({ htmlContent, maxH
       <div
         ref={contentRef}
         className={cn(
-          "prose prose-invert max-w-none prose-p:text-primary/90 transition-all duration-500 ease-in-out overflow-hidden",
-          !isExpanded && isTruncated && "mask-gradient"
+          "prose prose-invert max-w-none prose-p:text-primary/90 transition-all duration-500 ease-in-out overflow-hidden"
         )}
-        style={{ maxHeight: isExpanded ? contentRef.current?.scrollHeight : maxHeight }}
+        style={{
+          maxHeight: isExpanded ? contentRef.current?.scrollHeight : maxHeight,
+          ...collapsedStyles,
+        }}
         dangerouslySetInnerHTML={{ __html: htmlContent }}
       />
       {isTruncated && (
@@ -40,12 +48,6 @@ export const ReadMoreDescription: React.FC<ReadMoreProps> = ({ htmlContent, maxH
           </button>
         </div>
       )}
-      <style jsx>{`
-        .mask-gradient {
-          mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-        }
-      `}</style>
     </div>
   );
 };
