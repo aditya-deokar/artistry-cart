@@ -14,11 +14,27 @@ If you are new to the project, read these in order:
 1. [Project Overview](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/00-overview/product-overview.md>)
 2. [Business Context](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/00-overview/business-context.md>)
 3. [Repository Map](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/00-overview/repo-map.md>)
-4. [Local Development](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/01-getting-started/local-development.md>)
-5. [Environment Variables](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/01-getting-started/environment-variables.md>)
-6. [Commands and Workflows](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/01-getting-started/commands-and-workflows.md>)
+4. [Learning Guide: Nx Monorepo And Microservices](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/README.md>)
+5. [Local Development](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/01-getting-started/local-development.md>)
+6. [Environment Variables](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/01-getting-started/environment-variables.md>)
+7. [Commands and Workflows](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/01-getting-started/commands-and-workflows.md>)
 
 ## Documentation Sections
+
+### `learn`
+
+Learning path for understanding the architecture from first principles:
+
+- [Learning Guide: Nx Monorepo And Microservices](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/README.md>)
+- [First Principles](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/01-first-principles.md>)
+- [Nx Monorepo Fundamentals](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/02-nx-monorepo-fundamentals.md>)
+- [Nx In This Repository](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/03-nx-in-this-repository.md>)
+- [Microservices Fundamentals](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/04-microservices-fundamentals.md>)
+- [Artistry Cart Microservices Architecture](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/05-artistry-cart-microservices.md>)
+- [Monolith, Monorepo, And Microservices](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/06-monolith-monorepo-microservices.md>)
+- [Benefits, Tradeoffs, And Risks](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/07-benefits-tradeoffs-risks.md>)
+- [Interview Guide](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/08-interview-guide.md>)
+- [Glossary And Cheat Sheet](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/learn/09-glossary-cheat-sheet.md>)
 
 ### `00-overview`
 
@@ -176,6 +192,7 @@ Implemented through Phase 8:
 - quality and operations docs
 - decision docs
 - interview-prep docs
+- first-principles learning docs under `docs/learn`
 - initial reference docs
 - DevOps planning docs
 - legacy migration and canonicalization docs
