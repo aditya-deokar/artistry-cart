@@ -1,15 +1,15 @@
 import { defineConfig } from 'vitest/config';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createWorkspaceAliases } from '../../vitest.workspace-aliases';
 
 const configDir = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(configDir, '../..');
 
 export default defineConfig({
   root: configDir,
   resolve: {
-    alias: {
-      '@artistry-cart/test-utils': path.resolve(configDir, '../../packages/test-utils/index.ts'),
-    },
+    alias: createWorkspaceAliases(repoRoot),
   },
   test: {
     name: 'product-service',
