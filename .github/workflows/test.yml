@@ -52,7 +52,7 @@ jobs:
 
       - name: Run affected builds
         if: github.event_name == 'pull_request'
-        run: pnpm exec nx affected --target=build --base=origin/master --head=HEAD --parallel=3
+        run: pnpm exec nx affected --target=build --base=origin/master --head=HEAD --parallel=3 --skip-nx-cache
 
       - name: Run unit and integration tests with coverage
         if: github.event_name == 'push'
@@ -60,7 +60,7 @@ jobs:
 
       - name: Build deployable apps
         if: github.event_name == 'push'
-        run: pnpm exec nx run-many --target=build --projects=${{ env.DEPLOYABLE_APPS }} --parallel=5
+        run: pnpm exec nx run-many --target=build --projects=${{ env.DEPLOYABLE_APPS }} --parallel=5 --skip-nx-cache
 
       - name: Upload coverage to Codecov
         if: github.event_name == 'push'
@@ -151,9 +151,11 @@ jobs:
 
       - name: Build shared packages
         run: pnpm run build:shared
+        env:
+          NX_SKIP_NX_CACHE: "true"
 
       - name: Build core backend services
-        run: pnpm exec nx run-many --target=build --projects=${{ env.CORE_BACKEND_BUILD_APPS }} --parallel=5
+        run: pnpm exec nx run-many --target=build --projects=${{ env.CORE_BACKEND_BUILD_APPS }} --parallel=5 --skip-nx-cache
 
       - name: Start auth-service
         run: node apps/auth-service/dist/main.js >/tmp/auth-service.log 2>&1 &
