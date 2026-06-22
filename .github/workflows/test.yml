@@ -149,6 +149,9 @@ jobs:
       - name: Generate Prisma client
         run: pnpm exec prisma generate
 
+      - name: Build shared packages
+        run: pnpm run build:shared
+
       - name: Build core backend services
         run: pnpm exec nx run-many --target=build --projects=${{ env.CORE_BACKEND_BUILD_APPS }} --parallel=5
 
@@ -180,24 +183,33 @@ jobs:
       - name: Wait for services to be ready
         shell: bash
         run: |
-          declare -A checks=(
-            ["auth-service"]="http://localhost:6001/readyz"
-            ["product-service"]="http://localhost:6002/readyz"
-            ["order-service"]="http://localhost:6004/readyz"
-            ["recommendation-service"]="http://localhost:6005/readyz"
-            ["api-gateway"]="http://localhost:8080/readyz"
+          checks=(
+            "auth-service|http://localhost:6001/readyz"
+            "product-service|http://localhost:6002/readyz"
+            "order-service|http://localhost:6004/readyz"
+            "recommendation-service|http://localhost:6005/readyz"
+            "api-gateway|http://localhost:8080/readyz"
           )
 
-          for service in "${!checks[@]}"; do
+          for check in "${checks[@]}"; do
+            service="${check%%|*}"
+            url="${check#*|}"
             echo "Waiting for ${service}..."
             for attempt in $(seq 1 60); do
-              if curl --fail --silent "${checks[$service]}" >/dev/null; then
+              if curl --fail --silent "${url}" >/dev/null; then
                 echo "  ${service} is ready"
                 break
               fi
 
               if [[ "${attempt}" == "60" ]]; then
                 echo "${service} did not become ready in time"
+                echo "::group::${service}.log"
+                if [[ -f "/tmp/${service}.log" ]]; then
+                  cat "/tmp/${service}.log"
+                else
+                  echo "No log captured"
+                fi
+                echo "::endgroup::"
                 exit 1
               fi
 
