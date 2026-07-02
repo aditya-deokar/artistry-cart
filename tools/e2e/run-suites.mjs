@@ -198,6 +198,7 @@ function spawnChild(args, label, envOverrides = {}) {
       ...envOverrides,
     },
     stdio: ["ignore", "pipe", "pipe"],
+    shell: process.platform === "win32",
   });
 
   prefixOutput(child.stdout, label);
@@ -260,6 +261,10 @@ async function waitForExit(child, label, timeoutMs = 10_000) {
         resolve(undefined);
       }
     };
+
+    if (child.exitCode !== null || child.killed) {
+      return finish();
+    }
 
     child.once("exit", finish);
 

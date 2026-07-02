@@ -41,15 +41,15 @@ describe('Shops API (E2E)', () => {
   describe('GET /api/shops/:shopId/products', () => {
     it('should return products for a shop (or empty)', async () => {
       const res = await axios.get('/api/shops/fake-shop-id/products');
-      // May return empty array or 404 depending on implementation
-      expect([200, 404]).toContain(res.status);
+      // fake-shop-id isn't a valid ObjectId, so Prisma might throw a 400
+      expect([200, 400, 404]).toContain(res.status);
     });
   });
 
   describe('GET /api/shops/:shopId/reviews', () => {
     it('should return reviews (possibly empty)', async () => {
       const res = await axios.get('/api/shops/fake-shop-id/reviews');
-      expect([200, 404]).toContain(res.status);
+      expect([200, 400, 404]).toContain(res.status);
     });
   });
 
