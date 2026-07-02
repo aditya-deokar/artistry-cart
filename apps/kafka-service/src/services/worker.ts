@@ -21,6 +21,9 @@ type GaugeMetric = {
   inc: (labels?: MetricLabels, value?: number) => void;
   set: (labels: MetricLabels, value: number) => void;
 };
+type HistogramMetric = {
+  observe: (labels: MetricLabels, value: number) => void;
+};
 
 export type KafkaWorkerState = {
   connected: boolean;
@@ -40,6 +43,9 @@ export type KafkaWorkerMetrics = {
   inflightBatches: GaugeMetric;
   currentBatchSize: GaugeMetric;
   readinessGauge: GaugeMetric;
+  consumerLag: GaugeMetric;
+  batchDurationHistogram: HistogramMetric;
+  eventProcessingDuration: HistogramMetric;
 };
 
 type BatchProcessorDependencies = {
@@ -144,6 +150,23 @@ export function createKafkaWorkerMetrics(registry: MetricsRegistry): KafkaWorker
     readinessGauge: registry.gauge(
       "kafka_consumer_ready",
       "Kafka consumer readiness state",
+    ),
+    consumerLag: registry.gauge(
+      "kafka_consumer_lag",
+      "Difference between partition high watermark and last committed offset",
+      ["topic", "partition"],
+    ),
+    batchDurationHistogram: registry.histogram(
+      "kafka_batch_duration_seconds",
+      "Kafka batch processing duration in seconds",
+      ["status"],
+      [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+    ),
+    eventProcessingDuration: registry.histogram(
+      "kafka_event_processing_duration_seconds",
+      "Individual Kafka event processing duration in seconds",
+      ["action"],
+      [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1],
     ),
   };
 }
@@ -265,6 +288,18 @@ export async function processKafkaBatch(
   dependencies.metrics.inflightBatches.inc({}, 1);
   dependencies.metrics.currentBatchSize.set({}, batch.messages.length);
 
+  // Track consumer lag: difference between high watermark and last message offset
+  const highWatermark = Number(batch.highWatermark);
+  const lastMessageOffset = batch.messages.length > 0
+    ? Number(batch.messages[batch.messages.length - 1].offset)
+    : 0;
+  if (Number.isFinite(highWatermark) && Number.isFinite(lastMessageOffset)) {
+    dependencies.metrics.consumerLag.set(
+      { topic: batch.topic, partition: String(batch.partition) },
+      Math.max(0, highWatermark - lastMessageOffset - 1),
+    );
+  }
+
   try {
     for (
       let startIndex = 0;
@@ -291,9 +326,16 @@ export async function processKafkaBatch(
           }
 
           const event = parseEvent(message.value, fallbackTimestamp);
+
+          const eventStartedAt = Date.now();
           await processEventWithRetry(event, eventKey, dependencies);
+          const eventDurationMs = Date.now() - eventStartedAt;
 
           dependencies.metrics.eventsProcessedTotal.inc({ action: event.action });
+          dependencies.metrics.eventProcessingDuration.observe(
+            { action: event.action },
+            eventDurationMs / 1_000,
+          );
           dependencies.state.lastProcessedAt = new Date().toISOString();
           dependencies.state.lastError = undefined;
 
@@ -350,7 +392,7 @@ export async function processKafkaBatch(
         } finally {
           processedMessages += 1;
 
-          if (processedMessages % 10 === 0) {
+          if (processedMessages % 5 === 0) {
             await heartbeat();
           }
         }
@@ -366,6 +408,10 @@ export async function processKafkaBatch(
     dependencies.metrics.currentBatchSize.set({}, 0);
     dependencies.metrics.batchesTotal.inc({ status: batchStatus });
     dependencies.metrics.batchDurationMsTotal.inc({ status: batchStatus }, durationMs);
+    dependencies.metrics.batchDurationHistogram.observe(
+      { status: batchStatus },
+      durationMs / 1_000,
+    );
     syncKafkaWorkerReadiness(dependencies.state, dependencies.metrics);
   }
 }

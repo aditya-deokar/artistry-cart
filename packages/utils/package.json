@@ -40,7 +40,22 @@
       "import": "./dist/kafka/client.js",
       "require": "./dist/kafka/client.js",
       "default": "./dist/kafka/client.js"
+    },
+    "./kafka/admin": {
+      "types": "./kafka/admin.ts",
+      "import": "./dist/kafka/admin.js",
+      "require": "./dist/kafka/admin.js",
+      "default": "./dist/kafka/admin.js"
+    },
+    "./kafka/health": {
+      "types": "./kafka/health.ts",
+      "import": "./dist/kafka/health.js",
+      "require": "./dist/kafka/health.js",
+      "default": "./dist/kafka/health.js"
     }
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
   },
   "nx": {
     "targets": {

@@ -41,7 +41,7 @@ type ShutdownConfig = {
 
 type MetricLabels = Record<string, string | number>;
 
-type MetricType = "counter" | "gauge";
+type MetricType = "counter" | "gauge" | "histogram";
 
 type MetricDefinition = {
   type: MetricType;
@@ -49,6 +49,14 @@ type MetricDefinition = {
   labelNames: string[];
   values: Map<string, number>;
   labelsByKey: Map<string, Record<string, string>>;
+  /** Histogram-specific: bucket boundaries */
+  buckets?: number[];
+  /** Histogram-specific: bucket counts per label key */
+  bucketCounts?: Map<string, number[]>;
+  /** Histogram-specific: sum of observed values per label key */
+  sums?: Map<string, number>;
+  /** Histogram-specific: count of observations per label key */
+  counts?: Map<string, number>;
 };
 
 type HttpObservabilityOptions = {
@@ -261,6 +269,43 @@ export class MetricsRegistry {
     };
   }
 
+  histogram(
+    name: string,
+    help: string,
+    labelNames: string[] = [],
+    buckets: number[] = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+  ) {
+    const metric = this.ensureMetric(name, "histogram", help, labelNames);
+    metric.buckets = buckets;
+    metric.bucketCounts = metric.bucketCounts ?? new Map();
+    metric.sums = metric.sums ?? new Map();
+    metric.counts = metric.counts ?? new Map();
+
+    return {
+      observe: (labels: MetricLabels = {}, value: number) => {
+        const key = this.labelKey(metric.labelNames, labels);
+        metric.labelsByKey.set(key, this.normalizeLabels(metric.labelNames, labels));
+
+        // Initialize bucket counts if this is the first observation for this key
+        if (!metric.bucketCounts!.has(key)) {
+          metric.bucketCounts!.set(key, new Array(buckets.length + 1).fill(0));
+        }
+
+        const counts = metric.bucketCounts!.get(key)!;
+        for (let i = 0; i < buckets.length; i += 1) {
+          if (value <= buckets[i]) {
+            counts[i] += 1;
+          }
+        }
+        // +Inf bucket
+        counts[buckets.length] += 1;
+
+        metric.sums!.set(key, (metric.sums!.get(key) ?? 0) + value);
+        metric.counts!.set(key, (metric.counts!.get(key) ?? 0) + 1);
+      },
+    };
+  }
+
   private labelKey(labelNames: string[], labels: MetricLabels): string {
     return labelNames.map((name) => `${name}=${String(labels[name] ?? "")}`).join("|");
   }
@@ -300,6 +345,42 @@ export class MetricsRegistry {
     for (const [name, metric] of this.metrics.entries()) {
       lines.push(`# HELP ${name} ${metric.help}`);
       lines.push(`# TYPE ${name} ${metric.type}`);
+
+      if (metric.type === "histogram" && metric.buckets && metric.bucketCounts) {
+        // Render Prometheus histogram format: _bucket, _sum, _count
+        if (metric.bucketCounts.size === 0) {
+          lines.push(`${name}_count 0`);
+          lines.push(`${name}_sum 0`);
+          continue;
+        }
+
+        for (const [key, bucketValues] of metric.bucketCounts.entries()) {
+          const labels = metric.labelsByKey.get(key) ?? {};
+          const formattedLabels = this.formatLabels(labels);
+          const labelsPrefix = formattedLabels
+            ? formattedLabels.slice(0, -1) + ","
+            : "{";
+
+          let cumulativeCount = 0;
+          for (let i = 0; i < metric.buckets.length; i += 1) {
+            cumulativeCount += bucketValues[i];
+            lines.push(
+              `${name}_bucket${labelsPrefix}le="${metric.buckets[i]}"}  ${cumulativeCount}`,
+            );
+          }
+          // +Inf bucket
+          cumulativeCount += bucketValues[metric.buckets.length];
+          lines.push(
+            `${name}_bucket${labelsPrefix}le="+Inf"} ${cumulativeCount}`,
+          );
+
+          const sum = metric.sums?.get(key) ?? 0;
+          const count = metric.counts?.get(key) ?? 0;
+          lines.push(`${name}_sum${formattedLabels} ${sum}`);
+          lines.push(`${name}_count${formattedLabels} ${count}`);
+        }
+        continue;
+      }
 
       if (metric.values.size === 0) {
         lines.push(`${name} 0`);

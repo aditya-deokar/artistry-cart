@@ -50,6 +50,13 @@ const kafkaServiceConfigSchema = z.object({
   minBytes: z.number().int().min(1).max(10 * 1024 * 1024),
   maxBytesPerPartition: z.number().int().min(1024).max(10 * 1024 * 1024),
   maxWaitTimeInMs: z.number().int().min(100).max(60_000),
+  // Startup resilience
+  startupMaxRetries: z.number().int().min(1).max(30),
+  startupRetryDelayMs: z.number().int().min(500).max(60_000),
+  // Topic pre-creation
+  topicPartitions: z.number().int().min(1).max(128),
+  topicReplicationFactor: z.number().int().min(1).max(5),
+  dlqPartitions: z.number().int().min(1).max(64),
 });
 
 export type KafkaServiceConfig = z.infer<typeof kafkaServiceConfigSchema>;
@@ -57,7 +64,7 @@ export type KafkaServiceConfig = z.infer<typeof kafkaServiceConfigSchema>;
 export const kafkaServiceConfig = kafkaServiceConfigSchema.parse({
   consumerGroupId: readStringEnv("KAFKA_CONSUMER_GROUP_ID", "user-events-group"),
   topic: readStringEnv("KAFKA_USER_EVENTS_TOPIC", "user-events"),
-  deadLetterTopic: readOptionalStringEnv("KAFKA_DLQ_TOPIC"),
+  deadLetterTopic: readOptionalStringEnv("KAFKA_DLQ_TOPIC") ?? "user-events.dlq",
   batchSize: readIntegerEnv("KAFKA_BATCH_SIZE", 100, { min: 1, max: 500 }),
   maxRetries: readIntegerEnv("KAFKA_MAX_RETRIES", 3, { min: 0, max: 10 }),
   retryBaseDelayMs: readIntegerEnv("KAFKA_RETRY_BASE_DELAY_MS", 250, {
@@ -85,5 +92,27 @@ export const kafkaServiceConfig = kafkaServiceConfigSchema.parse({
   maxWaitTimeInMs: readIntegerEnv("KAFKA_FETCH_MAX_WAIT_MS", 5_000, {
     min: 100,
     max: 60_000,
+  }),
+  // Startup resilience
+  startupMaxRetries: readIntegerEnv("KAFKA_STARTUP_MAX_RETRIES", 5, {
+    min: 1,
+    max: 30,
+  }),
+  startupRetryDelayMs: readIntegerEnv("KAFKA_STARTUP_RETRY_DELAY_MS", 3_000, {
+    min: 500,
+    max: 60_000,
+  }),
+  // Topic pre-creation
+  topicPartitions: readIntegerEnv("KAFKA_TOPIC_PARTITIONS", 6, {
+    min: 1,
+    max: 128,
+  }),
+  topicReplicationFactor: readIntegerEnv("KAFKA_TOPIC_REPLICATION_FACTOR", 1, {
+    min: 1,
+    max: 5,
+  }),
+  dlqPartitions: readIntegerEnv("KAFKA_DLQ_PARTITIONS", 3, {
+    min: 1,
+    max: 64,
   }),
 });

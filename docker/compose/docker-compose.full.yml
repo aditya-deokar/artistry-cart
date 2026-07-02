@@ -9,20 +9,20 @@ services:
       file: docker-compose.infra.yml
       service: redis
 
-  zookeeper:
-    extends:
-      file: docker-compose.infra.yml
-      service: zookeeper
-
   kafka:
     extends:
       file: docker-compose.infra.yml
       service: kafka
 
-  kafka-ui:
+  kafka-init:
     extends:
       file: docker-compose.infra.yml
-      service: kafka-ui
+      service: kafka-init
+
+  redpanda-console:
+    extends:
+      file: docker-compose.infra.yml
+      service: redpanda-console
 
   auth-service:
     extends:
