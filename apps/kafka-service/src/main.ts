@@ -12,6 +12,8 @@ import {
   setupHttpObservability,
 } from "@artistry-cart/utils/runtime";
 import { kafka } from "@artistry-cart/utils/kafka";
+import { ensureTopicsExist } from "@artistry-cart/utils/kafka";
+import { checkKafkaHealth } from "@artistry-cart/utils/kafka";
 import { kafkaServiceConfig } from "./config";
 import {
   createKafkaWorkerMetrics,
@@ -30,6 +32,9 @@ const consumer = kafka.consumer({
   minBytes: config.minBytes,
   maxBytesPerPartition: config.maxBytesPerPartition,
   maxWaitTimeInMs: config.maxWaitTimeInMs,
+  allowAutoTopicCreation: false,
+  sessionTimeout: 300000, // 5 minutes
+  heartbeatInterval: 10000, // 10 seconds
 });
 const deadLetterProducer = config.deadLetterTopic ? kafka.producer() : undefined;
 const state: KafkaWorkerState = {
@@ -76,6 +81,12 @@ managementApp.get("/", (_req, res) => {
   });
 });
 
+// Kafka health probe endpoint
+managementApp.get("/kafka-health", async (_req, res) => {
+  const result = await checkKafkaHealth(kafka);
+  res.status(result.healthy ? 200 : 503).json(result);
+});
+
 managementApp.get("/health", liveness);
 managementApp.get("/ready", readiness);
 
@@ -93,11 +104,47 @@ managementServer.on("error", (error) => {
   logger.error("Kafka management server error", { error });
 });
 
+// ---------------------------------------------------------------------------
+// Startup with retry loop & topic verification
+// ---------------------------------------------------------------------------
+
+function getStartupRetryDelay(attempt: number): number {
+  const delay = config.startupRetryDelayMs * 2 ** Math.max(0, attempt - 1);
+  const jitter = 1 + Math.random() * 0.2;
+  return Math.min(60_000, Math.round(delay * jitter));
+}
+
 async function startKafkaWorker(): Promise<void> {
+  // Step 1: Ensure topics exist (self-healing — creates if missing)
+  logger.info("Verifying Kafka topics exist", {
+    topic: config.topic,
+    deadLetterTopic: config.deadLetterTopic ?? null,
+  });
+
+  const topicDefinitions = [
+    {
+      topic: config.topic,
+      numPartitions: config.topicPartitions,
+      replicationFactor: config.topicReplicationFactor,
+    },
+  ];
+
+  if (config.deadLetterTopic) {
+    topicDefinitions.push({
+      topic: config.deadLetterTopic,
+      numPartitions: config.dlqPartitions,
+      replicationFactor: config.topicReplicationFactor,
+    });
+  }
+
+  await ensureTopicsExist(kafka, topicDefinitions);
+
+  // Step 2: Connect DLQ producer
   if (deadLetterProducer) {
     await deadLetterProducer.connect();
   }
 
+  // Step 3: Connect consumer & subscribe
   await consumer.connect();
   state.connected = true;
   syncKafkaWorkerReadiness(state, workerMetrics);
@@ -116,6 +163,7 @@ async function startKafkaWorker(): Promise<void> {
     partitionsConsumedConcurrently: config.partitionsConsumedConcurrently,
   });
 
+  // Step 4: Start consuming
   await consumer.run({
     autoCommit: false,
     eachBatchAutoResolve: false,
@@ -131,7 +179,43 @@ async function startKafkaWorker(): Promise<void> {
   });
 }
 
-void startKafkaWorker().catch((error) => {
+async function startWithRetry(): Promise<void> {
+  for (let attempt = 1; attempt <= config.startupMaxRetries; attempt += 1) {
+    try {
+      await startKafkaWorker();
+      return;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      state.connected = false;
+      state.running = false;
+      state.lastError = errorMessage;
+      syncKafkaWorkerReadiness(state, workerMetrics);
+
+      if (attempt >= config.startupMaxRetries) {
+        logger.error("Kafka consumer startup failed after all retries", {
+          error,
+          attempts: attempt,
+        });
+        throw error;
+      }
+
+      const delayMs = getStartupRetryDelay(attempt);
+      logger.warn("Kafka consumer startup failed, retrying", {
+        error: errorMessage,
+        attempt,
+        maxRetries: config.startupMaxRetries,
+        nextRetryMs: delayMs,
+      });
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, delayMs);
+      });
+    }
+  }
+}
+
+void startWithRetry().catch((error) => {
   state.connected = false;
   state.running = false;
   state.lastError = error instanceof Error ? error.message : String(error);

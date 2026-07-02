@@ -1,4 +1,7 @@
 import prisma from "@artistry-cart/libs/prisma";
+import { createLogger } from "@artistry-cart/utils/runtime";
+
+const logger = createLogger("recommendation-service");
 
 export const getUserActivity = async (userId: string) => {
   try {
@@ -12,7 +15,7 @@ export const getUserActivity = async (userId: string) => {
     });
     return userActivity?.actions || []; 
   } catch (error) {
-    console.log("Error fetching user activity :", error);
+    logger.error("Error fetching user activity", { error, userId });
     return [];
   }
 };

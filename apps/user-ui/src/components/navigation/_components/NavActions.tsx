@@ -122,9 +122,9 @@ export function NavActions({ onMenuClick, onCartClick, onWishlistClick, onSearch
 
     return (
         <div className={`flex items-center gap-2 ${className}`}>
-            {/* Search - Opens Overlay */}
-            <MagneticButton onClick={onSearchClick} ariaLabel="Search">
-                <Search className="w-5 h-5 text-[var(--ac-graphite)] dark:text-[var(--ac-silver)] transition-colors duration-300" />
+            {/* Search - Opens Overlay (Mobile only since we have inline search on desktop) */}
+            <MagneticButton onClick={onSearchClick} ariaLabel="Search" className="lg:hidden">
+                <Search className="w-5 h-5 text-current transition-colors duration-300" />
             </MagneticButton>
 
             {/* Theme Toggle */}
@@ -132,7 +132,7 @@ export function NavActions({ onMenuClick, onCartClick, onWishlistClick, onSearch
 
             {/* Wishlist - Opens Drawer */}
             <MagneticButton onClick={onWishlistClick} ariaLabel="Wishlist">
-                <Heart className="w-5 h-5 text-[var(--ac-graphite)] dark:text-[var(--ac-silver)] transition-colors duration-300" />
+                <Heart className="w-5 h-5 text-current transition-colors duration-300" />
                 <AnimatePresence>
                     {wishlist?.length > 0 && (
                         <motion.span
@@ -149,7 +149,7 @@ export function NavActions({ onMenuClick, onCartClick, onWishlistClick, onSearch
 
             {/* Cart - Opens Drawer */}
             <MagneticButton onClick={onCartClick} ariaLabel="Shopping Cart">
-                <ShoppingCart className="w-5 h-5 text-[var(--ac-graphite)] dark:text-[var(--ac-silver)] transition-colors duration-300" />
+                <ShoppingCart className="w-5 h-5 text-current transition-colors duration-300" />
                 <AnimatePresence>
                     {cart?.length > 0 && (
                         <motion.span
@@ -179,13 +179,13 @@ export function NavActions({ onMenuClick, onCartClick, onWishlistClick, onSearch
                                         sizes="32px"
                                     />
                                 ) : (
-                                    <User className="h-4 w-4 text-[var(--ac-graphite)] dark:text-[var(--ac-silver)]" />
+                                    <User className="h-4 w-4 text-current" />
                                 )}
                             </div>
                         </MagneticButton>
                     </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 mt-2">
+                <DropdownMenuContent align="end" className="w-56 mt-2 z-[100] bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] border border-[var(--ac-linen)] dark:border-white/10 shadow-2xl rounded-xl backdrop-blur-xl font-medium p-2">
                     {user && !isLoading ? (
                         <>
                             <DropdownMenuLabel className="font-normal">

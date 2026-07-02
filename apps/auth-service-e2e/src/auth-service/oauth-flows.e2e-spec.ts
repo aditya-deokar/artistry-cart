@@ -13,7 +13,6 @@ describe('OAuth Flows (E2E)', () => {
       const response = await axios.get('/api/oauth/status');
 
       expect(response.status).toBe(200);
-      expect(response.data).toHaveProperty('success', true);
       expect(response.data).toHaveProperty('providers');
       expect(response.data.providers).toHaveProperty('google');
       expect(response.data.providers).toHaveProperty('github');

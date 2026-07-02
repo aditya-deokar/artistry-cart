@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/auth";
 import {
   analyticsTrackRequestSchema,
   publishAnalyticsEvent,
@@ -9,7 +8,13 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+import { createLogger } from "@artistry-cart/utils/runtime";
+
+const logger = createLogger("user-ui-analytics");
+
 export async function POST(request: NextRequest) {
+  const { getCurrentUser } = await import("@/lib/auth");
+  const correlationId = request.headers.get("x-correlation-id") ?? undefined;
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
@@ -54,6 +59,7 @@ export async function POST(request: NextRequest) {
       ...parsedRequest.data,
       userId: currentUser.id,
       source: parsedRequest.data.source ?? "user-ui.client",
+      correlationId,
     });
 
     return NextResponse.json(
@@ -64,6 +70,13 @@ export async function POST(request: NextRequest) {
       { status: 202 },
     );
   } catch (error) {
+    logger.error("Failed to publish analytics event", {
+      error,
+      userId: currentUser.id,
+      action: parsedRequest.data.action,
+      correlationId,
+    });
+
     return NextResponse.json(
       {
         status: "error",

@@ -60,16 +60,22 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
   return (
    
 
-    <motion.div variants={cardVariants} className="group relative flex flex-col">
-      {/* The background is now semantically colored */}
+    <motion.div variants={cardVariants} className="group relative flex flex-col cursor-pointer">
+      {/* The background is solid light gray/dark for a studio shot look, sharp corners */}
       <div className={cn(
-        "relative w-full aspect-[4/5] overflow-hidden rounded-lg",
-        "bg-muted" // Use `bg-muted` for a neutral placeholder color in both themes
+        "relative w-full aspect-square overflow-hidden bg-[#F5F5F5] dark:bg-[#1A1A1A]" 
       )}>
-        {/* --- BADGES (Updated to use event object) --- */}
-        <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-            {product.event && <div className="bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">OFFER</div>}
-            {isLimited && <div className="bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">Limited</div>}
+        {/* --- BADGES (Sharp white labels) --- */}
+        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1 items-start">
+            <div className="bg-white dark:bg-black text-[var(--ac-charcoal)] dark:text-white text-[9px] font-bold px-2 py-1 tracking-widest uppercase shadow-sm">
+                NEW
+            </div>
+            {timeleft && (
+                <div className="bg-white dark:bg-black text-[var(--ac-charcoal)] dark:text-white text-[9px] font-bold px-2 py-1 tracking-widest uppercase shadow-sm flex items-center gap-1 mt-1">
+                    <Clock size={10} />
+                    60 DAYS
+                </div>
+            )}
         </div>
         
         {/* --- IMAGE --- */}
@@ -103,56 +109,22 @@ export const ProductCard = ({ product }: { product: ArtProduct }) => {
       </div>
 
       <div className="mt-4 text-left flex-grow flex flex-col">
-        {/* --- TITLE & ARTIST (Updated text colors to be semantic) --- */}
-        <h3 className="font-display text-lg text-foreground relative w-fit">
-          <Link href={`/product/${product.slug}`}>
-            {product.title}
-            <span className="absolute bottom-[-2px] left-0 h-[2px] w-0 bg-amber-600 transition-all duration-300 group-hover:w-full"></span>
-          </Link>
-        </h3>
-        {/* <p className="text-sm text-muted-foreground mt-1 hover:text-amber-800 transition-colors">
-            by {product.Shop ? (
-              <Link href={`/shops/${product.Shop.slug || product.Shop.id}`}>
-                {product.Shop.name}
-              </Link>
-            ) : (
-              <span>Unknown Seller</span>
-            )}
-        </p> */}
+        {/* --- SKU & TITLE (Minimal typography) --- */}
+        <p className="text-[10px] text-[var(--ac-stone)] uppercase tracking-wider mb-1">
+            {product.slug?.substring(0, 5) || 'ART12'}
+        </p>
         
-        <div className="flex-grow" />
-
-        {/* --- DYNAMIC INFO (Updated text colors) --- */}
-        <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-            {product.totalSales && product.totalSales > 0 && (
-                <div className="flex items-center gap-1.5">
-                    <TrendingUp size={14} className="text-green-600"/>
-                    <span>{product.totalSales > 1 ? `${product.totalSales} sold` : 'Best Seller'}</span>
-                </div>
-            )}
-            {product.event && timeleft && (
-                <div className="flex items-center gap-1.5">
-                    <Clock size={14}/>
-                    <span>{timeleft}</span>
-                </div>
-            )}
-        </div>
-
-        {/* --- PRICE (Updated to use new pricing structure) --- */}
-        <div className="flex items-baseline gap-2 mt-2">
-            {/* Use pricing.finalPrice if available (includes event discounts), 
-                otherwise fall back to sale_price or regular_price */}
-            <p className="font-semibold text-base text-amber-600">
-                {formatPrice(product.pricing?.finalPrice || product.sale_price || product.regular_price)}
-            </p>
+        <div className="flex justify-between items-start gap-2">
+            <h3 className="font-sans text-[13px] text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)] tracking-wide group-hover:text-[var(--ac-gold)] transition-colors">
+                <Link href={`/product/${product.slug}`}>
+                    {product.title}
+                </Link>
+            </h3>
             
-            {/* Show original price as strikethrough if there's a discount */}
-            {((product.pricing?.finalPrice && product.pricing.finalPrice < product.regular_price) || 
-              (product.sale_price && product.sale_price < product.regular_price)) && (
-                <p className="text-sm text-muted-foreground line-through">
-                    {formatPrice(product.regular_price)}
-                </p>
-            )}
+            {/* PRICE (Minimal) */}
+            <div className="text-[13px] text-[var(--ac-stone)] font-medium">
+                {formatPrice(product.pricing?.finalPrice || product.sale_price || product.regular_price)}
+            </div>
         </div>
       </div>
     </motion.div>

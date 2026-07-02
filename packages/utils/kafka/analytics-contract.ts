@@ -32,8 +32,17 @@ const analyticsEventContextRules = (
   }
 };
 
+/** Current schema version for analytics events. */
 export const ANALYTICS_EVENT_SCHEMA_VERSION = 1;
 
+/**
+ * All schema versions this consumer can handle.
+ * When evolving the schema, add older versions here to maintain
+ * backward-compatibility until all producers have migrated.
+ */
+export const SUPPORTED_SCHEMA_VERSIONS = [1] as const;
+
+/** All valid user action types for analytics tracking. */
 export const ANALYTICS_USER_ACTIONS = [
   "add_to_wishlist",
   "add_to_cart",
@@ -61,6 +70,10 @@ export const analyticsTrackRequestSchema = analyticsTrackRequestBaseSchema.super
   analyticsEventContextRules,
 );
 
+/**
+ * Full analytics event schema — includes server-side fields (eventId, userId,
+ * timestamp, source, correlationId) that are not present in the client request.
+ */
 export const analyticsEventSchema = analyticsTrackRequestBaseSchema
   .extend({
     eventId: z.string().trim().min(1).max(255),
@@ -71,6 +84,8 @@ export const analyticsEventSchema = analyticsTrackRequestBaseSchema
       .trim()
       .refine((value) => !Number.isNaN(Date.parse(value)), "timestamp must be an ISO date"),
     userId: z.string().trim().min(1).max(255),
+    /** Optional correlation ID for end-to-end request tracing. */
+    correlationId: z.string().trim().min(1).max(255).optional(),
   })
   .superRefine(analyticsEventContextRules);
 
