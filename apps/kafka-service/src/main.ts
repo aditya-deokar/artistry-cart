@@ -33,6 +33,8 @@ const consumer = kafka.consumer({
   maxBytesPerPartition: config.maxBytesPerPartition,
   maxWaitTimeInMs: config.maxWaitTimeInMs,
   allowAutoTopicCreation: false,
+  sessionTimeout: 300000, // 5 minutes
+  heartbeatInterval: 10000, // 10 seconds
 });
 const deadLetterProducer = config.deadLetterTopic ? kafka.producer() : undefined;
 const state: KafkaWorkerState = {

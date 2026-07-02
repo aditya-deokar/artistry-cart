@@ -16,10 +16,16 @@ interface NavLinkData {
 }
 
 const defaultLinks: NavLinkData[] = [
-    { label: 'Shop', href: '/product', hasDropdown: true },
-    { label: 'Artisans', href: '/artisans' },
-    { label: 'Create', href: '/ai-vision', badge: 'AI' },
-    { label: 'About', href: '/about' },
+    { label: 'NEW', href: '/product?category=new' },
+    { label: 'PAINTINGS', href: '/product?category=paintings' },
+    { label: 'SCULPTURES', href: '/product?category=sculptures' },
+    { label: 'DIGITAL ART', href: '/product?category=digital' },
+    { label: 'PHOTOGRAPHY', href: '/product?category=photography' },
+    { label: 'CERAMICS', href: '/product?category=ceramics' },
+    { label: 'TEXTILES', href: '/product?category=textiles' },
+    { label: 'OFFERS', href: '/offers' },
+    { label: 'COLLECTIONS', href: '/collections', hasDropdown: true },
+    { label: 'EXHIBITIONS', href: '/exhibitions' },
 ];
 
 interface DesktopNavProps {
@@ -68,9 +74,9 @@ function NavItem({
             onMouseEnter={onHover}
         >
             {/* Label */}
-            <span className={`relative z-10 text-sm font-medium tracking-wide transition-colors duration-300 ${isActive
-                    ? 'text-[var(--ac-gold-dark)] dark:text-[var(--ac-gold)]'
-                    : 'text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)] group-hover:text-[var(--ac-gold-dark)] dark:group-hover:text-[var(--ac-gold)]'
+            <span className={`relative z-10 text-[11px] font-bold tracking-[0.15em] transition-colors duration-300 uppercase ${isActive
+                    ? 'text-[var(--ac-charcoal)] dark:text-white'
+                    : 'text-[var(--ac-stone)] dark:text-gray-400 group-hover:text-[var(--ac-charcoal)] dark:group-hover:text-white'
                 }`}>
                 {link.label}
             </span>
@@ -79,8 +85,8 @@ function NavItem({
             {link.hasDropdown && (
                 <svg
                     className={`inline-block ml-1.5 w-3 h-3 transition-all duration-300 ${isActive
-                            ? 'rotate-180 text-[var(--ac-gold)]'
-                            : 'text-[var(--ac-stone)] group-hover:text-[var(--ac-gold)]'
+                            ? 'rotate-180 text-[var(--ac-charcoal)] dark:text-white'
+                            : 'text-[var(--ac-stone)] dark:text-gray-500 group-hover:text-[var(--ac-charcoal)] dark:group-hover:text-white'
                         }`}
                     fill="none"
                     viewBox="0 0 24 24"

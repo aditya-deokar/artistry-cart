@@ -130,9 +130,9 @@ export function MegaMenu({
 
     return (
         <>
-            {/* Backdrop Area - only visible when open */}
+            {/* Backdrop Area - only visible when open, without blur as requested */}
             <div
-                className={`fixed inset-0 z-40 bg-black/20 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                className={`fixed inset-0 z-40 bg-black/60 transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 onClick={onClose}
             />
 
@@ -147,12 +147,12 @@ export function MegaMenu({
             {/* Menu Container */}
             <div
                 ref={menuRef}
-                className="fixed left-0 right-0 z-50 top-[80px] bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] border-b border-[var(--ac-linen)] dark:border-[var(--ac-slate)] shadow-xl overflow-hidden"
+                className="fixed left-0 right-0 z-50 top-[80px] bg-white dark:bg-[#111111] border-b border-[var(--ac-linen)] dark:border-white/5 shadow-2xl overflow-hidden"
                 style={{ opacity: 0, visibility: 'hidden' }}
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onClose}
             >
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <div ref={contentRef} className="grid grid-cols-4 gap-12">
                         {/* Column 1: Categories */}
                         <div>

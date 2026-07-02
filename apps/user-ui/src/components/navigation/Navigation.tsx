@@ -11,6 +11,7 @@ import { useGSAP } from '@gsap/react';
 import { DesktopNav } from './_components/DesktopNav';
 import { Logo } from './_components/Logo';
 import { NavActions } from './_components/NavActions';
+import { Search } from 'lucide-react';
 
 // Features
 import { MegaMenu } from './MegaMenu/MegaMenu';
@@ -137,27 +138,24 @@ export function Navigation({
                 }}
                 animate={hidden ? 'hidden' : 'visible'}
                 transition={{ duration: 0.35, ease: 'easeInOut' }}
-                className={`fixed top-0 inset-x-0 z-[60] w-full transition-all duration-300 ${scrolled
-                    ? 'bg-[var(--ac-ivory)]/90 dark:bg-[var(--ac-obsidian)]/90 backdrop-blur-xl border-b border-[var(--ac-linen)]/50 dark:border-[var(--ac-slate)]/50 py-3 shadow-sm'
-                    : transparent
-                        ? 'bg-transparent py-5 lg:py-6'
-                        : 'bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] py-5 lg:py-6'
-                    } ${className}`}
+                className={`fixed top-0 inset-x-0 z-40 w-full transition-all duration-300 bg-[var(--ac-ivory)] dark:bg-[#181818] text-[var(--ac-charcoal)] dark:text-white ${className}`}
             >
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between">
+                {/* Top Bar */}
+                <div className="w-full px-4 sm:px-6 lg:px-8 border-b border-[var(--ac-linen)] dark:border-white/10">
+                    <div className="flex items-center justify-between h-20">
                         {/* Logo */}
                         <Logo scrolled={scrolled} />
 
-                        {/* Desktop Navigation */}
-                        {variant === 'floating' && (
-                            <div className="hidden lg:flex flex-1 items-center justify-center px-8">
-                                <DesktopNav
-                                    activeItem={activeNavItem}
-                                    onNavHover={handleNavHover}
-                                />
-                            </div>
-                        )}
+                        {/* Search Bar - Opens Overlay */}
+                        <button 
+                            onClick={() => setIsSearchOpen(true)}
+                            className="hidden lg:flex flex-1 max-w-2xl mx-12 relative items-center border-b border-[var(--ac-stone)]/30 dark:border-white/20 pb-1 text-left group"
+                        >
+                            <Search className="w-4 h-4 text-[var(--ac-stone)] dark:text-gray-400 absolute left-0 group-hover:text-[var(--ac-charcoal)] dark:group-hover:text-white transition-colors" />
+                            <span className="w-full bg-transparent border-none text-[var(--ac-stone)] dark:text-gray-500 pl-8 text-sm group-hover:text-[var(--ac-charcoal)] dark:group-hover:text-gray-300 transition-colors">
+                                Search...
+                            </span>
+                        </button>
 
                         {/* Actions */}
                         <NavActions
@@ -165,6 +163,16 @@ export function Navigation({
                             onCartClick={() => setIsCartOpen(true)}
                             onWishlistClick={() => setIsWishlistOpen(true)}
                             onSearchClick={() => setIsSearchOpen(true)}
+                        />
+                    </div>
+                </div>
+
+                {/* Bottom Bar - Categories */}
+                <div className="w-full px-4 sm:px-6 lg:px-8 bg-white dark:bg-[#111111] border-b border-[var(--ac-linen)] dark:border-white/5">
+                    <div className="flex items-center justify-center h-12 overflow-x-auto hide-scrollbar">
+                        <DesktopNav
+                            activeItem={activeNavItem}
+                            onNavHover={handleNavHover}
                         />
                     </div>
                 </div>
@@ -186,9 +194,9 @@ export function Navigation({
             />
 
             <MegaMenu
-                isOpen={activeNavItem === 'Shop'}
+                isOpen={activeNavItem === 'COLLECTIONS'}
                 onClose={() => handleNavHover(null)}
-                onMouseEnter={() => handleNavHover('Shop')}
+                onMouseEnter={() => handleNavHover('COLLECTIONS')}
             />
 
             <CartDrawer

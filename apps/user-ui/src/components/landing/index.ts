@@ -10,6 +10,7 @@
 
 // Core Sections
 export { Hero } from './Hero';
+export { EcomHero } from './EcomHero';
 export { Manifesto } from './Manifesto';
 export { FeaturedCategories } from './FeaturedCategories';
 export { CuratedCollection } from './CuratedCollection';

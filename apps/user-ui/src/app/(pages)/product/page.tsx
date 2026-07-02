@@ -11,6 +11,7 @@ import Loading from './loading';
 import { ArtProduct } from '@/types/products';
 import { Pagination } from '@/components/shop/Pagination';
 import { ShopHero } from '@/components/shop/ShopHero';
+import { SlidersHorizontal, ChevronDown, LayoutGrid, Square } from 'lucide-react';
 
 // A custom hook for debouncing input to prevent excessive API calls
 const useDebounce = (value: any, delay: number) => {
@@ -126,33 +127,61 @@ const ProductPage = () => {
     console.log(data)
 
     return (
-        <div >
+        <div className="bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] min-h-screen pt-[128px]">
             {/* <ShopHero /> */}
-            <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    <aside className="lg:col-span-1">
-                        <FilterSidebar
-                            categories={categories}
-                            filters={{
-                                category: filters.category,
-                                priceRange: filters.priceRange,
-                                sortBy: filters.sortBy as any
-                            }}
-                            setFilters={setFilters}
-                        />
-                    </aside>
-                    <section className="lg:col-span-3">
+            <main className="w-full">
+                {/* Top Filter Bar */}
+                <div className="border-b border-[var(--ac-linen)] dark:border-white/10 bg-transparent relative z-20">
+                    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+                        {/* Left Side: Filters */}
+                        <div className="flex items-center space-x-6 text-sm text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)]">
+                            <button className="flex items-center gap-2 hover:text-[var(--ac-gold)] transition-colors">
+                                <SlidersHorizontal size={16} />
+                                <span>All Filters</span>
+                            </button>
+                            <div className="hidden md:flex items-center space-x-6">
+                                <button className="flex items-center gap-1 hover:text-[var(--ac-gold)] transition-colors">
+                                    Availability <ChevronDown size={14} />
+                                </button>
+                                <button className="flex items-center gap-1 hover:text-[var(--ac-gold)] transition-colors">
+                                    Material <ChevronDown size={14} />
+                                </button>
+                                <button className="flex items-center gap-1 hover:text-[var(--ac-gold)] transition-colors">
+                                    Design Style <ChevronDown size={14} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Right Side: Count and View */}
+                        <div className="flex items-center space-x-6 text-sm text-[var(--ac-stone)]">
+                            <span>{pagination?.totalItems || products.length} products</span>
+                            <div className="flex items-center space-x-3">
+                                <button className="hover:text-[var(--ac-charcoal)] dark:hover:text-white transition-colors">
+                                    <LayoutGrid size={18} />
+                                </button>
+                                <button className="text-gray-300 dark:text-gray-600 hover:text-[var(--ac-charcoal)] dark:hover:text-white transition-colors">
+                                    <Square size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    <section className="w-full relative">
                         {isLoading && <div className="absolute inset-0 bg-white/50 z-20"></div>} {/* Subtle loading overlay */}
 
                         {products.length > 0 ? (
                             <>
                                 <ProductGrid products={products} />
                                 {pagination && pagination.totalPages > 1 && (
-                                    <Pagination
-                                        currentPage={pagination.currentPage}
-                                        totalPages={pagination.totalPages}
-                                        onPageChange={handlePageChange}
-                                    />
+                                    <div className="mt-16">
+                                        <Pagination
+                                            currentPage={pagination.currentPage}
+                                            totalPages={pagination.totalPages}
+                                            onPageChange={handlePageChange}
+                                        />
+                                    </div>
                                 )}
                             </>
                         ) : (

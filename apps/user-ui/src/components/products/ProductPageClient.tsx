@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArtProduct, ImageInfo } from '@/types/products';
 import { formatPrice } from '@/lib/formatters';
 import { useStore } from '@/store';
@@ -57,172 +58,129 @@ export function ProductPageClient({ product, validImages }: ProductPageClientPro
   }, [product.id, product.Shop?.id, trackEventOnce]);
 
   return (
-    <Bounded className="py-12 md:py-20 mt-4">
+    <main className="w-full min-h-screen bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] pb-24 pt-[128px]">
       {/* Event Information Banner */}
       {hasActiveEvent && isEventActive && product.event && (
-        <div className="mb-8">
-          <EventCountdown endingDate={product.event.ending_date} />
-
-          <div className="mt-4 p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
-            <div className="flex flex-wrap items-center gap-4">
-              <Badge variant="secondary" className="gap-2">
-                <Tag className="h-4 w-4" />
-                {product.event.event_type}
-              </Badge>
-
-              {product.event.discount_percent && (
-                <Badge variant="default" className="gap-2 bg-green-600">
-                  <TrendingUp className="h-4 w-4" />
-                  {product.event.discount_percent}% OFF
-                </Badge>
-              )}
-
-              <div className="flex items-center gap-2 text-sm text-primary/80">
-                <Calendar className="h-4 w-4" />
-                <span className="font-medium">{product.event.title}</span>
-              </div>
+        <div className="w-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-purple-500/20 py-2">
+            <div className="max-w-[1600px] mx-auto px-6 flex items-center justify-between text-sm">
+                <div className="flex gap-4">
+                  <span className="font-bold text-purple-700 dark:text-purple-300">{product.event.title}</span>
+                  {product.event.discount_percent && <span className="bg-green-600 text-white px-2 py-0.5 text-xs uppercase tracking-widest">{product.event.discount_percent}% OFF</span>}
+                </div>
+                <EventCountdown endingDate={product.event.ending_date} />
             </div>
-          </div>
         </div>
       )}
 
-      {/* Status Badges */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        {isInCart && (
-          <Badge variant="default" className="bg-amber-300/30 hover:bg-amber-400/80">
-            In Your Cart
-          </Badge>
-        )}
-
-        {isWishlisted && (
-          <Badge variant="default" className="bg-amber-300/30 hover:bg-amber-400/80">
-            In Your Wishlist
-          </Badge>
-        )}
-
-        {product.is_on_discount && !hasActiveEvent && (
-          <Badge variant="default" className="bg-orange-600 hover:bg-orange-700">
-            On Sale
-          </Badge>
-        )}
-
-        {product.stock && product.stock > 0 && product.stock < 10 && (
-          <Badge variant="default" className="bg-yellow-600 hover:bg-yellow-700">
-            ⚠️ Only {product.stock} Left!
-          </Badge>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-16">
-        <ProductGalleryV2
-          productTitle={product.title}
-          images={validImages}
-          videoUrl={product.video_url}
-        />
-
-        <div className="flex flex-col gap-6 text-primary">
-          <div className="relative">
-            <div className="absolute top-0 right-0">
-              <WishlistButton product={product} productId={product.id} />
-            </div>
-
-            <p className="text-sm font-medium text-primary/70">{product.category}</p>
-            <h1 className="font-display text-4xl leading-tight md:text-5xl">
-              {product.title}
-            </h1>
-
-            {product.Shop ? (
-              <Link
-                href={`/artist/${product.Shop.id}`}
-                className="text-lg text-primary/80 hover:text-accent transition-colors"
-              >
-                by {product.Shop.name}
-              </Link>
-            ) : (
-              <span className="text-lg text-primary/80">
-                by Unknown Artist
-              </span>
-            )}
-
-            {product.ratings && (
-              <div className="mt-3 flex items-center gap-2">
-                <StarRating rating={product.ratings} />
-                <span className="text-sm text-primary/70">
-                  ({product.totalSales} {product.totalSales === 1 ? 'review' : 'reviews'})
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Pricing Section */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-baseline gap-4">
-              <span className="text-4xl font-light text-amber-400">
-                {formatPrice(product.pricing?.finalPrice ?? product.sale_price ?? product.regular_price)}
-              </span>
-
-              {(product.pricing?.discountInfo || product.sale_price) && (
-                <span className="text-2xl text-primary/50 line-through">
-                  {formatPrice(product.regular_price)}
-                </span>
+      <div className="flex flex-col lg:flex-row w-full relative">
+        
+        {/* Left Column - Image (60%) */}
+        <div className="lg:w-[55%] xl:w-[60%] bg-[#F9F9F9] dark:bg-[#1A1A1A] relative border-r border-[var(--ac-linen)] dark:border-white/5">
+           <div className="sticky top-[128px] h-[calc(100vh-128px)] flex items-center justify-center p-8 lg:p-20">
+           <div className="absolute top-8 left-8 z-10 flex flex-col gap-2">
+              <div className="bg-white dark:bg-black text-[var(--ac-charcoal)] dark:text-white text-[10px] font-bold px-3 py-1.5 tracking-widest uppercase shadow-sm border border-gray-100 dark:border-white/10">NEW</div>
+              {product.is_on_discount && !hasActiveEvent && (
+                <div className="bg-orange-600 text-white text-[10px] font-bold px-3 py-1.5 tracking-widest uppercase shadow-sm">SALE</div>
               )}
-            </div>
+           </div>
+           
+           <div className="relative w-full max-w-[800px] aspect-square flex items-center justify-center">
+              {validImages.length > 0 ? (
+                  <Image 
+                    src={validImages[0].url} 
+                    alt={product.title} 
+                    fill 
+                    className="object-contain" 
+                    priority
+                  />
+              ) : (
+                  <div className="w-full h-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-400">No Image Available</div>
+              )}
+           </div>
+           </div>
+        </div>
 
-            {/* {product.pricing?.savings && product.pricing.savings > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-green-600 bg-green-100 dark:bg-green-900/30 px-3 py-1.5 rounded-full">
-                  💰 Save {formatPrice(product.pricing.savings)}
-                </span>
-                
-                {product.pricing.discountInfo && (
-                  <span className="text-xs text-primary/60">
-                    ({Math.round((product.pricing.savings / product.pricing.originalPrice) * 100)}% off)
-                  </span>
-                )}
+        {/* Right Column - Details (40%) */}
+        <div className="lg:w-[45%] xl:w-[40%] px-6 py-12 lg:px-16 lg:py-24 flex flex-col justify-start">
+           
+           {/* Breadcrumbs */}
+           <div className="flex items-center text-xs text-[var(--ac-stone)] tracking-wider mb-8 uppercase gap-2">
+              <Link href="/" className="hover:text-[var(--ac-charcoal)] dark:hover:text-white transition-colors">Home</Link> <span>/</span> 
+              <Link href="/product" className="hover:text-[var(--ac-charcoal)] dark:hover:text-white transition-colors">Shop</Link> <span>/</span> 
+              <span className="text-[var(--ac-charcoal)] dark:text-white">{product.category || 'Art'}</span>
+           </div>
+
+           {/* Title & Wishlist */}
+           <div className="flex justify-between items-start mb-6">
+              <h1 className="font-sans text-4xl lg:text-[42px] leading-tight text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)] tracking-wide pr-8">
+                 {product.title}
+              </h1>
+              <div className="mt-2 text-[var(--ac-stone)] hover:text-red-500 transition-colors">
+                  <WishlistButton product={product} productId={product.id} />
               </div>
-            )} */}
+           </div>
 
-            {/* Event Discount Info */}
-            {hasActiveEvent && product.event && product.event.discount_percent && (
-              <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">
-                🎉 Special Event Price - Limited Time Only!
-              </p>
-            )}
-          </div>
+           {/* Metadata Row */}
+           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-[var(--ac-stone)] uppercase tracking-widest mb-8 border-b border-[var(--ac-linen)] dark:border-white/10 pb-6">
+               <span>Availability: <span className="text-[var(--ac-charcoal)] dark:text-white">{product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock'}</span></span>
+               <span className="text-gray-300 dark:text-gray-700">|</span>
+               <span>SKU: <span className="text-[var(--ac-charcoal)] dark:text-white">{product.slug?.substring(0,6).toUpperCase() || 'ART123'}</span></span>
+           </div>
 
-          <p className="text-primary/90 text-base leading-relaxed">
-            {product.description}
-          </p>
+           {/* Description */}
+           <p className="text-[13px] leading-relaxed text-[var(--ac-stone)] mb-8">
+               {product.description}
+           </p>
 
-          {/* Selectors */}
-          {product.sizes && product.sizes.length > 0 && (
-            <SizeSelector sizes={product.sizes} />
-          )}
+           {/* Selectors */}
+           <div className="mb-8 space-y-4">
+              {product.sizes && product.sizes.length > 0 && (
+                <SizeSelector sizes={product.sizes} />
+              )}
+              {product.colors && product.colors.length > 0 && (
+                <ColorSelector colors={product.colors} />
+              )}
+           </div>
 
-          {product.colors && product.colors.length > 0 && (
-            <ColorSelector colors={product.colors} />
-          )}
+           {/* Price */}
+           <div className="mb-10 flex items-center gap-4">
+               <span className="text-lg text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)]">
+                   {formatPrice(product.pricing?.finalPrice ?? product.sale_price ?? product.regular_price)}
+               </span>
+               {(product.pricing?.discountInfo || product.sale_price) && (
+                 <span className="text-sm text-gray-400 line-through">
+                   {formatPrice(product.regular_price)}
+                 </span>
+               )}
+           </div>
 
-          {/* Add to Cart Form */}
-          <AddToCartForm
-            product={product}
-            isInCart={isInCart}
-          />
+           {/* Notify / Cart Box */}
+           {product.stock <= 0 ? (
+               <div className="bg-[#F9F9F9] dark:bg-[#1A1A1A] p-6 mb-6 text-[13px] text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)]">
+                   <p className="mb-2 uppercase tracking-widest font-semibold">Currently Out of Stock</p>
+                   <p className="text-[var(--ac-stone)]">You can still add it to your cart to reserve it now, or sign up to receive alerts when it is back in stock.</p>
+               </div>
+           ) : null}
 
-          <DeliveryInfo product={product} />
-          <ProductMeta product={product} />
+           {/* Add to Cart Form */}
+           <AddToCartForm product={product} isInCart={isInCart} />
+
+           {/* Extra Details */}
+           <div className="mt-12 space-y-6 pt-12 border-t border-[var(--ac-linen)] dark:border-white/10">
+               <DeliveryInfo product={product} />
+               <ProductMeta product={product} />
+           </div>
         </div>
       </div>
 
-      {/* Product Details Tabs */}
-      <div className="mt-20">
-        <ProductDetailsTabs product={product} />
+      {/* Product Details Tabs & Recommended */}
+      <div className="max-w-[1600px] mx-auto px-6 lg:px-16 mt-20">
+          <ProductDetailsTabs product={product} />
       </div>
-
-      <div className="pt-24 border-t border-primary/10 mt-16">
-        <RecommendedProducts variant="grid" title="You Might Also Like" />
+      
+      <div className="max-w-[1600px] mx-auto px-6 lg:px-16 mt-16 pt-16 border-t border-[var(--ac-linen)] dark:border-white/10">
+          <RecommendedProducts variant="grid" title="You Might Also Like" />
       </div>
-    </Bounded>
+    </main>
   );
 }
-

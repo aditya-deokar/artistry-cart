@@ -72,23 +72,23 @@ export const AddToCartForm: React.FC<AddToCartFormProps> = ({ product, isInCart 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="flex items-center justify-between">
-            <span className="font-medium">Quantity</span>
-            <div className="flex items-center gap-3 border border-neutral-700 rounded-full px-3">
+        <div className="flex items-center justify-between border-b border-[var(--ac-linen)] dark:border-white/10 pb-4 mb-6">
+            <span className="text-[13px] text-[var(--ac-stone)] uppercase tracking-wider">Quantity</span>
+            <div className="flex items-center gap-4">
                 <button 
                   type="button" 
                   onClick={() => handleQuantityChange(-1)} 
                   disabled={quantity <= 1 || isOutOfStock} 
-                  className="p-2 disabled:opacity-30 hover:text-accent transition-colors"
+                  className="p-1 disabled:opacity-30 hover:text-[var(--ac-charcoal)] dark:hover:text-white transition-colors text-[var(--ac-stone)]"
                 >
                   &minus;
                 </button>
-                <span className="w-10 text-center font-medium">{quantity}</span>
+                <span className="w-6 text-center text-sm">{quantity}</span>
                 <button 
                   type="button" 
                   onClick={() => handleQuantityChange(1)} 
                   disabled={quantity >= stock || isOutOfStock} 
-                  className="p-2 disabled:opacity-30 hover:text-accent transition-colors"
+                  className="p-1 disabled:opacity-30 hover:text-[var(--ac-charcoal)] dark:hover:text-white transition-colors text-[var(--ac-stone)]"
                 >
                   +
                 </button>
@@ -97,25 +97,25 @@ export const AddToCartForm: React.FC<AddToCartFormProps> = ({ product, isInCart 
         <div className="flex flex-col gap-4">
             <button 
               type="submit" 
-              className="w-full uppercase py-3.5 bg-accent text-primary rounded-full font-semibold hover:bg-accent/90 transition-all disabled:bg-neutral-600 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
+              className="w-full uppercase py-5 bg-[#181818] dark:bg-white text-white dark:text-[#181818] font-semibold text-[13px] tracking-widest hover:bg-black dark:hover:bg-gray-200 transition-all disabled:bg-neutral-300 disabled:dark:bg-neutral-800 disabled:text-neutral-500 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
               disabled={isOutOfStock}
             >
                 {isInCart ? (
                   <>
-                    <Check className="h-5 w-5" />
-                    Update Cart ({quantity} more)
+                    <Check className="h-4 w-4" />
+                    UPDATE CART ({quantity} MORE)
                   </>
                 ) : (
                   <>
-                    <ShoppingCart className="h-5 w-5" />
-                    {isOutOfStock ? 'Sold Out' : 'Add to Cart'}
+                    <ShoppingCart className="h-4 w-4" />
+                    {isOutOfStock ? 'SOLD OUT' : 'ADD TO CART'}
                   </>
                 )}
             </button>
-            <div className="text-center"><StockStatus /></div>
+            <div className="text-center mt-2"><StockStatus /></div>
             
             {isInCart && (
-              <p className="text-sm text-center text-green-600 dark:text-green-400 font-medium">
+              <p className="text-sm text-center text-green-600 dark:text-green-400 font-medium mt-2">
                 ✓ Already in your cart. Click to add {quantity} more.
               </p>
             )}

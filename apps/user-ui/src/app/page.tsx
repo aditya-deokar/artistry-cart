@@ -9,7 +9,7 @@
 
 import { Navigation } from '@/components/navigation';
 import {
-  Hero,
+  EcomHero,
   Manifesto,
   FeaturedCategories,
   CuratedCollection,
@@ -24,13 +24,13 @@ import {
 export default function HomePage() {
   return (
     <>
-      {/* Premium Navigation - Transparent with floating pill */}
-      <Navigation transparent hideOnScroll />
+      {/* Premium Navigation - Solid dark theme */}
+      <Navigation />
 
       {/* Main Content */}
       <main>
-        {/* 1. Hero - Full-viewport cinematic introduction */}
-        <Hero />
+        {/* 1. Hero - Full-viewport e-commerce introduction */}
+        <EcomHero />
 
         {/* 2. Manifesto - Scroll-reveal brand philosophy */}
         <Manifesto />

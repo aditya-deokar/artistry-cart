@@ -57,18 +57,18 @@ export function ModeToggle() {
           <Moon className="h-5 w-5 text-[var(--ac-graphite)] dark:text-[var(--ac-silver)] scale-0 rotate-90 transition-all duration-300 dark:scale-100 dark:rotate-0 absolute" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="mt-2">
-        <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer">
-          <Sun className="w-4 h-4 mr-2" />
-          Light
+      <DropdownMenuContent align="end" className="mt-2 z-[100] min-w-[160px] p-2 bg-[var(--ac-ivory)] dark:bg-[var(--ac-obsidian)] border border-[var(--ac-linen)] dark:border-white/10 shadow-2xl rounded-xl backdrop-blur-xl font-medium">
+        <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer flex items-center p-2.5 rounded-lg hover:bg-[var(--ac-cream)] dark:hover:bg-white/5 transition-colors group">
+          <Sun className="w-4 h-4 mr-3 text-[var(--ac-stone)] group-hover:text-[var(--ac-gold)] transition-colors" />
+          <span className="text-sm text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)] group-hover:text-[var(--ac-gold-dark)] dark:group-hover:text-white transition-colors">Light</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer">
-          <Moon className="w-4 h-4 mr-2" />
-          Dark
+        <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer flex items-center p-2.5 rounded-lg hover:bg-[var(--ac-cream)] dark:hover:bg-white/5 transition-colors group">
+          <Moon className="w-4 h-4 mr-3 text-[var(--ac-stone)] group-hover:text-[var(--ac-gold)] transition-colors" />
+          <span className="text-sm text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)] group-hover:text-[var(--ac-gold-dark)] dark:group-hover:text-white transition-colors">Dark</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer">
-          <span className="w-4 h-4 mr-2 flex items-center justify-center text-xs">💻</span>
-          System
+        <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer flex items-center p-2.5 rounded-lg hover:bg-[var(--ac-cream)] dark:hover:bg-white/5 transition-colors group">
+          <span className="w-4 h-4 mr-3 flex items-center justify-center text-[10px] uppercase tracking-widest text-[var(--ac-stone)] group-hover:text-[var(--ac-gold)] transition-colors font-bold border border-current rounded-sm">OS</span>
+          <span className="text-sm text-[var(--ac-charcoal)] dark:text-[var(--ac-pearl)] group-hover:text-[var(--ac-gold-dark)] dark:group-hover:text-white transition-colors">System</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
