@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/auth";
 import {
   analyticsTrackRequestSchema,
   publishAnalyticsEvent,
@@ -14,6 +13,7 @@ import { createLogger } from "@artistry-cart/utils/runtime";
 const logger = createLogger("user-ui-analytics");
 
 export async function POST(request: NextRequest) {
+  const { getCurrentUser } = await import("@/lib/auth");
   const correlationId = request.headers.get("x-correlation-id") ?? undefined;
   const currentUser = await getCurrentUser();
 
