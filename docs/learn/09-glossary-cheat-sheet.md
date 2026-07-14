@@ -176,7 +176,7 @@ pnpm test
 Start Kafka locally:
 
 ```bash
-docker compose -f libs/docker-compose.yml up -d
+docker compose -f docker/compose/docker-compose.infra.yml up -d
 ```
 
 ## Interview One-Liners

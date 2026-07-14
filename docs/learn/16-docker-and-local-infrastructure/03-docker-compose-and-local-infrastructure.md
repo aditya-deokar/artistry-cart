@@ -71,9 +71,9 @@ It defines:
 
 - MongoDB
 - Redis
-- Zookeeper
-- Kafka
-- Kafka UI
+- Kafka (KRaft — no ZooKeeper)
+- kafka-init
+- Redpanda Console
 - networks
 - volumes
 - health checks
@@ -109,21 +109,15 @@ It starts:
 
 This keeps test infrastructure separate from normal local infrastructure.
 
-## Kafka Local Compose
+## Kafka Local Setup
 
-Artistry Cart also has:
+Kafka infrastructure is included in the canonical infra compose:
 
 ```text
-libs/docker-compose.yml
+docker/compose/docker-compose.infra.yml
 ```
 
-It starts:
-
-- Zookeeper
-- Kafka
-- Kafka UI
-
-This is useful when developing Kafka analytics locally.
+It starts Kafka in KRaft mode alongside MongoDB and Redis. No separate Kafka-only compose file is needed.
 
 ## Compose Extends
 
@@ -149,7 +143,7 @@ Compose gives Artistry Cart repeatable local infrastructure for:
 - database
 - cache
 - Kafka broker
-- Kafka UI
+- Redpanda Console
 - full app/service environment
 - e2e test dependencies
 

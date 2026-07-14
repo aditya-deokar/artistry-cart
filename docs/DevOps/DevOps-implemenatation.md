@@ -44,7 +44,7 @@ Supporting infrastructure:
 - MongoDB
 - Redis
 - Kafka
-- Kafka UI for local development
+- Redpanda Console for local Kafka inspection
 
 The e2e apps in `apps/*-e2e` are test projects and should not be containerized as production services.
 
@@ -86,14 +86,14 @@ Historical note:
 
 - Nx monorepo organization for frontends, APIs, workers, and shared packages
 - `docker-compose.test.yml` for MongoDB and Redis test infrastructure
-- `libs/docker-compose.yml` for Kafka and Kafka UI
+- `docker/compose/docker-compose.infra.yml` for Kafka, MongoDB, Redis, and Redpanda Console
 - shared Docker build templates in `docker/backend.Dockerfile` and `docker/frontend.Dockerfile`
 - mostly configurable ports through `PORT`
 - basic health-style endpoints in several services
 
 ### Current gaps that matter for Dockerization
 
-- `api-gateway` proxies to hardcoded `localhost` upstreams instead of environment-based service URLs
+- `api-gateway` proxies to environment-based upstream service URLs (now configurable, defaults to localhost ports)
 - multiple services hardcode local CORS origins such as `http://localhost:3000` and `http://localhost:3001`
 - health endpoints are inconsistent across services: `/gateway-health`, `/`, and `/health`
 - `aivision-service` explicitly loads `.env` from relative filesystem paths, which is fragile inside containers
@@ -126,7 +126,7 @@ For local Docker-based development, we should run:
 - MongoDB
 - Redis
 - Kafka
-- Kafka UI
+- Redpanda Console
 
 This gives the team a one-command environment for full-stack validation.
 
@@ -400,7 +400,7 @@ Tasks:
 - use service health checks and `depends_on` with healthy conditions
 - create named networks for app traffic
 - persist MongoDB and Kafka data only when useful for local workflows
-- expose only the frontends, gateway, and optional Kafka UI to the host
+- expose only the frontends, gateway, and optional Redpanda Console to the host
 
 Recommended local service exposure:
 
@@ -409,7 +409,7 @@ Recommended local service exposure:
 - `api-gateway` -> host
 - `mongodb` -> optional host exposure
 - `redis` -> optional host exposure
-- `kafka-ui` -> optional host exposure
+- `redpanda-console` -> optional host exposure
 
 Internal-only services:
 

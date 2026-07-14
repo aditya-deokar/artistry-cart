@@ -131,10 +131,9 @@ The order service is not allowed to assume foreground payment calls are the only
 
 ## Current Constraints
 
-- Kafka usage appears focused on analytics rather than broad cross-service domain events
+- Kafka usage is focused on analytics rather than broad cross-service domain events — this is an intentional scope decision
 - recommendation serving still performs compute in the request path
-- event schema governance is lightweight and code-driven rather than contract-driven
-- there is no dedicated observability layer for event lag, dead-letter handling, or retry policy documentation yet
+- event schema governance uses Zod contracts with versioning, but does not yet use a schema registry
 
 ## Related Docs
 

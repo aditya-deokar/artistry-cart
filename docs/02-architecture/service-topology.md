@@ -20,7 +20,7 @@ This document explains how the major runtime components are arranged, what each 
 | MongoDB | data store | `27017` | primary persistence | Prisma client in multiple services |
 | Redis | cache/auxiliary infra | `6379` | optional fast-path support for selected flows | auth and order codepaths |
 | Kafka | event bus | `9092` | analytics event transport | frontend producer and kafka-service consumer |
-| Kafka UI | local dev tool | `8089` | inspect Kafka state locally | Kafka |
+| Redpanda Console | local dev tool | `8089` | inspect Kafka state locally | Kafka |
 
 ## Client Entry Paths
 
@@ -89,7 +89,7 @@ All services do not reinvent infrastructure independently. They rely on shared p
 
 - `packages/libs/prisma` for database access
 - `packages/libs/redis` for Redis lifecycle and graceful fallback
-- `packages/utils/kafka` for Kafka configuration
+- `packages/utils/kafka` for Kafka client configuration, idempotent producer, analytics contract, admin topic management, and health probes
 - `packages/middleware` for auth and role middleware
 - `packages/error-handler` for normalized Express error handling
 - `packages/test-utils` for cross-service tests
@@ -108,7 +108,6 @@ This creates consistency, but it also creates coupling. Shared packages are a fo
 ### Constraints
 
 - shared database ownership makes true service autonomy weaker than the folder structure suggests
-- static local proxy assumptions in the gateway limit configuration flexibility
 - some cross-domain behavior still depends on code-level conventions rather than hard contracts
 
 ## Related Docs

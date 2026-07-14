@@ -47,32 +47,25 @@ See [Environment Variables](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart
 
 ## Start Local Infrastructure
 
-### Kafka
+### All Infrastructure (Recommended)
 
-The repo includes a Compose file for Kafka-related infrastructure:
+The canonical Compose file starts all required infrastructure:
 
 ```bash
-docker compose -f libs/docker-compose.yml up -d
+docker compose -f docker/compose/docker-compose.infra.yml up -d
 ```
 
 This starts:
 
-- Zookeeper
-- Kafka broker
-- Kafka UI on port `8089`
+- MongoDB (replica set)
+- Redis
+- Kafka broker (KRaft mode — no ZooKeeper required)
+- kafka-init (creates `user-events` and `user-events.dlq` topics)
+- Redpanda Console on port `8089`
 
-### MongoDB and Redis
+### Full Docker Compose Stack
 
-MongoDB and Redis are expected separately. The repository does not currently include them in the provided Compose file.
-
-Recommended defaults:
-
-- MongoDB: `mongodb://localhost:27017/artistry-cart`
-- Redis: `redis://localhost:6379`
-
-### Full Docker Compose stack
-
-Phase 3 of the DevOps rollout adds a canonical full-stack Compose setup under `docker/compose/`:
+The full-stack Compose entry point includes both infrastructure and all application services:
 
 ```bash
 docker compose -f docker/compose/docker-compose.full.yml up --build
@@ -187,7 +180,7 @@ If you need AI Vision flows:
 - order service: `http://localhost:6004`
 - recommendation service: `http://localhost:6005`
 - AI Vision service: `http://localhost:6006`
-- Kafka UI: `http://localhost:8089`
+- Redpanda Console: `http://localhost:8089`
 
 The complete port reference is in [Port Map](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docs/11-reference/port-map.md>).
 

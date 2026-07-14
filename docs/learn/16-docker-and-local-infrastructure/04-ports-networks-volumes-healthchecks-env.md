@@ -164,7 +164,7 @@ Artistry Cart uses:
 
 - MongoDB and Kafka volumes for persistent local infra
 - data/edge/app networks
-- health checks for MongoDB, Redis, Zookeeper, Kafka
+- health checks for MongoDB, Redis, Kafka
 - Kafka UI exposed on host port `8089`
 - test MongoDB on host `27018`
 - test Redis on host `6380`

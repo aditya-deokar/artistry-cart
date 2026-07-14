@@ -94,9 +94,7 @@ The repository structure suggests a few intentional separations:
 ## Where The Architecture Is Still Transitional
 
 - multiple services share the same MongoDB schema and Prisma client
-- gateway proxy targets are hardcoded to local host/port assumptions
-- service conventions are similar, but not perfectly standardized
-- some operational concerns such as observability and config normalization are only partially encoded
+- service conventions are similar, but not perfectly standardized across all services
 
 ## What To Read Next
 

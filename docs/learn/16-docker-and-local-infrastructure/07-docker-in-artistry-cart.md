@@ -10,7 +10,6 @@ docker/frontend.Dockerfile
 docker/compose/docker-compose.infra.yml
 docker/compose/docker-compose.apps.yml
 docker/compose/docker-compose.full.yml
-libs/docker-compose.yml
 docker-compose.test.yml
 .dockerignore
 ```
@@ -58,9 +57,9 @@ Key ideas:
 
 - MongoDB
 - Redis
-- Zookeeper
-- Kafka
-- Kafka UI
+- Kafka (KRaft — no ZooKeeper)
+- kafka-init (topic pre-creation)
+- Redpanda Console
 
 It also defines:
 
@@ -79,13 +78,13 @@ It also defines:
 
 It uses `extends` to reuse definitions.
 
-## Kafka Local Compose
+## Kafka Local Setup
 
-`libs/docker-compose.yml` provides a Kafka-focused local setup:
+The canonical infrastructure compose (`docker/compose/docker-compose.infra.yml`) includes Kafka running in KRaft mode alongside MongoDB and Redis:
 
-- Zookeeper
-- Kafka
-- Kafka UI on `8089`
+- Kafka broker (KRaft — no ZooKeeper required)
+- kafka-init container (creates topics on startup)
+- Redpanda Console on `8089`
 
 Useful when working specifically on Kafka analytics.
 
@@ -120,5 +119,5 @@ docker build -f docker/frontend.Dockerfile . --build-arg APP_NAME=user-ui --buil
 
 If asked "How is Docker used in Artistry Cart?", say:
 
-> Artistry Cart uses Docker for both local infrastructure and application packaging. Compose files run MongoDB, Redis, Kafka, Kafka UI, and app stacks. The backend Dockerfile builds selected Nx backend services with Prisma generation and runs `node main.js`. The frontend Dockerfile builds selected Next.js apps and runs the standalone server. Test Compose provides isolated MongoDB and Redis ports for e2e workflows.
+> Artistry Cart uses Docker for both local infrastructure and application packaging. Compose files run MongoDB, Redis, Kafka (KRaft mode), Redpanda Console, and app stacks. The backend Dockerfile builds selected Nx backend services with Prisma generation and runs `node main.js`. The frontend Dockerfile builds selected Next.js apps and runs the standalone server. Test Compose provides isolated MongoDB and Redis ports for e2e workflows.
 

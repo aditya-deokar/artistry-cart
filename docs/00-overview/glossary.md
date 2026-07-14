@@ -60,9 +60,9 @@ An auxiliary infrastructure component used for cache or token/session-adjacent f
 
 The event-streaming system used for asynchronous user activity processing.
 
-### Kafka UI
+### Kafka UI (Redpanda Console)
 
-The local browser UI container exposed by the Docker Compose setup for inspecting Kafka topics and brokers.
+The local browser UI container (Redpanda Console) exposed by the Docker Compose setup for inspecting Kafka topics and brokers. Replaces the archived provectuslabs/kafka-ui.
 
 ### ImageKit
 

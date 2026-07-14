@@ -20,7 +20,7 @@ This repository is not a single app. It is a local platform made up of:
 - a Kafka worker
 - MongoDB
 - Redis
-- Kafka and Kafka UI
+- Kafka and Redpanda Console
 
 Running that stack manually is possible, but it is noisy and fragile. Docker Compose gives the team:
 
@@ -35,10 +35,8 @@ The repo already has two useful but partial Compose assets:
 
 - [docker-compose.test.yml](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/docker-compose.test.yml>)
   - MongoDB and Redis for e2e tests
-- [libs/docker-compose.yml](</C:/Users/adity/Desktop/Artistry Cart/artistry-cart/libs/docker-compose.yml>)
-  - Kafka, Zookeeper, and Kafka UI for local infrastructure
 
-Those files solve isolated pieces of the problem, but they do not yet provide a full application stack.
+The canonical Compose assets live under `docker/compose/`.
 
 ## Strategy Goals
 
@@ -69,12 +67,11 @@ Recommended meaning of each file:
 
 | File | Purpose |
 | --- | --- |
-| `docker-compose.infra.yml` | MongoDB, Redis, Kafka, Zookeeper, Kafka UI |
+| `docker-compose.infra.yml` | MongoDB, Redis, Kafka (KRaft), kafka-init, Redpanda Console |
 | `docker-compose.apps.yml` | frontends, gateway, backend services, worker |
 | `docker-compose.full.yml` | convenience entry point that includes infra + apps |
 | `docker-compose.override.example.yml` | optional local overrides for developers |
 
-The existing root test compose file can remain for e2e use. The Kafka compose file under `libs/` can remain temporarily, but the canonical direction should be the `docker/compose/` folder above.
 
 ## Service Inventory
 
@@ -93,9 +90,8 @@ Recommended local Compose service names:
 | `kafka-service` | worker | no | `http://kafka-service:3000` management endpoint |
 | `mongodb` | database | optional | `mongodb://mongodb:27017/artistry-cart` |
 | `redis` | cache | optional | `redis://redis:6379` |
-| `zookeeper` | Kafka dependency | no | `zookeeper:2181` |
 | `kafka` | broker | optional | `kafka:9092` |
-| `kafka-ui` | local admin tool | optional | `http://kafka-ui:8089` |
+| `redpanda-console` | local admin tool | optional | `http://redpanda-console:8089` |
 
 ## Host Port Exposure Rules
 
@@ -104,7 +100,7 @@ By default, only these services should publish ports to the host:
 - `user-ui`
 - `seller-ui`
 - `api-gateway`
-- `kafka-ui`
+- `redpanda-console`
 
 Optional host exposure:
 
@@ -120,7 +116,6 @@ Internal-only by default:
 - `recommendation-service`
 - `aivision-service`
 - `kafka-service`
-- `zookeeper`
 
 Why this matters:
 
@@ -142,9 +137,9 @@ Recommended use:
 
 | Network | Purpose | Members |
 | --- | --- | --- |
-| `edge` | host-facing traffic | `user-ui`, `seller-ui`, `api-gateway`, optional `kafka-ui` |
+| `edge` | host-facing traffic | `user-ui`, `seller-ui`, `api-gateway`, optional `redpanda-console` |
 | `app` | internal application traffic | all frontends, gateway, APIs, workers |
-| `data` | infra access | APIs, workers, `mongodb`, `redis`, `kafka`, `zookeeper` |
+| `data` | infra access | APIs, workers, `mongodb`, `redis`, `kafka` |
 
 This is a local-development simplification, but it helps keep service intent clear.
 
@@ -216,11 +211,11 @@ Recommended health-check behavior:
 
 Recommended dependency flow:
 
-1. `mongodb`, `redis`, `zookeeper`, `kafka`
+1. `mongodb`, `redis`, `kafka`
 2. internal APIs and worker
 3. `api-gateway`
 4. `user-ui` and `seller-ui`
-5. optional `kafka-ui`
+5. optional `redpanda-console`
 
 Compose should rely on health rather than raw container start order where possible.
 
@@ -247,7 +242,7 @@ Recommended profiles:
 | --- | --- |
 | `core` | `user-ui`, `seller-ui`, `api-gateway`, core APIs, `mongodb`, `redis` |
 | `ai` | `aivision-service` |
-| `analytics` | `kafka`, `zookeeper`, `kafka-service`, `kafka-ui` |
+| `analytics` | `kafka`, `kafka-service`, `redpanda-console` |
 | `full` | everything |
 | `test` | throwaway infra for e2e-like workflows |
 

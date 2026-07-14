@@ -88,7 +88,7 @@ Example image:
 ```text
 mongo:7
 redis:7-alpine
-bitnami/kafka:3.7.0-debian-12-r0
+apache/kafka:latest
 ```
 
 ## Why Docker Is Useful For Microservices

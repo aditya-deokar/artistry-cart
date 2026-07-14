@@ -84,37 +84,42 @@ The recommendation API can use already-prepared behavior data instead of making 
 
 Strong parts:
 
-- event-driven analytics path
-- dedicated Kafka worker service
-- shared Kafka utilities
-- local Kafka tooling
+- event-driven analytics path with exactly-once production semantics
+- dedicated Kafka worker service with manual offset commits
+- shared Kafka utilities (idempotent producer, analytics contract, admin, health probes)
+- KRaft-native broker (no ZooKeeper)
+- Redpanda Console for local Kafka inspection
 - clear separation from request path
+- Zod schema contracts with versioning (`SUPPORTED_SCHEMA_VERSIONS`)
+- dead-letter queue (DLQ) for malformed or exhausted events
+- exponential backoff retry with jitter for producer and consumer
+- correlation ID propagation for distributed tracing
+- Prometheus-compatible consumer metrics (`/metrics`)
 
 Maturity areas:
 
-- event schema versioning
-- dead-letter topic strategy
-- retry policy
-- lag monitoring and alerts
-- event id deduplication
-- contract tests for producer/consumer event shape
+- schema registry integration (currently code-driven Zod contracts)
+- consumer lag alerting rules
+- event replay tooling
 
-## Example Event Contract
+## Actual Event Contract
 
-Possible analytics event shape:
+The analytics event shape is defined by Zod in `packages/utils/kafka/analytics-contract.ts`:
 
 ```json
 {
-  "eventId": "evt_123",
-  "eventType": "ProductViewed",
-  "version": 1,
-  "occurredAt": "2026-06-10T10:00:00.000Z",
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "action": "product_view",
+  "schemaVersion": 1,
+  "timestamp": "2026-06-10T10:00:00.000Z",
   "userId": "u1",
   "productId": "p1",
-  "metadata": {
-    "device": "desktop",
-    "source": "product-page"
-  }
+  "source": "user-ui",
+  "quantity": 1,
+  "correlationId": "req-abc-123",
+  "device": "desktop",
+  "city": "Mumbai",
+  "country": "IN"
 }
 ```
 
@@ -134,5 +139,5 @@ Be ready to answer:
 
 If asked "How does Kafka work in Artistry Cart?", say:
 
-> Kafka is used for analytics ingestion. User activity events are produced from the frontend side and written to a Kafka topic. `kafka-service` consumes those events, validates them, and materializes user/product analytics into MongoDB. `recommendation-service` can later read that prepared analytics data. This keeps analytics writes off the main user request path.
+> Kafka is used for analytics ingestion with production-grade reliability. User activity events are produced from the frontend using an idempotent KafkaJS producer and written to a `user-events` topic. `kafka-service` consumes events in batches with manual offset commits, validates them with Zod schema contracts, and materializes user/product/shop analytics into MongoDB. Failed events are routed to a dead-letter queue. `recommendation-service` reads the prepared analytics data. This keeps analytics writes off the main user request path while maintaining exactly-once production semantics and at-least-once consumption.
 

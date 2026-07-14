@@ -6,19 +6,21 @@
 ![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=111111)
 ![Prisma](https://img.shields.io/badge/Prisma-MongoDB-2D3748?logo=prisma&logoColor=white)
-![Kafka](https://img.shields.io/badge/Kafka-analytics-231F20?logo=apachekafka&logoColor=white)
+![Kafka](https://img.shields.io/badge/Kafka-KRaft-231F20?logo=apachekafka&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-ready-326CE5?logo=kubernetes&logoColor=white)
 
-Artistry Cart is a production-oriented, service-based ecommerce platform for artisan commerce. It combines a buyer marketplace, a seller operations dashboard, API gateway routing, domain-focused backend services, MongoDB persistence through Prisma, Kafka-backed analytics, Stripe payments, Redis-assisted runtime behavior, and a dedicated AI Vision service for generation, visual search, and artisan collaboration.
+Artistry Cart is a production-oriented, microservices-based ecommerce platform for artisan commerce. It combines a buyer marketplace, a seller operations dashboard, an API gateway edge layer, domain-focused backend services, MongoDB persistence through Prisma, a KRaft-native Kafka analytics pipeline with exactly-once production semantics and dead-letter queue support, Stripe payments, Redis-assisted runtime behavior with graceful degradation, and a dedicated AI Vision service for generation, visual search, and artisan collaboration.
 
-The repository is intentionally built as an Nx monorepo: one workspace, multiple deployable applications, shared infrastructure packages, unified testing, Docker/Kubernetes assets, and a canonical documentation system under [`docs/`](docs/README.md).
+The repository is built as an Nx monorepo: one workspace, multiple independently deployable applications, shared infrastructure packages, unified testing, Docker/Kubernetes assets, and a canonical documentation system under [`docs/`](docs/README.md).
 
 ## Table Of Contents
 
-- [Product Scope](#product-scope)
+- [System Design Philosophy](#system-design-philosophy)
 - [Architecture Overview](#architecture-overview)
-- [Applications And Services](#applications-and-services)
+- [Service Decomposition](#service-decomposition)
 - [Request, Event, And Data Flows](#request-event-and-data-flows)
+- [Kafka Analytics Pipeline](#kafka-analytics-pipeline)
+- [Data Architecture](#data-architecture)
 - [Technology Stack](#technology-stack)
 - [Repository Map](#repository-map)
 - [Local Development](#local-development)
@@ -27,33 +29,38 @@ The repository is intentionally built as an Nx monorepo: one workspace, multiple
 - [Testing](#testing)
 - [Docker, Kubernetes, And Delivery](#docker-kubernetes-and-delivery)
 - [Observability And Security](#observability-and-security)
-- [Production Readiness Notes](#production-readiness-notes)
+- [Architectural Tradeoffs](#architectural-tradeoffs)
+- [Production Readiness](#production-readiness)
 - [Documentation Guide](#documentation-guide)
 
-## Product Scope
+## System Design Philosophy
 
-Artistry Cart supports three major experience areas:
+Artistry Cart is designed around several intentional architectural principles:
 
-| Area | What It Provides |
-| --- | --- |
-| Buyer marketplace | Landing pages, catalog browsing, product detail pages, search, shops, artisans, events, cart, wishlist, checkout, profile, order history, and support pages. |
-| Seller operations | Seller auth, onboarding, shop setup, dashboard navigation, product management, order review, discounts, offers, event management, and operational workflows. |
-| Platform intelligence | Auth, OAuth, payments, analytics ingestion, recommendation serving, AI concept generation, visual search, collections, comments, artisan matching, and scheduled AI maintenance jobs. |
+### Separation Of Concerns Through Service Boundaries
 
-The platform is more than a CRUD storefront. Its interesting engineering surface comes from combining commerce, payments, personalization, AI workflows, async analytics, deployment automation, and operational hardening inside one coherent workspace.
+Each backend service owns a distinct business domain. This isn't arbitrary decomposition — the splits follow natural fault isolation and operational sensitivity boundaries:
+
+- **Auth** is isolated because identity, JWTs, OAuth, cookies, and onboarding flows have their own complexity and security surface.
+- **Orders** are isolated because payment processing and Stripe webhook flows are operationally sensitive — a payment bug should not cascade into catalog or AI features.
+- **AI Vision** is isolated because AI workloads (embeddings, generation, visual search, Agenda background jobs) have fundamentally different latency profiles, dependency graphs, and scaling characteristics than transactional commerce.
+- **Kafka analytics** is isolated because materialization is asynchronous and operationally independent from request handling — consumer lag and batch failures should not affect buyer experience.
+
+### Asynchronous Where It Matters, Synchronous Where It's Simpler
+
+The system uses async event processing only where latency decoupling provides real value (analytics materialization, recommendation data capture), while keeping synchronous request/response patterns for catalog, checkout, and auth — where simplicity and debuggability outweigh the benefits of async orchestration.
+
+### Pragmatic Hybrid Over Ideological Purity
+
+Artistry Cart uses a shared MongoDB schema through Prisma rather than database-per-service. This is a deliberate tradeoff: it sacrifices full service storage independence for dramatically faster development velocity, simpler local setup, and consistent data access patterns. Services express ownership logically through code, APIs, and documentation.
+
+### Defense In Depth For Payments And External Integrations
+
+Stripe webhooks are verified with signature validation using raw body parsing. OAuth flows use PKCE-aware Arctic providers. AI Vision routes have per-route rate limiting independent of the gateway. The gateway itself enforces CORS, rate limiting, and centralized proxy routing.
 
 ## Architecture Overview
 
-Artistry Cart uses a pragmatic hybrid architecture:
-
-- Nx and pnpm keep all source, tests, shared packages, and infrastructure definitions in one monorepo.
-- Next.js powers the buyer and seller frontends.
-- Express services own major backend domains.
-- The API gateway is the client-facing backend entry point and routes traffic to internal services.
-- MongoDB is the durable system of record through a shared Prisma client.
-- Kafka carries user activity events into analytics read models.
-- Redis supports selected fast-path or auxiliary behavior with graceful fallback.
-- AI Vision is isolated from transactional commerce services because it has heavier dependencies, different latency behavior, and scheduled background jobs.
+### High-Level System Diagram
 
 ```mermaid
 flowchart LR
@@ -69,7 +76,7 @@ flowchart LR
     Gateway --> Reco["recommendation-service"]
     Gateway --> AIV["aivision-service"]
 
-    UserUI -. "user activity events" .-> Kafka["Kafka<br/>user-events"]
+    UserUI -. "user activity events" .-> Kafka["Kafka<br/>KRaft (no ZooKeeper)"]
     Order -. "purchase analytics outbox" .-> Kafka
     Kafka --> Worker["kafka-service<br/>analytics worker"]
 
@@ -117,8 +124,8 @@ flowchart TD
     subgraph State["State and infrastructure"]
         DB["MongoDB :27017"]
         Cache["Redis :6379"]
-        Bus["Kafka :9092"]
-        KUI["Kafka UI :8089"]
+        Bus["Kafka :9092 (KRaft)"]
+        KUI["Redpanda Console :8089"]
     end
 
     U --> G
@@ -143,7 +150,9 @@ flowchart TD
     O --> Cache
 ```
 
-## Applications And Services
+## Service Decomposition
+
+### Applications
 
 | Project | Type | Port | Responsibility |
 | --- | --- | ---: | --- |
@@ -155,7 +164,7 @@ flowchart TD
 | [`apps/order-service`](apps/order-service) | Express service | `6004` | Checkout, Stripe sessions/intents, webhooks, orders, cancellations, refunds, seller orders, earnings, payouts, and purchase analytics outbox. |
 | [`apps/recommendation-service`](apps/recommendation-service) | Express service | `6005` | Recommendation APIs backed by materialized user activity and TensorFlow-based scoring/fallback logic. |
 | [`apps/aivision-service`](apps/aivision-service) | Express service | `6006` | Text/image generation, product variations, visual search, concepts, gallery, collections, comments, artisan matching, embeddings, rate limiting, and Agenda jobs. |
-| [`apps/kafka-service`](apps/kafka-service) | Worker + HTTP management | `3000` | Kafka consumer for `user-events`, analytics materialization, retry/DLQ behavior, readiness, and Prometheus-style metrics. |
+| [`apps/kafka-service`](apps/kafka-service) | Worker + HTTP management | `3000` | Kafka consumer for `user-events`, analytics materialization, DLQ routing, retry with exponential backoff, readiness probes, and Prometheus-style metrics. |
 
 ### Shared Packages
 
@@ -164,7 +173,7 @@ flowchart TD
 | [`packages/error-handler`](packages/error-handler) | Shared Express error classes and middleware for normalized application, Prisma, validation, auth, and unexpected errors. |
 | [`packages/middleware`](packages/middleware) | Shared JWT auth, role guards, seller/user/admin authorization helpers, and identity hydration. |
 | [`packages/libs`](packages/libs) | Prisma client, Redis initialization, and ImageKit integration entry points. |
-| [`packages/utils`](packages/utils) | Kafka client utilities plus shared runtime helpers for logging, CORS, health, metrics, request IDs, security headers, service URLs, and shutdown. |
+| [`packages/utils`](packages/utils) | Kafka client (SASL/SSL-capable), idempotent producer, analytics contract (Zod), admin topic management, health probes, and shared runtime helpers for logging, CORS, health, metrics, request IDs, security headers, service URLs, and shutdown. |
 | [`packages/test-utils`](packages/test-utils) | Test helpers, mocks, auth utilities, data factories, request helpers, and shared setup. |
 
 ## Request, Event, And Data Flows
@@ -244,15 +253,14 @@ sequenceDiagram
     UI->>K: Publish browse/cart/wishlist/shop events
     O->>K: Publish purchase events from analytics outbox
     K->>W: Deliver event batch
-    W->>W: Validate payload, retry transient errors
+    W->>W: Validate payload (Zod), retry transient errors
     W->>DB: Upsert UserAnalytics
     W->>DB: Upsert productAnalytics/shopAnalytics
+    W--xW: DLQ malformed/exhausted events
     R->>DB: Read activity and product data
     R->>R: Score or use cached/fallback recommendations
     R-->>UI: Recommended products
 ```
-
-The worker uses manual offset commits, validates messages before persistence, supports bounded retry, and can dead-letter invalid or exhausted events when `KAFKA_DLQ_TOPIC` is configured.
 
 ### AI Vision Flow
 
@@ -281,7 +289,100 @@ sequenceDiagram
 
 AI Vision supports anonymous exploration for selected paths while still allowing stricter authenticated routes through local `requireAuth` behavior.
 
-### Data Ownership Model
+## Kafka Analytics Pipeline
+
+The Kafka pipeline is one of the most architecturally intentional subsystems in the platform. It goes beyond basic pub/sub to implement production-grade reliability patterns.
+
+### Pipeline Architecture
+
+```mermaid
+flowchart LR
+    A["user-ui (Next.js)"] -->|"Analytics API"| B["@artistry-cart/utils/kafka<br/>Idempotent Producer"]
+    C["order-service"] -->|"Transactional Outbox"| B
+    B -->|"Exactly-once produce"| D["Kafka Broker<br/>(KRaft — no ZooKeeper)<br/>user-events topic"]
+    D -->|"Batch consumer<br/>manual offset commit"| E["kafka-service"]
+    E -->|"Success"| F["MongoDB<br/>UserAnalytics<br/>productAnalytics<br/>shopAnalytics"]
+    E -..->|"Permanent failure"| G["user-events.dlq<br/>Dead Letter Queue"]
+```
+
+### Infrastructure: KRaft-Native Kafka (No ZooKeeper)
+
+The platform uses the official **`apache/kafka`** image running in **KRaft mode** — Kafka's built-in consensus protocol that replaces ZooKeeper entirely. This provides:
+
+- **Simpler operations**: One process handles both broker and controller roles (`KAFKA_PROCESS_ROLES: broker,controller`).
+- **Faster startup**: No ZooKeeper dependency means fewer moving parts and fewer failure modes.
+- **Modern baseline**: KRaft is the recommended production mode for Kafka 3.3+.
+
+Topic initialization is handled by a dedicated `kafka-init` container that runs after the Kafka healthcheck passes, creating `user-events` (6 partitions, 7-day retention) and `user-events.dlq` (3 partitions, 30-day retention) with idempotent `--if-not-exists` semantics.
+
+The Kafka UI is provided by **Redpanda Console** (`redpandadata/console`) on port `8089`, replacing the archived `provectuslabs/kafka-ui`.
+
+### Reliability Guarantees
+
+#### Idempotent Producer (Exactly-Once Production)
+
+The shared KafkaJS producer (`packages/utils/kafka/analytics-producer.ts`) operates with `idempotent: true` and `maxInFlightRequests: 5`. If a network timeout occurs after the broker receives a message but before it sends the ACK, the producer retries automatically — idempotency ensures the broker recognizes the duplicate sequence number and discards it silently.
+
+#### Transactional Outbox Pattern
+
+Services like `order-service` do not write to Kafka during the main database transaction. Instead, they write an event to an `analyticsOutbox` table in MongoDB. A background process polls this table and uses the idempotent producer to publish. This prevents the **dual-write problem** — if the DB commits but Kafka is down, the event is not lost.
+
+#### Exponential Backoff And Connection Resilience
+
+Both the producer and consumer use exponential backoff with jitter:
+
+- **Producer**: 5 connect retries with exponential delay (1s base, 30s cap, 25% jitter), then fails the request.
+- **Consumer**: Configurable startup retries (default 5, 3s base, 60s cap, 20% jitter), with infinite reconnection on network loss after initial connect.
+
+#### Manual Offset Commits
+
+The consumer uses `autoCommit: false` and `eachBatchAutoResolve: false` — offsets are only committed after successful processing and persistence, ensuring at-least-once delivery semantics at the consumer side.
+
+#### Dead Letter Queue (DLQ)
+
+When a message fails Zod schema validation or exhausts per-message retries, it is routed to `user-events.dlq` with enriched error metadata rather than being retried infinitely (which would cause head-of-line blocking). The consumer commits the offset and continues.
+
+### Schema Contract And Evolution
+
+All Kafka payloads are validated using Zod schemas defined in `analytics-contract.ts`:
+
+- **Versioning**: Every event includes a `schemaVersion` header. The consumer maintains a `SUPPORTED_SCHEMA_VERSIONS` array for backward-compatible evolution.
+- **Correlation**: A `correlationId` header propagates from the API Gateway / Next.js frontend through to consumer logs, enabling end-to-end distributed tracing of a single user request.
+- **Typed actions**: Seven action types are enforced — `add_to_wishlist`, `add_to_cart`, `product_view`, `remove_from_wishlist`, `remove_from_cart`, `purchase`, `shop_visit`.
+- **Contextual validation**: Action-specific rules (e.g., `shop_visit` requires `shopId` or `productId`, other actions require `productId`) are enforced via Zod superRefine.
+
+### Topic Administration
+
+The Kafka admin module (`packages/utils/kafka/admin.ts`) provides idempotent topic creation via `ensureTopicsExist()` — the `kafka-service` verifies topic existence at startup and creates missing topics programmatically, providing self-healing behavior independent of the Docker init container.
+
+### Health And Observability
+
+- **`/kafka-health`** endpoint performs a lightweight admin client probe (connect → list topics → disconnect) and returns cluster health with latency.
+- **`/metrics`** exposes Prometheus-compatible worker metrics:
+  - `kafka_consumer_lag` — critical scaling signal
+  - `kafka_batch_duration_seconds` — processing latency histogram
+  - `kafka_events_dead_lettered_total` — schema mismatch alert trigger
+- **`/ready`** reflects consumer connection state, running status, and shutdown awareness.
+- **`waitForKafka()`** utility provides startup readiness with configurable retry and backoff for dependent services.
+
+### Kafka Client Configuration
+
+The shared Kafka client (`packages/utils/kafka/client.ts`) supports production deployment scenarios:
+
+| Feature | Environment Variable | Default |
+| --- | --- | --- |
+| Broker list | `KAFKA_BROKERS` | `localhost:9092` |
+| Client ID | `KAFKA_CLIENT_ID` | Per-service name |
+| SASL auth | `KAFKA_SASL_USERNAME`, `KAFKA_SASL_PASSWORD`, `KAFKA_SASL_MECHANISM` | Disabled |
+| TLS | `KAFKA_SSL` | `false` |
+| Log level | `KAFKA_LOG_LEVEL` | `warn` |
+| Connection timeout | `KAFKA_CONNECTION_TIMEOUT_MS` | `3000` |
+| Request timeout | `KAFKA_REQUEST_TIMEOUT_MS` | `30000` |
+| Retry config | `KAFKA_RETRY_INITIAL_TIME_MS`, `KAFKA_RETRY_MAX_RETRIES` | `300`, `10` |
+
+## Data Architecture
+
+### Ownership Model
 
 The repository is service-oriented at the application boundary, but persistence is centralized. Services express ownership logically through code, APIs, and documentation while sharing one MongoDB schema and Prisma client.
 
@@ -298,66 +399,80 @@ flowchart TD
     Gateway["api-gateway<br/>site config bootstrap"] --> Prisma
 ```
 
-Major model clusters in [`prisma/schema.prisma`](prisma/schema.prisma):
+### Major Model Clusters
 
-- Identity: `users`, `sellers`, `addresses`, `Notification`
-- Shops: `shops`, `shopReviews`, `site_config`
-- Catalog: `products`, `ProductPricing`, `events`, `EventProductDiscount`, `discount_codes`, `discount_usage`, `banners`
-- Orders: `orders`, `OrderItem`, `payments`, `payouts`, `refunds`
-- Analytics: `UserAnalytics`, `productAnalytics`, `shopAnalytics`, `uniqueShopVisitor`, `analyticsOutbox`
-- AI Vision: `VisionSession`, `Concept`, `ConceptImage`, `AIGeneratedProduct`, `ArtisanMatch`, `ConceptCollection`, `ConceptComment`, `RateLimitEntry`, `ProductEmbedding`, `APIUsageLog`
+The schema in [`prisma/schema.prisma`](prisma/schema.prisma) is organized into six bounded contexts:
+
+| Context | Models | Owning Service |
+| --- | --- | --- |
+| Identity | `users`, `sellers`, `addresses`, `Notification` | `auth-service` |
+| Shops | `shops`, `shopReviews`, `site_config` | `product-service`, `auth-service` |
+| Catalog | `products`, `ProductPricing`, `events`, `EventProductDiscount`, `discount_codes`, `discount_usage`, `banners` | `product-service` |
+| Orders | `orders`, `OrderItem`, `payments`, `payouts`, `refunds` | `order-service` |
+| Analytics | `UserAnalytics`, `productAnalytics`, `shopAnalytics`, `uniqueShopVisitor`, `analyticsOutbox` | `kafka-service` (write), `recommendation-service` (read) |
+| AI Vision | `VisionSession`, `Concept`, `ConceptImage`, `AIGeneratedProduct`, `ArtisanMatch`, `ConceptCollection`, `ConceptComment`, `RateLimitEntry`, `ProductEmbedding`, `APIUsageLog` | `aivision-service` |
+
+### Why Shared Persistence
+
+This is the most significant structural tradeoff. The shared schema enables:
+
+- **Fast development**: No cross-database sync, no distributed transactions.
+- **Simple local setup**: One MongoDB instance, one `prisma generate`.
+- **Consistent typed access**: All services use the same generated Prisma client.
+
+The cost is weaker service autonomy — schema migrations require coordination, and cross-service data access is possible at the ORM level even when it shouldn't be. This is mitigated by clear code ownership and documented model boundaries.
 
 ## Technology Stack
 
 | Layer | Technologies |
 | --- | --- |
-| Monorepo | Nx 21, pnpm workspace, TypeScript |
+| Monorepo | Nx 21, pnpm workspace, TypeScript 5.8 |
 | Frontend | Next.js 15, React 19, Tailwind CSS 4, React Query, Zustand, Jotai, GSAP, Framer Motion, Radix UI, Lucide |
 | Backend | Express, Node.js 20, Zod, cookie-parser, CORS, express-rate-limit |
-| Data | MongoDB, Prisma, Redis |
-| Events | Kafka, KafkaJS, Kafka UI, DLQ-capable analytics worker |
+| Data | MongoDB 7, Prisma 6, Redis 7 |
+| Events | Apache Kafka (KRaft-native, no ZooKeeper), KafkaJS, Redpanda Console, idempotent producer, DLQ-capable analytics worker |
 | Payments | Stripe client/server SDKs and signed webhooks |
 | AI and media | Google Gemini, Hugging Face, TensorFlow.js, LangChain, ImageKit |
-| Testing | Vitest, Supertest, Nx e2e projects, shared mocks and factories |
+| Testing | Vitest 4, Supertest, Nx e2e projects, shared mocks and factories |
 | Delivery | Docker, Docker Compose, GitHub Actions, GHCR, Kustomize, Kubernetes |
-| Operations | `/healthz`, `/readyz`, `/metrics`, structured logs, request IDs, Trivy scans, SBOM/provenance, Dependabot |
+| Operations | `/healthz`, `/readyz`, `/metrics`, structured JSON logs, request IDs, Trivy scans, SBOM/provenance, Dependabot |
 
 ## Repository Map
 
 ```text
 .
-+-- apps/
-|   +-- user-ui/                    # Buyer-facing Next.js app
-|   +-- seller-ui/                  # Seller dashboard Next.js app
-|   +-- api-gateway/                # Public backend proxy/edge service
-|   +-- auth-service/               # Identity, OAuth, onboarding
-|   +-- product-service/            # Catalog, shops, search, discounts, events
-|   +-- order-service/              # Checkout, orders, Stripe, payouts
-|   +-- recommendation-service/     # Recommendation APIs
-|   +-- aivision-service/           # AI generation, visual search, concepts
-|   +-- kafka-service/              # Analytics worker
-|   +-- *-e2e/                      # Service-level e2e projects
-+-- packages/
-|   +-- error-handler/              # Shared Express error contract
-|   +-- middleware/                 # Shared auth/role middleware
-|   +-- libs/                       # Prisma, Redis, ImageKit helpers
-|   +-- utils/                      # Kafka and runtime utilities
-|   +-- test-utils/                 # Shared test helpers and mocks
-+-- prisma/
-|   +-- schema.prisma               # MongoDB schema
-|   +-- seed/                       # Seed fixtures and scripts
-+-- docker/
-|   +-- backend.Dockerfile
-|   +-- frontend.Dockerfile
-|   +-- compose/                    # Infra, apps, and full-stack Compose files
-+-- k8s/
-|   +-- base/                       # Kustomize base manifests
-|   +-- overlays/                   # dev, staging, production overlays
-|   +-- addons/monitoring/          # Optional Prometheus Operator resources
-+-- scripts/ci/                     # Release and deployment helper scripts
-+-- tools/e2e/                      # E2E orchestration helper
-+-- docs/                           # Canonical documentation system
-+-- .github/workflows/              # CI, publish, deploy, security workflows
+├── apps/
+│   ├── user-ui/                    # Buyer-facing Next.js app
+│   ├── seller-ui/                  # Seller dashboard Next.js app
+│   ├── api-gateway/                # Public backend proxy/edge service
+│   ├── auth-service/               # Identity, OAuth, onboarding
+│   ├── product-service/            # Catalog, shops, search, discounts, events
+│   ├── order-service/              # Checkout, orders, Stripe, payouts
+│   ├── recommendation-service/     # Recommendation APIs
+│   ├── aivision-service/           # AI generation, visual search, concepts
+│   ├── kafka-service/              # Analytics worker
+│   └── *-e2e/                      # Service-level e2e projects
+├── packages/
+│   ├── error-handler/              # Shared Express error contract
+│   ├── middleware/                 # Shared auth/role middleware
+│   ├── libs/                       # Prisma, Redis, ImageKit helpers
+│   ├── utils/                      # Kafka and runtime utilities
+│   └── test-utils/                 # Shared test helpers and mocks
+├── prisma/
+│   ├── schema.prisma               # MongoDB schema
+│   └── seed/                       # Seed fixtures and scripts
+├── docker/
+│   ├── backend.Dockerfile
+│   ├── frontend.Dockerfile
+│   └── compose/                    # Infra, apps, and full-stack Compose files
+├── k8s/
+│   ├── base/                       # Kustomize base manifests
+│   ├── overlays/                   # dev, staging, production overlays
+│   └── addons/monitoring/          # Optional Prometheus Operator resources
+├── scripts/ci/                     # Release and deployment helper scripts
+├── tools/e2e/                      # E2E orchestration helper
+├── docs/                           # Canonical documentation system
+└── .github/workflows/              # CI, publish, deploy, security workflows
 ```
 
 ## Local Development
@@ -411,7 +526,7 @@ The canonical full-stack Compose entry point is:
 docker compose -f docker/compose/docker-compose.full.yml up --build
 ```
 
-Infra only:
+Infra only (MongoDB, Redis, Kafka with KRaft, kafka-init, Redpanda Console):
 
 ```bash
 docker compose -f docker/compose/docker-compose.infra.yml up -d
@@ -425,13 +540,13 @@ docker compose -f docker/compose/docker-compose.apps.yml up --build
 
 ### Option 2: Manual Service Startup
 
-Start infrastructure first:
+Start infrastructure first using the Compose infra stack:
 
 ```bash
-docker compose -f libs/docker-compose.yml up -d
+docker compose -f docker/compose/docker-compose.infra.yml up -d
 ```
 
-That starts Zookeeper, Kafka, and Kafka UI. MongoDB and Redis can be started locally or through the Compose infra stack.
+This starts MongoDB (with replica set), Redis, Kafka (KRaft — no ZooKeeper), the topic init container, and Redpanda Console.
 
 Recommended manual order:
 
@@ -500,7 +615,7 @@ The full inventory lives in [`docs/01-getting-started/environment-variables.md`]
 | Database/cache | `DATABASE_URL`, `REDIS_ENABLED`, `REDIS_URL` |
 | Auth | `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`, `MAINTENANCE_TOKEN` |
 | OAuth | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `FACEBOOK_CLIENT_ID`, `FACEBOOK_CLIENT_SECRET`, `OAUTH_REDIRECT_BASE_URL` |
-| Kafka | `KAFKA_BROKERS`, `KAFKA_CLIENT_ID`, `KAFKA_USER_EVENTS_TOPIC`, `KAFKA_DLQ_TOPIC`, retry/batch/fetch controls |
+| Kafka | `KAFKA_BROKERS`, `KAFKA_CLIENT_ID`, `KAFKA_USER_EVENTS_TOPIC`, `KAFKA_DLQ_TOPIC`, `KAFKA_SSL`, `KAFKA_SASL_USERNAME`, `KAFKA_SASL_PASSWORD`, `KAFKA_SASL_MECHANISM`, retry/batch/fetch controls |
 | Payments | `STRIPE_SECRETE_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLIC_KEY` |
 | Email | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SERVICE`, `SMTP_USER`, `SMTP_PASS` |
 | AI/media | `GOOGLE_API_KEY`, `HUGGINGFACE_API_KEY`, `IMAGEKIT_PUBLIC_API_KEY`, `IMAGEKIT_PRIVATE_API_KEY`, `IMAGEKIT_URL_ENDPOINT` |
@@ -519,9 +634,8 @@ Note the current Stripe secret variable is intentionally documented as `STRIPE_S
 | `6005` | `recommendation-service` | Recommendations |
 | `6006` | `aivision-service` | AI Vision API |
 | `8080` | `api-gateway` | Public backend entry point |
-| `8089` | Kafka UI | Local Kafka inspection |
-| `9092` | Kafka | Broker |
-| `2181` | Zookeeper | Local Kafka dependency |
+| `8089` | Redpanda Console | Kafka topic inspection (replaces archived kafka-ui) |
+| `9092` | Kafka | Broker (KRaft mode — no ZooKeeper required) |
 | `6379` | Redis | Cache/auxiliary runtime |
 | `27017` | MongoDB | Primary database |
 
@@ -595,10 +709,10 @@ The repository includes:
 
 - [`docker/backend.Dockerfile`](docker/backend.Dockerfile)
 - [`docker/frontend.Dockerfile`](docker/frontend.Dockerfile)
-- [`docker/compose/docker-compose.infra.yml`](docker/compose/docker-compose.infra.yml)
-- [`docker/compose/docker-compose.apps.yml`](docker/compose/docker-compose.apps.yml)
-- [`docker/compose/docker-compose.full.yml`](docker/compose/docker-compose.full.yml)
-- [`docker-compose.test.yml`](docker-compose.test.yml)
+- [`docker/compose/docker-compose.infra.yml`](docker/compose/docker-compose.infra.yml) — MongoDB (replica set), Redis, Kafka (KRaft), kafka-init, Redpanda Console
+- [`docker/compose/docker-compose.apps.yml`](docker/compose/docker-compose.apps.yml) — All application services
+- [`docker/compose/docker-compose.full.yml`](docker/compose/docker-compose.full.yml) — Combined infra + apps
+- [`docker-compose.test.yml`](docker-compose.test.yml) — Test infrastructure
 
 The Compose design separates infra, apps, and full-stack startup so local workflows can be as small or complete as needed.
 
@@ -608,12 +722,12 @@ The Kubernetes baseline uses Kustomize:
 
 ```text
 k8s/
-+-- base/
-+-- overlays/
-|   +-- dev/
-|   +-- staging/
-|   +-- production/
-+-- addons/monitoring/
+├── base/                   # Deployments, Services, ConfigMaps, NetworkPolicies, Ingress
+├── overlays/
+│   ├── dev/
+│   ├── staging/
+│   └── production/
+└── addons/monitoring/      # Optional Prometheus Operator resources
 ```
 
 ```mermaid
@@ -641,7 +755,7 @@ flowchart TD
     Order --> Redis
 ```
 
-Only `user-ui`, `seller-ui`, and `api-gateway` are intended to be public. Internal services stay behind `ClusterIP` services. Stateful production infrastructure is expected to be managed outside the app cluster.
+Only `user-ui`, `seller-ui`, and `api-gateway` are intended to be public. Internal services stay behind `ClusterIP` services. Stateful production infrastructure (MongoDB, Redis, Kafka) is expected to be managed outside the app cluster.
 
 Apply an overlay:
 
@@ -690,15 +804,15 @@ flowchart LR
 
 The shared runtime utilities in [`packages/utils/runtime`](packages/utils/runtime/index.ts) provide:
 
-- structured logging with production JSON output
+- structured logging with production JSON output and human-readable dev format
 - `x-request-id` generation and propagation
 - request completion logs
-- Prometheus-compatible `/metrics`
+- Prometheus-compatible `/metrics` with counter, gauge, and histogram support
 - process uptime and HTTP request metrics
 - standardized `/healthz` and `/readyz`
-- graceful shutdown helpers
+- graceful shutdown helpers with configurable timeout
 
-`kafka-service` adds worker metrics for processing, parse failures, readiness state, and management endpoints.
+`kafka-service` adds worker metrics for processing latency, parse failures, dead-letter counts, readiness state, and management endpoints.
 
 ### Security Baseline
 
@@ -714,29 +828,72 @@ Current safeguards include:
 - Kubernetes non-root execution, dropped capabilities, disabled privilege escalation, runtime-default seccomp, PDB/HPA manifests, and baseline NetworkPolicy resources.
 - Trivy image/filesystem scans, SBOM/provenance generation, Dependabot, and scheduled security workflow.
 
-## Production Readiness Notes
+## Architectural Tradeoffs
 
-The project has a real production-grade foundation, but the README is intentionally candid about remaining maturity work.
+This section is intentionally candid about design decisions and their implications — these are the kinds of points that matter in system design discussions.
+
+### Shared Persistence vs Database Per Service
+
+**Decision**: All services share one MongoDB instance and Prisma client.
+
+**Why**: Dramatically simpler local development, no distributed transactions, consistent typed access. At the current scale, the development velocity gain far outweighs the coupling cost.
+
+**Cost**: Service independence is logical rather than physical. Schema migrations require cross-team coordination. A service can accidentally read another service's data at the ORM level.
+
+**Mitigation path**: Clear code ownership boundaries, documented model contexts, and potential future migration to per-service schemas using MongoDB's multi-database support.
+
+### Kafka For Analytics Only vs Broad Event Bus
+
+**Decision**: Kafka is used exclusively for analytics materialization, not for cross-service domain events.
+
+**Why**: Analytics has a clear async value proposition (user-facing latency decoupling). Expanding Kafka to general domain events would add operational complexity without proportional benefit at current scale.
+
+**Cost**: Cross-service communication still relies on synchronous HTTP calls through the gateway.
+
+### Request-Time Recommendation Scoring vs Offline Model Serving
+
+**Decision**: Recommendations are computed in the request path with caching and TensorFlow-based fallback logic.
+
+**Why**: Simpler infrastructure — no separate model-serving pipeline, no offline batch jobs for scoring.
+
+**Cost**: Recommendation API latency includes scoring time. Scaling recommendation traffic is more expensive than serving from a precomputed index.
+
+### Monorepo vs Multi-Repo
+
+**Decision**: Everything lives in one Nx-managed monorepo.
+
+**Why**: Shared packages are trivial to evolve. Cross-service refactors are atomic. CI uses Nx-aware affected builds to avoid redundant work.
+
+**Cost**: Repo size and cognitive load grow. Shared packages can create accidental coupling if discipline slips.
+
+### Product-Service Scope
+
+**Decision**: `product-service` owns catalog, shops, search, pricing, discounts, events, and offers.
+
+**Why**: These domains are tightly coupled in the business logic — a discount references a product which belongs to a shop.
+
+**Cost**: High blast radius. A bug in discount logic could affect search or event listing.
+
+## Production Readiness
 
 ### Strong Signals
 
-- Clear app and service boundaries.
-- Buyer and seller frontends are separated by persona.
-- Orders and AI workloads are isolated from core catalog logic.
-- Kafka analytics keeps user-facing interactions off the analytics write path.
-- Shared runtime utilities standardize health, readiness, metrics, logging, CORS, security headers, and shutdown.
+- Clear app and service boundaries with intentional decomposition.
+- Buyer and seller frontends separated by persona.
+- Orders and AI workloads isolated from core catalog logic.
+- Kafka analytics pipeline with exactly-once production, DLQ, schema contracts, and health probes.
+- Shared runtime utilities standardize health, readiness, metrics, logging, CORS, security headers, and shutdown across all services.
 - Shared test utilities reduce duplicated mocking and setup.
 - Docker Compose, Dockerfiles, Kustomize overlays, CI, image publishing, scanning, and deployment workflows are present.
+- SASL/SSL-capable Kafka client for production broker authentication.
 
-### Known Tradeoffs And Risks
+### Areas For Future Hardening
 
-- Persistence is shared through one MongoDB schema and Prisma client, so service independence is logical rather than fully physical.
-- `product-service` owns a broad catalog, search, pricing, discount, event, offer, and shop surface; this is convenient but high-blast-radius.
-- Recommendation scoring still happens in the request path with caching/fallbacks rather than a fully offline model-serving pipeline.
-- `aivision-service` combines API routes and Agenda jobs; long-term production scaling may split API and worker roles.
-- Secrets management is environment/Kubernetes-secret based today; external secret management and rotation workflows are future hardening items.
-- Validation is strongest in AI Vision and less uniform across all backend services.
+- Secrets management is environment/Kubernetes-secret based today; external secret management (Vault, AWS Secrets Manager) and rotation workflows are future items.
+- Validation rigor is strongest in AI Vision and the Kafka pipeline; other backend services would benefit from similar Zod coverage.
 - Frontend automated test coverage is not as visible as backend service coverage.
+- Recommendation serving would benefit from a precomputed index or offline model pipeline at higher scale.
+- `aivision-service` combines API routes and Agenda jobs; production scaling may split API and worker roles.
 
 ## Documentation Guide
 
