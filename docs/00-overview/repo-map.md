@@ -106,8 +106,8 @@ The repo also includes Nx e2e projects for several backend services:
 
 ## Infrastructure and Workflow Definitions
 
-- `libs/docker-compose.yml`
-  - local Kafka, Zookeeper, and Kafka UI setup
+- `docker/compose/docker-compose.infra.yml`
+  - local MongoDB, Redis, Kafka (KRaft), kafka-init, and Redpanda Console setup
 
 - `.github/workflows/test.yml`
   - CI workflow for unit, integration, coverage, build, and e2e execution

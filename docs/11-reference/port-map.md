@@ -14,10 +14,9 @@ This map documents the ports referenced by the current codebase and local infras
 | `6005` | `recommendation-service` | Recommendation API |
 | `6006` | `aivision-service` | AI Vision API |
 | `8080` | `api-gateway` | Client-facing backend entry point |
-| `8089` | Kafka UI | Local browser-based Kafka inspection UI |
+| `8089` | Redpanda Console | Local browser-based Kafka inspection UI (replaces archived provectuslabs/kafka-ui) |
 | `9092` | Kafka | Broker endpoint |
 | `9093` | Kafka controller | Internal controller listener in local Compose |
-| `2181` | Zookeeper | Local Kafka dependency in Compose |
 | `6379` | Redis | Default local Redis port |
 | `27017` | MongoDB | Default local MongoDB port |
 

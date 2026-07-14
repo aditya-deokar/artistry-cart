@@ -109,7 +109,7 @@ Checks:
 
 Checks:
 
-- confirm Kafka is running from `libs/docker-compose.yml`
+- confirm Kafka is running from `docker/compose/docker-compose.infra.yml`
 - confirm `KAFKA_BROKERS` matches the broker endpoint
 - confirm `KAFKA_USER_EVENTS_TOPIC` exists or can be auto-created
 - confirm `kafka-service` is running if you expect analytics ingestion to happen

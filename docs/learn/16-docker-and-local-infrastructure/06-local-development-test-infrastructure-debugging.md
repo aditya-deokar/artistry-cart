@@ -36,7 +36,7 @@ docker compose -f docker/compose/docker-compose.infra.yml up -d
 Start Kafka-specific local setup:
 
 ```bash
-docker compose -f libs/docker-compose.yml up -d
+docker compose -f docker/compose/docker-compose.infra.yml up -d
 ```
 
 Start test infra:

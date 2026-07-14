@@ -97,16 +97,16 @@ pnpm test:error-handler
 
 ## Local Infra Workflow
 
-Start Kafka infrastructure:
+Start local infrastructure (MongoDB, Redis, Kafka, Redpanda Console):
 
 ```bash
-docker compose -f libs/docker-compose.yml up -d
+docker compose -f docker/compose/docker-compose.infra.yml up -d
 ```
 
-Stop Kafka infrastructure:
+Stop local infrastructure:
 
 ```bash
-docker compose -f libs/docker-compose.yml down
+docker compose -f docker/compose/docker-compose.infra.yml down
 ```
 
 ## Prisma Workflow
@@ -170,7 +170,7 @@ And ensure AI/ImageKit environment variables are present.
 Use:
 
 ```bash
-docker compose -f libs/docker-compose.yml up -d
+docker compose -f docker/compose/docker-compose.infra.yml up -d
 pnpm exec nx serve kafka-service
 pnpm exec nx serve recommendation-service
 ```

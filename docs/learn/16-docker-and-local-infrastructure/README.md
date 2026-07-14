@@ -56,6 +56,6 @@ Artistry Cart includes:
 - `docker/compose/docker-compose.infra.yml`
 - `docker/compose/docker-compose.apps.yml`
 - `docker/compose/docker-compose.full.yml`
-- `libs/docker-compose.yml` for local Kafka/Kafka UI style setup
+- `docker/compose/docker-compose.infra.yml` for local infrastructure (MongoDB, Redis, Kafka, Redpanda Console)
 - `docker-compose.test.yml` for test MongoDB and Redis
 
