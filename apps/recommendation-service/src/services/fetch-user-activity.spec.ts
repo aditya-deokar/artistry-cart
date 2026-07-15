@@ -60,7 +60,7 @@ describe('getUserActivity', () => {
   });
 
   it('should return empty array on Prisma error', async () => {
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     prismaMock.userAnalytics.findUnique.mockRejectedValue(
       new Error('DB connection failed')
     );
@@ -69,8 +69,7 @@ describe('getUserActivity', () => {
 
     expect(result).toEqual([]);
     expect(consoleSpy).toHaveBeenCalledWith(
-      'Error fetching user activity :',
-      expect.any(Error)
+      expect.stringContaining('Error fetching user activity')
     );
     consoleSpy.mockRestore();
   });
